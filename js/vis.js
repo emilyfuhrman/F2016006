@@ -68,7 +68,7 @@ var init = function(){
 
 				d.pos.x -=self.hex_w/2;
 				d.pos.y -=self.hex_h/2;
-				console.log(d.pos);
+				//console.log(d.pos);
 			});
 
 			self.generate();
