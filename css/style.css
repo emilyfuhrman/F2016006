@@ -28,6 +28,12 @@ svg {
 	padding:0;
 	}
 
+.hexmesh {
+	fill:none;
+	stroke:white;
+	stroke-width:0.5;
+	}
+
 .hex {
 	fill:white;
 	stroke:white;
