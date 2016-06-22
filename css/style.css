@@ -89,6 +89,7 @@ div {
 	----------------------------- */
 
 #form {
+	visibility:visible;
 	opacity:1;
 	position:absolute;
 	background:white;
@@ -97,6 +98,7 @@ div {
 	margin:0 auto;
 	}
 #form.hidden {
+	visibility:hidden;
 	opacity:0;
 	}
 
