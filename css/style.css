@@ -20,7 +20,7 @@ div {
 	height:100%;
 	}
 
-/*	TITLE & ANNOTATIONS
+/*	TITLE & NAVIGATION
 	----------------------------- */
 
 .nav {
@@ -33,14 +33,45 @@ div {
 #title {
 	font-size:0.8rem;
 	left:15px;
-	top:18px;
+	top:24px;
+	}
+
+#menu {
+	}
+
+#menu .btn {
+	position:absolute;
+	color:white;
+	font-size:0.6rem;
+	/*padding:6px 15px;*/
+	top:54px;
+	border:1px solid white;
+	cursor:pointer;
+	}
+#menu .btn.view {
+	padding:6px 0 6px 30px;
+	width:90px;
+	border-radius:15px;
+	}
+
+#menu .btn#mode {
+	background:url(../assets/icon_switch.svg) no-repeat 6px 5px;
+	background-size:16px 16px;
+	right:15px;
+	}
+
+#menu .btn#add {
+	background:url(../assets/icon_add.svg) no-repeat 8px 6px;
+	background-size:14px 14px;
+	right:15px;
+	top:90px;
 	}
 
 #anno {
 	width:500px;
 	font-size:0.6rem;
 	right:15px;
-	bottom:18px;
+	bottom:24px;
 	}
 
 #anno #comment {
@@ -52,6 +83,58 @@ div {
 	width:100%;
 	padding-top:15px;
 	border-top:1px solid white;
+	}
+
+/*	FORM
+	----------------------------- */
+
+#form {
+	opacity:1;
+	position:absolute;
+	background:white;
+	width:500px;
+	height:400px;
+	margin:0 auto;
+	}
+#form.hidden {
+	opacity:0;
+	}
+
+#form select {
+	width:120px;
+	}
+
+#form button {
+	cursor:pointer;
+	}
+
+#form .section {
+	width:100%;
+	padding:30px 0;
+	border-top:1px solid gray;
+	}
+
+#form .elem {
+	padding:30px 24px;
+	font-size:0.6rem;
+	}
+
+#form .elem#header {
+	font-size:1rem;
+	margin-left:24px;
+	padding:24px 0;
+	}
+
+#form .row {
+	width:100%;
+	float:left;
+	}
+
+#form .tag {
+	color:gray;
+	font-size:0.5rem;
+	letter-spacing:1px;
+	text-transform:uppercase;
 	}
 
 /*	VIS

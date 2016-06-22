@@ -5,7 +5,11 @@ var init = function(){
 		data:null,
 
 		//default mode
-		mode:'math',
+		mode:0,
+		modes:[
+			'math',
+			'science'
+		],
 
 		//default view
 		view:0,
@@ -19,10 +23,10 @@ var init = function(){
 		hex_h:26,
 		hex_sideLength:15,
 
-		colors:{
-			'math':'#3366cc',
-			'science':'#85B800'
-		},
+		colors:[
+			'#3366cc',
+			'#85B800'
+		],
 
 		//path_hex:"M0,15L7.5,2h15L30,15l-7.5,13h-15L0,15z",
 
@@ -55,15 +59,51 @@ var init = function(){
 			self.w = window.innerWidth;
 			self.h = window.innerHeight;
 
-			self.svg = d3.select('#container').append('svg')
+			self.svg = d3.select('#container').selectAll('svg.vis')
+				.data([self]);
+			self.svg.enter().append('svg')
+				.classed('vis',true);
+			self.svg
 				.style('background',self.colors[self.mode]);
+			self.svg
+				.on('click',function(){
+					form_hide();
+				});
+			self.svg.exit().remove();
 
+			//grab all annotation elements
 			self.anno_comment = d3.select('#comment');
 			self.anno_userDetail = d3.select('#anno #detail #user');
 			self.anno_tweet = d3.select('#anno #detail #twitter');
 
-			//update title to reflect current mode
-			d3.select('#title span.mode').text(util_toTitleCase(self.mode));
+			//grab form and inputs
+			self.form = d3.select('#form')
+				.classed('hidden',true)
+				.style('left',self.w/2 -250 +'px')
+				.style('top','150px')
+				;
+
+			//grab buttons, add click handlers
+			self.mode_switch = d3.select('#menu .btn#mode').on('click',function(){
+				d3.event.stopPropagation();
+				self.mode = 1 -self.mode;
+				self.generate();
+			});
+			self.add = d3.select('#menu .btn#add').on('click',function(){
+				d3.event.stopPropagation();
+				form_show();
+			});
+			self.form_submit = d3.select('#form #submit').on('click',function(){
+        		d3.event.preventDefault();
+				d3.event.stopPropagation();
+			});
+
+			//update all mode spans to reflect current mode
+			d3.select('#title .mode').text(util_toTitleCase(self.modes[self.mode]));
+			d3.select('#form .mode').text(self.modes[self.mode]);
+
+			//update switch button to reflect opposite mode
+			d3.select('#menu span.mode_opp').text(self.modes[1 -self.mode]);
 
 			//**TODO -- determine number of rings to calculate positions for
 
@@ -73,6 +113,17 @@ var init = function(){
 			var hex_rad = 8,
 				hex_rad_hov = hex_rad*2.25;
 
+			//INITIALIZE VARIABLES
+			//this is just used to neatly generate a hexagon path
+			var hexbin = d3.hexbin();
+			var hexTTG,
+				hexTTback,
+				hexTT;
+			var hexG,
+				hexesG,
+				hexes;
+
+			//INITIALIZE FUNCTIONS
 			//convert cube coordinates to pixel coordinates
 			function util_cubeToPix(_cube){
 				var obj = {};
@@ -116,6 +167,16 @@ var init = function(){
 				self.anno_tweet.html('');
 			}
 
+			function form_show(){
+				self.form.classed('hidden',false);
+			}
+			function form_clear(){
+
+			}
+			function form_hide(){
+				self.form.classed('hidden',true);
+			}
+
 			//generate cube coordinates for data points
 			//thank you, http://stackoverflow.com/questions/2049196/generating-triangular-hexagonal-coordinates-xyz
 			var cube_coords = [];
@@ -135,16 +196,6 @@ var init = function(){
 			self.data.forEach(function(d,i){
 				d.pos.pixel = util_cubeToPix(cube_coords[i]);
 			});
-
-			//hexagon logic
-			//this is just used to neatly generate a hexagon path
-			var hexbin = d3.hexbin();
-			var hexTTG,
-				hexTTback,
-				hexTT;
-			var hexG,
-				hexesG,
-				hexes;
 
 			hexG = self.svg.selectAll('g.hexG')
 				.data([self.data]);

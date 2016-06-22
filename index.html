@@ -14,13 +14,35 @@
 </head>
 <body>
 	<div id='container'></div>
-	<div class='nav' id='title'><span class='mode'>Math</span> class: LOVE or HATE?</div>
+	<div class='nav' id='title'><span class='mode'></span> class: LOVE or HATE?</div>
+	<div id='menu'>
+		<div class='btn view' id='mode'>View <span class='mode_opp'></span></div>
+		<div class='btn view' id='add'>Submit data</div>
+	</div>
 	<div class='nav' id='anno'>
 		<div id='comment'></div>
 		<div id='detail'>
 			<div id='user'>Hover over a hexagon for detail.</div>
 			<div id='twitter'></div>
 		</div>
+	</div>
+	<div id='form' class='hidden'>
+		<div class='elem' id='header'>Rate your <span class='mode'></span> class:</div>
+		<form class='elem'>
+			<div class='section'>
+  				<div class='row'><span class='tag'>Gender:</span> <input type="radio" name="gender" value="female"> Female <input type="radio" name="gender" value="male"> Male</div>
+  				<div class='row'><span class='tag'>Country:</span> <select></select></div>
+  				<div class='row'><span class='tag'>Current age:</span> <select></select></div>
+  			</div>
+			<div class='section'>
+  				<div class='row'><span class='tag'>When did you take this class?</span> <select></select></div>
+  				<div class='row'><span class='tag'>Rating:</span> <select></select></div>
+  				<div class='row'><span class='tag'>Describe your experience:</span> <textarea></textarea></div>
+  			</div>
+  			<div class='section'>
+  				<button id='submit'>Submit</button>
+  			</div>
+		</form>
 	</div>
 	<script type='text/javascript' src='js/vis.js'></script>
 </body>
