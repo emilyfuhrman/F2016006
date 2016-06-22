@@ -28,6 +28,20 @@ svg {
 	padding:0;
 	}
 
+.hexTTG {
+	opacity:1;
+	pointer-events:none;
+	}
+.hexTTG.hidden {
+	opacity:0;
+	}
+.hexTTG .hexTTback {
+	}
+.hexTTG .hexTT {
+	fill:white;
+	stroke-width:3;
+	}
+
 .hex {
 	fill:white;
 	stroke:white;
