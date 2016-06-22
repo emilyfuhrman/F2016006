@@ -16,7 +16,8 @@ var init = function(){
 		hex_sideLength:15,
 
 		colors:{
-			'math':'#3366cc'
+			'math':'#3366cc',
+			'science':'#85B800'
 		},
 
 		path_hex:"M0,15L7.5,2h15L30,15l-7.5,13h-15L0,15z",
@@ -37,43 +38,6 @@ var init = function(){
 				return d3.descending(a.rating,b.rating);
 			});
 
-			//store (basic) position of each data point
-			//doesn't take into account actual size; just distance from origin
-			//thank you, http://www.redblobgames.com/grids/hexagons/
-			/*var origin = {
-				'x':window.innerWidth/2,
-				'y':window.innerHeight/2
-			};
-
-			var row = 0;
-			var coords = [
-				{'x': 0, 'y': 1, 'z':-1},
-				{'x': 1, 'y': 0, 'z':-1},
-				{'x': 1, 'y':-1, 'z': 0},
-				{'x': 0, 'y':-1, 'z': 1},
-				{'x':-1, 'y': 0, 'z': 1},
-				{'x':-1, 'y': 1, 'z': 0}
-			];
-
-			self.data.forEach(function(d,i){
-				d.pos = {};
-
-				//create deep copy
-				var c = jQuery.extend(true,{},coords[i%6]);
-				var f = self.hex_h;
-
-				c.x *=f;
-				c.y *=f;
-				c.z *=f;
-
-				d.pos.x = i === 0 ? origin.x : origin.x +c.x;// -(c.x*0.125);
-				d.pos.y = i === 0 ? origin.y : origin.y +(c.z +(c.x + (c.x&1))/2);
-
-				d.pos.x -=self.hex_w/2;
-				d.pos.y -=self.hex_h/2;
-				//console.log(d.pos);
-			});*/
-
 			self.generate();
 		},
 		generate:function(){
@@ -83,6 +47,7 @@ var init = function(){
 			self.svg = d3.select('#container').append('svg')
 				.style('background',self.colors[self.mode]);
 
+			//**TODO
 			//maximum radius of the hexagon group
 			//var max_vis_r = window.innerHeight/3;
 
@@ -97,8 +62,29 @@ var init = function(){
 				'y':window.innerHeight/2
 			};
 			var hexbin = d3.hexbin()
-				.size([self.h,self.w])
-				.radius(20);
+				//.size([self.h,self.w])
+				.size([self.w*0.8,self.h*0.75])
+				.radius(12);
+			var hexbin_pos = hexbin.centers();
+
+			//**TODO sort hex data into spiral
+			
+			var hexbin_med_x = hexbin_pos[Math.floor(hexbin_pos.length/3)][0],//d3.median(hexbin_pos,function(d){ return d[0]; }),	//center hexagon, x-value
+				hexbin_med_y = hexbin_pos[Math.floor(hexbin_pos.length/3)][1];//d3.median(hexbin_pos,function(d){ return d[1]; });	//center hexagon, y-value
+
+			//hexify data
+			self.data.forEach(function(d,i){
+				d.pos = {};
+				d.pos.x = i === 0 ? hexbin_med_x : hexbin_pos[i][0];
+				d.pos.y = i === 0 ? hexbin_med_y : hexbin_pos[i][1];
+			});
+
+			//spiral, from http://www.redblobgames.com/grids/hexagons/#rings
+			// function cube_spiral(center, radius):
+			//     var results = [center]
+			//     for each 1 ≤ k ≤ radius:
+			//         results = results + cube_ring(center, k)
+			//     return results
 
 			var hexG,
 				hexmesh,
@@ -107,16 +93,16 @@ var init = function(){
 				.data([self.data]);
 			hexG.enter().append('g')
 				.classed('hexG',true);
-			hexG
-				.attr('transform','translate(' +self.w +',0)rotate(90)');
+			/*hexG
+				.attr('transform','translate(' +self.w +',0)rotate(90)');*/
 			hexG.exit().remove();
-			hexmesh = hexG.selectAll('path.hexmesh')
-				.data([self.data]);
+			/*hexmesh = hexG.selectAll('path.hexmesh')
+				.data(function(d){ return [d]; });
 			hexmesh.enter().append('path')
 				.classed('hexmesh',true);
 			hexmesh
 				.attr('d',hexbin.mesh);
-			hexmesh.exit().remove();
+			hexmesh.exit().remove();*/
 			hexes = hexG.selectAll('path.hex')
 				.data(function(d){ return d; });
 			hexes.enter().append('path')
@@ -124,13 +110,18 @@ var init = function(){
 			hexes
 				.attr('d',hexbin.hexagon())
 				.attr('transform',function(d,i){
-					return 'translate(' +d +')';
+					var x = d.pos.x +(self.w*0.1),
+						y = d.pos.y +(self.h*0.125);
+					return 'translate(' +x +',' +y +')';
 				})
 				.style('stroke',self.colors[self.mode])
 				.style('fill-opacity',function(d){
 					return d.rating/5;
 				});
 			hexes.exit().remove();
+		},
+		resize:function(){
+			//**TODO
 		}
 	}
 }
