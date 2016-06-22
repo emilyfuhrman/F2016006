@@ -63,7 +63,8 @@ var init = function(){
 			//**TODO -- determine how to size hexagons in order for the group to fit nicely on a screen
 
 			//**TODO -- calculate correct radius for hexagon group
-			var hex_rad = 8;
+			var hex_rad = 9,
+				hex_rad_hov = hex_rad*2.25;
 
 			//convert cube coordinates to pixel coordinates
 			function coords_cube_to_pix(_cube){
@@ -108,8 +109,7 @@ var init = function(){
 
 			//hexagon logic
 			//this is just used to neatly generate a hexagon path
-			var hexbin = d3.hexbin().radius(hex_rad),
-				hexbinLG = d3.hexbin().radius(hex_rad*2);
+			var hexbin = d3.hexbin();
 			var hexTTG,
 				hexTTback,
 				hexTT;
@@ -145,7 +145,7 @@ var init = function(){
 			hexes.enter().append('path')
 				.classed('hex',true);
 			hexes
-				.attr('d',hexbin.hexagon())
+				.attr('d',hexbin.hexagon(hex_rad))
 				.style('stroke',self.colors[self.mode])
 				.style('fill-opacity',function(d){
 					return d.rating/5;
@@ -176,7 +176,7 @@ var init = function(){
 			hexTTback.enter().append('path')
 				.classed('hexTTback',true);
 			hexTTback
-				.attr('d',hexbinLG.hexagon())
+				.attr('d',hexbin.hexagon(hex_rad_hov))
 				.style('fill',self.colors[self.mode])
 				;
 			hexTTback.exit().remove();
@@ -185,7 +185,7 @@ var init = function(){
 			hexTT.enter().append('path')
 				.classed('hexTT',true);
 			hexTT
-				.attr('d',hexbinLG.hexagon())
+				.attr('d',hexbin.hexagon(hex_rad_hov))
 				.style('stroke',self.colors[self.mode]);
 			hexTT.exit().remove();
 		},
