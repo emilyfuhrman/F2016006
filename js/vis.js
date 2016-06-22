@@ -58,16 +58,23 @@ var init = function(){
 			self.svg = d3.select('#container').append('svg')
 				.style('background',self.colors[self.mode]);
 
+			self.anno_comment = d3.select('#comment');
+			self.anno_userDetail = d3.select('#anno #detail #user');
+			self.anno_tweet = d3.select('#anno #detail #twitter');
+
+			//update title to reflect current mode
+			d3.select('#title span.mode').text(util_toTitleCase(self.mode));
+
 			//**TODO -- determine number of rings to calculate positions for
 
 			//**TODO -- determine how to size hexagons in order for the group to fit nicely on a screen
 
 			//**TODO -- calculate correct radius for hexagon group
-			var hex_rad = 9,
+			var hex_rad = 8,
 				hex_rad_hov = hex_rad*2.25;
 
 			//convert cube coordinates to pixel coordinates
-			function coords_cube_to_pix(_cube){
+			function util_cubeToPix(_cube){
 				var obj = {};
 				var s = hex_rad;
 
@@ -87,6 +94,28 @@ var init = function(){
 				return obj;
 			}
 
+			//thank you, http://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
+			function util_toTitleCase(_str){
+			    return _str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+			}
+
+			function util_resolveGender(_g){
+				return _g.toLowerCase() === 'f' ? 'Female' : 'Male';
+			}
+
+			function detail_update(_d){
+				var str_comment = '&ldquo;' +_d.comment +'&rdquo;',
+					str_userDetail = 'Grade ' +_d.grade +' rating: ' +_d.rating +'/5 &#124; ' +util_resolveGender(_d.gender) +', ' +_d.age +', ' +_d.location;
+				self.anno_comment.html(str_comment);
+				self.anno_userDetail.html(str_userDetail);
+			}
+			function detail_clear(){
+				var str_userDetail = 'Hover over a hexagon for detail.'
+				self.anno_comment.html('');
+				self.anno_userDetail.html(str_userDetail);
+				self.anno_tweet.html('');
+			}
+
 			//generate cube coordinates for data points
 			//thank you, http://stackoverflow.com/questions/2049196/generating-triangular-hexagonal-coordinates-xyz
 			var cube_coords = [];
@@ -104,7 +133,7 @@ var init = function(){
 			}
 			//convert to pixel coordinates
 			self.data.forEach(function(d,i){
-				d.pos.pixel = coords_cube_to_pix(cube_coords[i]);
+				d.pos.pixel = util_cubeToPix(cube_coords[i]);
 			});
 
 			//hexagon logic
@@ -127,6 +156,7 @@ var init = function(){
 			hexG
 				.on('mouseout',function(d){
 					hexTTG.classed('hidden',true);
+					detail_clear();
 				});
 			hexG.exit().remove();
 			hexesG = hexG.selectAll('g.hexesG')
@@ -162,6 +192,7 @@ var init = function(){
 						});
 					hexTT
 						.style('fill-opacity',o);
+					detail_update(d);
 				});
 			hexes.exit().remove();
 
@@ -170,6 +201,8 @@ var init = function(){
 				.data([self.data]);
 			hexTTG.enter().append('g')
 				.classed('hexTTG',true);
+			hexTTG
+				.classed('hidden',true);
 			hexTTG.exit().remove();
 			hexTTback = hexTTG.selectAll('path.hexTTback')
 				.data(function(d){ return [d]; });

@@ -2,7 +2,8 @@ html,
 body {
 	width:100%;
 	height:100%;
-	background:gray;
+	font-family:'Arial',sans-serif;
+	font-size:20px;
 	margin:0;
 	padding:0;
 	}
@@ -19,6 +20,43 @@ div {
 	height:100%;
 	}
 
+/*	TITLE & ANNOTATIONS
+	----------------------------- */
+
+.nav {
+	position:absolute;
+	color:white;
+	fill:white;
+	letter-spacing:0.025rem;
+	}
+
+#title {
+	font-size:0.8rem;
+	left:15px;
+	top:18px;
+	}
+
+#anno {
+	width:500px;
+	font-size:0.6rem;
+	right:15px;
+	bottom:18px;
+	}
+
+#anno #comment {
+	font-family:'Georgia', serif;
+	padding-bottom:15px;
+	}
+
+#anno #detail {
+	width:100%;
+	padding-top:15px;
+	border-top:1px solid white;
+	}
+
+/*	VIS
+	----------------------------- */
+
 svg {
 	display:block;
 	background:blue;
@@ -26,6 +64,7 @@ svg {
 	height:100%;
 	margin:0;
 	padding:0;
+	shape-rendering:geometricPrecision;
 	}
 
 .hexTTG {
