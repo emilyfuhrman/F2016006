@@ -20,7 +20,7 @@ var init = function(){
 			'science':'#85B800'
 		},
 
-		path_hex:"M0,15L7.5,2h15L30,15l-7.5,13h-15L0,15z",
+		//path_hex:"M0,15L7.5,2h15L30,15l-7.5,13h-15L0,15z",
 
 		getData:function(_callback){
 			d3.csv('data/dummy_full.csv',function(e,d){
@@ -31,8 +31,13 @@ var init = function(){
 		processData:function(){
 
 			//make rating into number
+			//set placeholder positions
 			self.data.forEach(function(d){
 				d.rating = +d.rating;
+
+				d.pos = {};
+				d.pos.cube = {};
+				d.pos.pixel  = {};
 			});
 			self.data.sort(function(a,b){
 				return d3.descending(a.rating,b.rating);
@@ -40,6 +45,8 @@ var init = function(){
 
 			self.generate();
 		},
+
+		//thanks for all the help, http://www.redblobgames.com/grids/hexagons/!
 		generate:function(){
 			self.w = window.innerWidth;
 			self.h = window.innerHeight;
@@ -49,42 +56,59 @@ var init = function(){
 
 			//**TODO
 			//maximum radius of the hexagon group
-			//var max_vis_r = window.innerHeight/3;
+			//var hex_rad = window.innerHeight/3;
+			//hardcode for now
+			var hex_rad = 9;
 
 			//calculate the size an individual hexagon should be
 			//based on the length of the full dataset
-			function calc_hexsize(){
+			function calc_hexSize(){
 
 			}
 
-			var origin = {
-				'x':window.innerWidth/2,
-				'y':window.innerHeight/2
-			};
-			var hexbin = d3.hexbin()
-				//.size([self.h,self.w])
-				.size([self.w*0.8,self.h*0.75])
-				.radius(12);
-			var hexbin_pos = hexbin.centers();
+			//convert cube coordinates to pixel coordinates
+			function coords_cube_to_pix(_cube){
+				var obj = {};
+				var s = hex_rad;
 
-			//**TODO sort hex data into spiral
-			
-			var hexbin_med_x = hexbin_pos[Math.floor(hexbin_pos.length/3)][0],//d3.median(hexbin_pos,function(d){ return d[0]; }),	//center hexagon, x-value
-				hexbin_med_y = hexbin_pos[Math.floor(hexbin_pos.length/3)][1];//d3.median(hexbin_pos,function(d){ return d[1]; });	//center hexagon, y-value
+				obj.x = _cube.x%1 === 1 ? Math.sqrt(3) * s * (_cube.z/2 +_cube.x) : -Math.sqrt(3) * s * (_cube.z/2 +_cube.y);
+				obj.y = 3/2 * s * _cube.z;
 
-			//hexify data
+				// thank you, http://stackoverflow.com/questions/2459402/hexagonal-grid-coordinates-to-pixel-coordinates?rq=1
+				// y = 3/2 * s * b
+				// b = 2/3 * y / s
+				// x = sqrt(3) * s * ( b/2 + r)
+				// x = - sqrt(3) * s * ( b/2 + g )
+				// r = (sqrt(3)/3 * x - y/3 ) / s
+				// g = -(sqrt(3)/3 * x + y/3 ) / s
+
+				// r + b + g = 0
+
+				return obj;
+			}
+
+			//this is really just for getting a hexagon path
+			var hexbin = d3.hexbin().radius(hex_rad);
+
+			//generate cube coordinates for data points
+			//thank you, http://stackoverflow.com/questions/2049196/generating-triangular-hexagonal-coordinates-xyz
+			var cube_coords = [];
+			for(var i=0; i<50; i++){
+				for(var j=-i; j<=i; j++)
+				for(var k=-i; k<=i; k++)
+				for(var l=-i; l<=i; l++)
+					if(Math.abs(j) +Math.abs(k) +Math.abs(l) == i*2 && j +k +l == 0){
+						var obj = {};
+						obj.x =j;
+						obj.y =k;
+						obj.z =l;
+						cube_coords.push(obj);
+					}
+			}
+			//convert to pixel coordinates
 			self.data.forEach(function(d,i){
-				d.pos = {};
-				d.pos.x = i === 0 ? hexbin_med_x : hexbin_pos[i][0];
-				d.pos.y = i === 0 ? hexbin_med_y : hexbin_pos[i][1];
+				d.pos.pixel = coords_cube_to_pix(cube_coords[i]);
 			});
-
-			//spiral, from http://www.redblobgames.com/grids/hexagons/#rings
-			// function cube_spiral(center, radius):
-			//     var results = [center]
-			//     for each 1 ≤ k ≤ radius:
-			//         results = results + cube_ring(center, k)
-			//     return results
 
 			var hexG,
 				hexmesh,
@@ -93,16 +117,15 @@ var init = function(){
 				.data([self.data]);
 			hexG.enter().append('g')
 				.classed('hexG',true);
-			/*hexG
-				.attr('transform','translate(' +self.w +',0)rotate(90)');*/
+			hexG
+				.attr('transform','translate(' +self.w/2 +',' +self.h/2 +')rotate(90)')
+				/*.attr('transform',function(){
+					var x = self.w/2,
+						y = self.h/2;
+					return 'translate(' +x +',' +y +')';
+				})*/
+				;
 			hexG.exit().remove();
-			/*hexmesh = hexG.selectAll('path.hexmesh')
-				.data(function(d){ return [d]; });
-			hexmesh.enter().append('path')
-				.classed('hexmesh',true);
-			hexmesh
-				.attr('d',hexbin.mesh);
-			hexmesh.exit().remove();*/
 			hexes = hexG.selectAll('path.hex')
 				.data(function(d){ return d; });
 			hexes.enter().append('path')
@@ -110,8 +133,8 @@ var init = function(){
 			hexes
 				.attr('d',hexbin.hexagon())
 				.attr('transform',function(d,i){
-					var x = d.pos.x +(self.w*0.1),
-						y = d.pos.y +(self.h*0.125);
+					var x = d.pos.pixel.x ? d.pos.pixel.x : 0,
+						y = d.pos.pixel.y ? d.pos.pixel.y : 0;
 					return 'translate(' +x +',' +y +')';
 				})
 				.style('stroke',self.colors[self.mode])
