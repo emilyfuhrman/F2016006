@@ -103,7 +103,7 @@ var init = function(){
 			self.mode_switch = d3.select('#menu .btn#mode').on('click',function(){
 				d3.event.stopPropagation();
 				filters_clear();
-				
+
 				self.mode = 1 -self.mode;
 				self.generate();
 			});
@@ -135,8 +135,12 @@ var init = function(){
 				} else{
 					self.filters = self.filters.filter(function(d){ return d !== btn_id; });
 				}
-
-				self.btn_filters_clear.classed('visible',true);
+				if(self.filters.length === 0){
+					filters_clear();
+				} else{
+					self.btn_filters_clear.classed('visible',true);
+				}
+				
 				btn
 					.classed('selected',!btn_selected)
 					.style('color',function(){ return btn_selected ? 'white' : self.colors[self.mode]; });
