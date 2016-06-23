@@ -2,7 +2,8 @@ var init = function(){
 
 	return {
 
-		data:null,
+		data:{},
+		data_display:null,
 
 		//default mode
 		mode:0,
@@ -11,8 +12,8 @@ var init = function(){
 			'science'
 		],
 
-		//default view
-		view:0,
+		//holds any selected filters
+		filters:[],
 
 		w:window.innerWidth,
 		h:window.innerHeight,
@@ -31,27 +32,38 @@ var init = function(){
 		//path_hex:"M0,15L7.5,2h15L30,15l-7.5,13h-15L0,15z",
 
 		getData:function(_callback){
-			d3.csv('data/dummy_full.csv',function(e,d){
-				self.data = d;
-				_callback();
+			var datasets = ['math','science'];
+			datasets.forEach(function(d){
+				d3.csv('data/dummy_full_' +d +'.csv',function(e,_d){
+					self.data[d] = _d;
+					datasets = datasets.filter(function(__d){ return __d !== d; });
+					if(datasets.length === 0){
+						_callback();
+					}
+				});
 			});
 		},
 		processData:function(){
 
 			//make rating into number
 			//create position placeholders
-			self.data.forEach(function(d){
-				d.rating = +d.rating;
+			self.modes.forEach(function(d){
+				self.data[d].forEach(function(_d){
+					_d.rating = +_d.rating;
 
-				d.pos = {};
-				d.pos.cube  = {};
-				d.pos.pixel = {};
-			});
-			self.data.sort(function(a,b){
-				return d3.descending(a.rating,b.rating);
+					_d.pos = {};
+					_d.pos.cube  = {};
+					_d.pos.pixel = {};
+				});
+				self.data[d].sort(function(a,b){
+					return d3.descending(a.rating,b.rating);
+				});
 			});
 
 			self.generate();
+		},
+		filterData:function(){
+			return self.data[self.modes[self.mode]];
 		},
 
 		//thanks for all the help, http://www.redblobgames.com/grids/hexagons/!
@@ -76,16 +88,22 @@ var init = function(){
 			self.anno_userDetail = d3.select('#anno #detail #user');
 			self.anno_tweet = d3.select('#anno #detail #twitter');
 
-			//grab form and inputs
+			//grab forms and inputs
 			self.form = d3.select('#form')
 				.classed('hidden',true)
 				.style('left',self.w/2 -250 +'px')
 				.style('top','150px')
 				;
+			self.form_tweet = d3.select('#form_tweet')
+				.classed('hidden',true)
+				.style('left',self.w/2 -250 +'px')
+				.style('top','150px');
 
 			//grab buttons, add click handlers
 			self.mode_switch = d3.select('#menu .btn#mode').on('click',function(){
 				d3.event.stopPropagation();
+				filters_clear();
+				
 				self.mode = 1 -self.mode;
 				self.generate();
 			});
@@ -96,6 +114,36 @@ var init = function(){
 			self.form_submit = d3.select('#form #submit').on('click',function(){
         		d3.event.preventDefault();
 				d3.event.stopPropagation();
+				form_submit();
+			});
+			self.form_submit = d3.select('#submit_tweet').on('click',function(){
+        		d3.event.preventDefault();
+				d3.event.stopPropagation();
+				form_submit_tweet();
+			});
+
+			//grab buttons (filters), add click handlers
+			self.btn_filters = d3.selectAll('.btn.filter').on('click',function(){
+				d3.event.stopPropagation();
+
+				var btn = d3.select(this),
+					btn_id = btn.attr('id'),
+					btn_selected = btn.classed('selected');
+
+				if(self.filters.indexOf(btn_id) <0){
+					self.filters.push(btn_id);
+				} else{
+					self.filters = self.filters.filter(function(d){ return d !== btn_id; });
+				}
+
+				self.btn_filters_clear.classed('visible',true);
+				btn
+					.classed('selected',!btn_selected)
+					.style('color',function(){ return btn_selected ? 'white' : self.colors[self.mode]; });
+			});
+			self.btn_filters_clear = d3.select('#clear').on('click',function(){
+				d3.event.stopPropagation();
+				filters_clear();
 			});
 
 			//update all mode spans to reflect current mode
@@ -167,6 +215,16 @@ var init = function(){
 				self.anno_tweet.html('');
 			}
 
+			function filters_clear(){
+				self.filters = [];
+
+				self.btn_filters_clear.classed('visible',false);
+				self.btn_filters
+					.classed('selected',false)
+					.style('color','white')
+					;
+			}
+
 			function form_show(){
 				self.form.classed('hidden',false);
 			}
@@ -175,6 +233,14 @@ var init = function(){
 			}
 			function form_hide(){
 				self.form.classed('hidden',true);
+				self.form_tweet.classed('hidden',true);
+			}
+			function form_submit(){
+				self.form.classed('hidden',true);
+				self.form_tweet.classed('hidden',false);
+			}
+			function form_submit_tweet(){
+				self.form_tweet.classed('hidden',true);
 			}
 
 			//generate cube coordinates for data points
@@ -193,12 +259,14 @@ var init = function(){
 					}
 			}
 			//convert to pixel coordinates
-			self.data.forEach(function(d,i){
+			self.data[self.modes[self.mode]].forEach(function(d,i){
 				d.pos.pixel = util_cubeToPix(cube_coords[i]);
 			});
 
+			self.data_display = self.filters.length === 0 ? self.data[self.modes[self.mode]] : self.filterData();
+
 			hexG = self.svg.selectAll('g.hexG')
-				.data([self.data]);
+				.data([self.data_display]);
 			hexG.enter().append('g')
 				.classed('hexG',true);
 			hexG
@@ -249,7 +317,7 @@ var init = function(){
 
 			//create tooltip group
 			hexTTG = hexG.selectAll('g.hexTTG')
-				.data([self.data]);
+				.data([self.data_display]);
 			hexTTG.enter().append('g')
 				.classed('hexTTG',true);
 			hexTTG
@@ -273,6 +341,7 @@ var init = function(){
 				.style('stroke',self.colors[self.mode]);
 			hexTT.exit().remove();
 		},
+
 		resize:function(){
 			//**TODO
 		}

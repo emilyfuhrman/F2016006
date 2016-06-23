@@ -16,6 +16,10 @@
 	<div id='container'></div>
 	<div class='nav' id='title'><span class='mode'></span> class: LOVE or HATE?</div>
 	<div id='menu'>
+		<div class='btn filter' id='gender'>Gender</div>
+		<div class='btn filter' id='country'>Country</div>
+		<div class='btn filter' id='grade'>Grade</div>
+		<div class='btn clear' id='clear'>Clear filter</div>
 		<div class='btn view' id='mode'>View <span class='mode_opp'></span></div>
 		<div class='btn view' id='add'>Submit data</div>
 	</div>
@@ -26,8 +30,8 @@
 			<div id='twitter'></div>
 		</div>
 	</div>
-	<div id='form' class='hidden'>
-		<div class='elem' id='header'>Rate your <span class='mode'></span> class:</div>
+	<div id='form' class='form hidden'>
+		<div class='elem header' id='header'>Rate your <span class='mode'></span> class:</div>
 		<form class='elem'>
 			<div class='section'>
   				<div class='row'><span class='tag'>Gender:</span> <input type="radio" name="gender" value="female"> Female <input type="radio" name="gender" value="male"> Male</div>
@@ -41,6 +45,17 @@
   			</div>
   			<div class='section'>
   				<button id='submit'>Submit</button>
+  			</div>
+		</form>
+	</div>
+	<div id='form_tweet' class='form hidden'>
+		<div class='elem header'>Thank you!</div>
+		<form class='elem'>
+			<div class='section'>
+  				<div class='row'><textarea id='tweet_body'></textarea></div>
+  			</div>
+  			<div class='section'>
+  				<button id='submit_tweet'>Tweet</button>
   			</div>
 		</form>
 	</div>

@@ -53,6 +53,42 @@ div {
 	width:90px;
 	border-radius:15px;
 	}
+#menu .btn.filter {
+	background:url(../assets/icon_filter.svg) no-repeat 6px 5px;
+	background-size:16px 16px;
+	background-color:transparent;
+	padding:6px 0 6px 30px;
+	width:90px;
+	}
+#menu .btn.filter.selected {
+	background-color:white;
+	}
+#menu .btn.clear {
+	opacity:0;
+	visibility:hidden;
+	font-size:0.4rem;
+	text-transform:uppercase;
+	left:420px;
+	top:66px;
+	padding:3px 6px 2px;
+	border-radius:9px;
+	}
+#menu .btn.clear.visible {
+	opacity:1;
+	visibility:visible;
+	}
+
+#menu .btn.filter#gender {
+	left:15px;
+	}
+
+#menu .btn.filter#country {
+	left:150px;
+	}
+
+#menu .btn.filter#grade {
+	left:285px;
+	}
 
 #menu .btn#mode {
 	background:url(../assets/icon_switch.svg) no-repeat 6px 5px;
@@ -88,55 +124,62 @@ div {
 /*	FORM
 	----------------------------- */
 
-#form {
+.form {
 	visibility:visible;
 	opacity:1;
 	position:absolute;
 	background:white;
 	width:500px;
-	height:400px;
 	margin:0 auto;
 	}
-#form.hidden {
+.form.hidden {
 	visibility:hidden;
 	opacity:0;
 	}
 
-#form select {
+.form select {
 	width:120px;
 	}
 
-#form button {
+.form button {
 	cursor:pointer;
 	}
 
-#form .section {
+.form .section {
 	width:100%;
 	padding:30px 0;
 	border-top:1px solid gray;
 	}
 
-#form .elem {
+.form .elem {
 	padding:30px 24px;
 	font-size:0.6rem;
 	}
 
-#form .elem#header {
+.form .elem.header {
 	font-size:1rem;
 	margin-left:24px;
 	padding:24px 0;
 	}
 
-#form .row {
+.form .row {
 	width:100%;
 	float:left;
 	}
 
-#form .tag {
+.form .tag {
 	color:gray;
 	font-size:0.5rem;
 	letter-spacing:1px;
 	text-transform:uppercase;
+	}
+
+#form {
+	height:400px;
+	}
+
+#form_tweet {
+	height:250px;
 	}
 
 /*	VIS
