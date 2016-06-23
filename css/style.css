@@ -54,6 +54,7 @@ div {
 	border-radius:15px;
 	}
 #menu .btn.filter {
+	opacity:1;
 	background:url(../assets/icon_filter.svg) no-repeat 6px 5px;
 	background-size:16px 16px;
 	background-color:transparent;
@@ -61,7 +62,12 @@ div {
 	width:90px;
 	}
 #menu .btn.filter.selected {
+	opacity:1;
 	background-color:white;
+	}
+#menu .btn.filter.deactivated {
+	opacity:0.5;
+	pointer-events:none;
 	}
 #menu .btn.clear {
 	opacity:0;

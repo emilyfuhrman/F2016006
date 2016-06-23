@@ -45,11 +45,11 @@ var init = function(){
 		},
 		processData:function(){
 
-			//make rating into number
 			//create position placeholders
 			self.modes.forEach(function(d){
 				self.data[d].forEach(function(_d){
 					_d.rating = +_d.rating;
+					_d.age = +_d.age;
 
 					_d.pos = {};
 					_d.pos.cube  = {};
@@ -140,14 +140,35 @@ var init = function(){
 				} else{
 					self.btn_filters_clear.classed('visible',true);
 				}
-				
+
+				//deactivate proper filter
+				//if button is just being selected, deactivate incompatible filter
+				if(btn_id !== 'gender' && !btn_selected){
+					if(btn_id === 'country'){
+						d3.select('.btn.filter#grade').classed('deactivated',true);
+					} else if(btn_id === 'grade'){
+						d3.select('.btn.filter#country').classed('deactivated',true);
+					}
+				//if button is being deselected, reactivate incompatible filter
+				} else if(btn_id !== 'gender' && btn_selected){
+					if(btn_id === 'country'){
+						d3.select('.btn.filter#grade').classed('deactivated',false);
+					} else if(btn_id === 'grade'){
+						d3.select('.btn.filter#country').classed('deactivated',false);
+					}
+				}
+
 				btn
 					.classed('selected',!btn_selected)
 					.style('color',function(){ return btn_selected ? 'white' : self.colors[self.mode]; });
+
+				self.generate();
 			});
 			self.btn_filters_clear = d3.select('#clear').on('click',function(){
 				d3.event.stopPropagation();
 				filters_clear();
+
+				self.generate();
 			});
 
 			//update all mode spans to reflect current mode
@@ -174,6 +195,10 @@ var init = function(){
 			var hexG,
 				hexesG,
 				hexes;
+
+			var scale_age = d3.scale.linear()
+				.domain([0,100])
+				.range([2,hex_rad]);
 
 			//INITIALIZE FUNCTIONS
 			//convert cube coordinates to pixel coordinates
@@ -225,6 +250,7 @@ var init = function(){
 				self.btn_filters_clear.classed('visible',false);
 				self.btn_filters
 					.classed('selected',false)
+					.classed('deactivated',false)
 					.style('color','white')
 					;
 			}
@@ -298,7 +324,9 @@ var init = function(){
 			hexes.enter().append('path')
 				.classed('hex',true);
 			hexes
-				.attr('d',hexbin.hexagon(hex_rad))
+				.attr('d',function(d){
+					return self.filters.length === 0 ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age));
+				})
 				.style('stroke',self.colors[self.mode])
 				.style('fill-opacity',function(d){
 					return d.rating/5;
