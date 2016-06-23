@@ -15,6 +15,14 @@ var init = function(){
 		//holds any selected filters
 		filters:[],
 
+		buckets_age:[
+			'<18',
+			'18-33',
+			'34-49',
+			'50-65',
+			'>65'
+		],
+
 		w:window.innerWidth,
 		h:window.innerHeight,
 
@@ -28,8 +36,6 @@ var init = function(){
 			'#3366cc',
 			'#85B800'
 		],
-
-		//path_hex:"M0,15L7.5,2h15L30,15l-7.5,13h-15L0,15z",
 
 		getData:function(_callback){
 			var datasets = ['math','science'];
@@ -45,11 +51,29 @@ var init = function(){
 		},
 		processData:function(){
 
+			function util_resolveBucket(_n){
+				var bucket;
+				if(_n <18){
+					bucket = 0;
+				} else if(_n >=18 && _n <=33){
+					bucket = 1;
+				} else if(_n >=34 && _n <=49){
+					bucket = 2;
+				} else if(_n >=50 && _n <=65){
+					bucket = 3;
+				} else if(_n >65){
+					bucket = 4;
+				}
+				return bucket;
+			}
+
 			//create position placeholders
 			self.modes.forEach(function(d){
 				self.data[d].forEach(function(_d){
 					_d.rating = +_d.rating;
 					_d.age = +_d.age;
+
+					_d.age_bucket = util_resolveBucket(_d.age);
 
 					_d.pos = {};
 					_d.pos.cube  = {};
@@ -197,7 +221,7 @@ var init = function(){
 				hexes;
 
 			var scale_age = d3.scale.linear()
-				.domain([0,100])
+				.domain([0,self.buckets_age.length -1])
 				.range([2,hex_rad]);
 
 			//INITIALIZE FUNCTIONS
@@ -325,7 +349,7 @@ var init = function(){
 				.classed('hex',true);
 			hexes
 				.attr('d',function(d){
-					return self.filters.length === 0 ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age));
+					return self.filters.length === 0 ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age_bucket));
 				})
 				.style('stroke',self.colors[self.mode])
 				.style('fill-opacity',function(d){
