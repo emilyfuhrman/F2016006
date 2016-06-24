@@ -127,6 +127,35 @@ div {
 	border-top:1px solid white;
 	}
 
+#arrows {
+	width:100%;
+	top:50%;
+	}
+
+#arrows .arrow {
+	opacity:0;
+	visibility:hidden;
+	position:absolute;
+	width:45px;
+	height:30px;
+	font-size:0.75rem;
+	top:50%;
+	padding:15px;
+	cursor:pointer;
+	}
+#arrows .arrow.visible {
+	opacity:1;
+	visibility:visible;
+	}
+#arrows .arrow#left {
+	text-align:left;
+	left:0;
+	}
+#arrows .arrow#right {
+	text-align:right;
+	right:0;
+	}
+
 /*	FORM
 	----------------------------- */
 

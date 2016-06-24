@@ -29,6 +29,8 @@ var init = function(){
 		buckets_country:[],
 		buckets_grade:d3.range(1,13),
 
+		state_grade:0,
+
 		col_w:0,
 
 		w:window.innerWidth,
@@ -139,6 +141,12 @@ var init = function(){
 					f = self.filters[0];
 					b = self['buckets_' +f];
 
+					if(f === 'grade'){
+						var s = self.state_grade === 0 ? 0 : 6,
+							e = self.state_grade === 0 ? 6 : 12;
+						b = b.slice(s,e);
+					}
+
 					//set width of buckets
 					self.col_w = Math.floor((self.w -self.w*0.25)/b.length);
 
@@ -165,6 +173,12 @@ var init = function(){
 				} else{
 					f = self.filters.filter(function(d){ return d !== 'gender'; })[0];
 					b = self['buckets_' +f];
+
+					if(f === 'grade'){
+						var s = self.state_grade === 0 ? 0 : 6,
+							e = self.state_grade === 0 ? 6 : 12;
+						b = b.slice(s,e);
+					}
 
 					//set width of buckets
 					self.col_w = Math.floor((self.w -self.w*0.25)/b.length);
@@ -220,6 +234,17 @@ var init = function(){
 			self.anno_comment = d3.select('#comment');
 			self.anno_userDetail = d3.select('#anno #detail #user');
 			self.anno_tweet = d3.select('#anno #detail #twitter');
+
+			//grab arrows
+			self.arrows = d3.selectAll('.arrow').on('click',function(){
+				d3.event.stopPropagation();
+				self.state_grade === 0 ? self.state_grade++ : self.state_grade--;
+				self.arrows.classed('visible',function(d,i){
+					return i !== self.state_grade;
+				});
+
+				self.generate();
+			});
 
 			//grab forms and inputs
 			self.form = d3.select('#form')
@@ -289,6 +314,14 @@ var init = function(){
 					} else if(btn_id === 'grade'){
 						d3.select('.btn.filter#country').classed('deactivated',false);
 					}
+				}
+
+				if(self.filters.filter(function(d){ return d === 'grade'; }).length >0){
+					self.arrows.classed('visible',function(d,i){
+						return i !== self.state_grade;
+					});
+				} else{
+					self.arrows.classed('visible',false);
 				}
 
 				btn
@@ -388,6 +421,7 @@ var init = function(){
 					.classed('deactivated',false)
 					.style('color','white')
 					;
+				self.arrows.classed('visible',false);
 			}
 
 			function form_show(){
