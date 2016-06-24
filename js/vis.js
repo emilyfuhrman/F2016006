@@ -151,19 +151,50 @@ var init = function(){
 							d[_d[f]].push(_d); 
 						}
 					});
-				} else if(self.filters.length === 2){
 
-				}
-				//convert back to array
-				d = d3.entries(d);
-				d.forEach(function(_d){ 
-					_d.value = _d.value.sort(function(a,b){ 
-						if(a.rating === b.rating){
-							return b.age_bucket -a.age_bucket;
-						}
-						return b.rating -a.rating; 
+					//convert back to array
+					d = d3.entries(d);
+					d.forEach(function(_d){ 
+						_d.value = _d.value.sort(function(a,b){ 
+							if(a.rating === b.rating){
+								return b.age_bucket -a.age_bucket;
+							}
+							return b.rating -a.rating; 
+						});
 					});
-				});
+				} else{
+					f = self.filters.filter(function(d){ return d !== 'gender'; })[0];
+					b = self['buckets_' +f];
+
+					//set width of buckets
+					self.col_w = Math.floor((self.w -self.w*0.25)/b.length);
+
+					b.forEach(function(_b){
+						d[_b] = [];
+						d[_b].push([]); //array -- M
+						d[_b].push([]); //array -- F
+					});
+					self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
+						if(d[_d[f]]){ 
+							var arr_g = _d.gender === 'M' ? 0 : 1;
+							_d.idx = d3.keys(d)[arr_g].indexOf(_d[f]);
+							d[_d[f]][arr_g].push(_d); 
+						}
+					});
+
+					//convert back to array
+					d = d3.entries(d);
+					d.forEach(function(_d){ 
+						_d.value.forEach(function(__d){
+							__d = __d.sort(function(a,b){ 
+								if(a.rating === b.rating){
+									return b.age_bucket -a.age_bucket;
+								}
+								return b.rating -a.rating; 
+							});
+						});
+					});
+				}
 			}
 			return d;
 		},
@@ -287,6 +318,7 @@ var init = function(){
 			//**TODO -- calculate correct radius for hexagon group
 			var hex_rad = 8,
 				hex_rad_hov = hex_rad*2.25;
+			var hex_row_height = Math.floor((self.h/4)/hex_rad);
 
 			//INITIALIZE VARIABLES
 			//this is just used to neatly generate a hexagon path
@@ -296,6 +328,7 @@ var init = function(){
 				hexTT;
 			var hexG,
 				hexesG,
+				hexesGG,
 				hexes;
 
 			var scale_age = d3.scale.linear()
@@ -417,12 +450,23 @@ var init = function(){
 			hexesG
 				.attr('transform',function(d,i){
 					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : i*self.col_w -self.w/2 +self.w*0.125,
-						y = d.pos && d.pos.pixel ? d.pos.pixel.x : -self.h*0.125;
+						y = d.pos && d.pos.pixel ? d.pos.pixel.x : -self.h*0.25;
 					return 'translate(' +x +',' +y +')';
 				});
 			hexesG.exit().remove();
-			hexes = hexesG.selectAll('path.hex')
-				.data(function(d,i){ return self.filters.length === 0 ? [d] : d.value; });
+			hexesGG = hexesG.selectAll('g.hexesGG')
+				.data(function(d,i){ return self.filters.length === 2 ? d.value : [d]; });
+			hexesGG.enter().append('g')
+				.classed('hexesGG',true);
+			hexesGG
+				.attr('transform',function(d,i){
+					var x = i*(hex_rad*8),
+						y = 0;
+					return 'translate(' +x +',' +y +')';
+				});
+			hexesGG.exit().remove();
+			hexes = hexesGG.selectAll('path.hex')
+				.data(function(d,i){ return self.filters.length === 0 ? [d] : self.filters.length === 1 ? d.value : d; });
 			hexes.enter().append('path')
 				.classed('hex',true);
 			hexes
@@ -430,8 +474,8 @@ var init = function(){
 					return self.filters.length === 0 ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age_bucket));
 				})
 				.attr('transform',function(d,i){
-					var x = self.filters.length === 0 ? 0 : Math.floor(i/10)*(hex_rad*1.5),
-						y = self.filters.length === 0 ? 0 : (i%10)*(hex_rad*1.75) +(Math.floor(i/10)%2)*(hex_rad*0.875); //why?
+					var x = self.filters.length === 0 ? 0 : Math.floor(i/hex_row_height)*(hex_rad*1.5),
+						y = self.filters.length === 0 ? 0 : (i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875); //why?
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})
 				.style('stroke',self.colors[self.mode])
@@ -440,8 +484,8 @@ var init = function(){
 				});
 			hexes
 				.on('mousemove',function(d,i){
-					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/10)*(hex_rad*1.5)),
-						y = d.pos && d.pos.pixel ? d.pos.pixel.x : (-self.h*0.125) +((i%10)*(hex_rad*1.75) +(Math.floor(i/10)%2)*(hex_rad*0.875));
+					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)),
+						y = d.pos && d.pos.pixel ? d.pos.pixel.x : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875));
 					var o = d.rating/5;
 
 					x +=self.w/2;
