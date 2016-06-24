@@ -43,8 +43,12 @@ var init = function(){
 		hex_sideLength:15,
 
 		colors:[
-			'#3366cc',
+			'#4a78cf',
 			'#85B800'
+		],
+		colors_legend:[
+			'#3366CC',
+			'#71A400'
 		],
 
 		getData:function(_callback){
@@ -102,6 +106,17 @@ var init = function(){
 					return d3.descending(a.rating,b.rating);
 				});
 			});
+
+			//**TODOS -- create all datasets here, access them in filterData();
+			//create gender dataset
+
+			//create grades dataset
+
+			//create countries dataset
+
+			//create gender-countries dataset
+
+			//create gender-grades dataset
 
 			self.generate();
 		},
@@ -279,6 +294,24 @@ var init = function(){
 				self.util_form_show();
 			});
 
+			//grab legend
+			self.legend = d3.select('.nav#legend')
+				.on('mousemove',function(){
+					d3.select('#legend #legend_tab').html('&dArr; Hide legend');
+					self.legend.classed('show',true);
+				})
+				.on('mouseout',function(){
+					d3.select('#legend #legend_tab').html('&#10595; View legend');
+					self.legend.classed('show',false);
+				});
+			self.legend_comps = self.legend.selectAll('.comp')
+				.style('background',self.colors_legend[self.mode]);
+			self.legend_body = d3.select('#legend_body').selectAll('svg.legend')
+				.data([self]);
+			self.legend_body.enter().append('svg')
+				.classed('legend',true);
+			self.legend_body.exit().remove();
+
 			//grab buttons (filters), add click handlers
 			self.btn_filters = d3.selectAll('.btn.filter').on('click',function(){
 				d3.event.stopPropagation();
@@ -296,6 +329,7 @@ var init = function(){
 					self.util_filters_clear();
 				} else{
 					self.btn_filters_clear.classed('visible',true);
+					self.legend.classed('expanded',true);
 					d3.select('#sampled').classed('visible',true);
 				}
 
@@ -343,6 +377,8 @@ var init = function(){
 			self.h = window.innerHeight;
 			
 			self.svg.style('background',self.colors[self.mode]);
+			self.legend_body.style('background',self.colors_legend[self.mode]);
+			self.legend_comps.style('background',self.colors_legend[self.mode]);
 
 			//update all mode spans to reflect current mode
 			d3.select('#title .mode').text(util_toTitleCase(self.modes[self.mode]));
@@ -573,6 +609,7 @@ var init = function(){
 				.style('color','white')
 				;
 			self.arrows.classed('visible',false);
+			self.legend.classed('expanded',false);
 			d3.select('#sampled').classed('visible',false);
 		},
 
