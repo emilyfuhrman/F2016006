@@ -124,6 +124,10 @@ var init = function(){
 						arr_countries[data[i].country]++;
 					}
 					var arr_countries_sorted = d3.entries(arr_countries).sort(function(a,b){ return b.value -a.value; });
+
+					//clear out array
+					self.buckets_country = [];
+
 					for(var i=0; i<5; i++){
 						if(arr_countries_sorted[i]){
 							self.buckets_country.push(arr_countries_sorted[i].key);
@@ -412,8 +416,8 @@ var init = function(){
 				.classed('hexesG',true);
 			hexesG
 				.attr('transform',function(d,i){
-					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : -self.h*0.125,
-						y = d.pos && d.pos.pixel ? d.pos.pixel.x : i*self.col_w;
+					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : i*self.col_w -self.w/2 +self.w*0.125,
+						y = d.pos && d.pos.pixel ? d.pos.pixel.x : -self.h*0.125;
 					return 'translate(' +x +',' +y +')';
 				});
 			hexesG.exit().remove();
@@ -424,10 +428,11 @@ var init = function(){
 			hexes
 				.attr('d',function(d){
 					return self.filters.length === 0 ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age_bucket));
+					//return hexbin.hexagon(hex_rad);
 				})
 				.attr('transform',function(d,i){
-					var x = self.filters.length === 0 ? 0 : i*(hex_rad*1.75),
-						y = 0;
+					var x = self.filters.length === 0 ? 0 : Math.floor(i/10)*(hex_rad*1.5),
+						y = self.filters.length === 0 ? 0 : (i%10)*(hex_rad*1.75) +(Math.floor(i/10)%2)*(hex_rad*0.875); //why?
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})
 				.style('stroke',self.colors[self.mode])
@@ -435,14 +440,14 @@ var init = function(){
 					return d.rating/5;
 				});
 			hexes
-				.on('mousemove',function(d){
+				.on('mousemove',function(d,i){
 					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : 0,
 						y = d.pos && d.pos.pixel ? d.pos.pixel.x : 0;
 					var o = d.rating/5;
 
 					x +=self.w/2;
 					y +=self.h/2;
-					
+
 					hexTTG
 						.classed('hidden',false)
 						.attr('transform',function(){
