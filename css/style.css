@@ -217,7 +217,7 @@ div {
 	height:250px;
 	}
 
-/*	VIS
+/*	HEXAGONS
 	----------------------------- */
 
 svg {
@@ -242,6 +242,18 @@ svg {
 .hexTTG .hexTT {
 	fill:white;
 	stroke-width:3;
+	}
+
+.hexG {
+	fill:white;
+	text-anchor:middle;
+	}
+
+.hexesGT {
+	font-size:0.8rem;
+	}
+.hexesGGT {
+	font-size:0.6rem;
 	}
 
 .hex {

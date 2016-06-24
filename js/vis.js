@@ -191,7 +191,8 @@ var init = function(){
 					self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
 						if(d[_d[f]]){ 
 							var arr_g = _d.gender === 'M' ? 0 : 1;
-							_d.idx = d3.keys(d)[arr_g].indexOf(_d[f]);
+							_d.idx = d3.keys(d).indexOf(_d[f]);
+							_d.idx_g = arr_g;
 							d[_d[f]][arr_g].push(_d); 
 						}
 					});
@@ -361,7 +362,9 @@ var init = function(){
 				hexTT;
 			var hexG,
 				hexesG,
+				hexesGT,
 				hexesGG,
+				hexesGGT,
 				hexes;
 
 			var scale_age = d3.scale.linear()
@@ -488,6 +491,21 @@ var init = function(){
 					return 'translate(' +x +',' +y +')';
 				});
 			hexesG.exit().remove();
+			hexesGT = hexesG.selectAll('text.hexesGT')
+				.data(function(d,i){ return [d]; });
+			hexesGT.enter().append('text')
+				.classed('hexesGT',true);
+			hexesGT
+				.attr('transform',function(d,i){
+					var x = 0,
+						y = hex_row_height*(hex_rad*2) -hex_rad*2;
+					return 'translate(' +x +',' +y +')';
+				})
+				.text(function(d){ 
+					var str = self.filters.length === 0 ? '' : d.key;
+					return str;
+				});
+			hexesGT.exit().remove();
 			hexesGG = hexesG.selectAll('g.hexesGG')
 				.data(function(d,i){ return self.filters.length === 2 ? d.value : [d]; });
 			hexesGG.enter().append('g')
@@ -499,6 +517,18 @@ var init = function(){
 					return 'translate(' +x +',' +y +')';
 				});
 			hexesGG.exit().remove();
+			hexesGGT = hexesGG.selectAll('text.hexesGGT')
+				.data(function(d,i){ return self.filters.length === 2 ? [d] : []; });
+			hexesGGT.enter().append('text')
+				.classed('hexesGGT',true);
+			hexesGGT
+				.attr('transform',function(d){
+					var x = 0,
+						y = hex_row_height*(hex_rad*2) +hex_rad*2;
+					return 'translate(' +x +',' +y +')';
+				})
+				.text(function(d,i){ return d[0].gender; });
+			hexesGGT.exit().remove();
 			hexes = hexesGG.selectAll('path.hex')
 				.data(function(d,i){ return self.filters.length === 0 ? [d] : self.filters.length === 1 ? d.value : d; });
 			hexes.enter().append('path')
@@ -518,8 +548,8 @@ var init = function(){
 				});
 			hexes
 				.on('mousemove',function(d,i){
-					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)),
-						y = d.pos && d.pos.pixel ? d.pos.pixel.x : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875));
+					var x = self.filters.length === 0 ? d.pos.pixel.y : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +d.idx_g*(hex_rad*8),
+						y = self.filters.length === 0 ? d.pos.pixel.x : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875));
 					var o = d.rating/5;
 
 					x +=self.w/2;
