@@ -1,4 +1,4 @@
-rating,gender,location,grade,age,comment
+rating,gender,country,grade,age,comment
 5,F,Russia,9,44,"Ut fermentum, magna id malesuada tempor, neque turpis pretium dolor, et elementum enim ex ac erat. Mauris tincidunt condimentum nunc, nec viverra mi. Donec a ante nisl. Nunc semper sit amet metus blandit euismod. "
 1,M,Sweden,9,63,"Ut fermentum, magna id malesuada tempor, neque turpis pretium dolor, et elementum enim ex ac erat. Mauris tincidunt condimentum nunc, nec viverra mi. Donec a ante nisl. Nunc semper sit amet metus blandit euismod. "
 1,M,United States,12,20,"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas fringilla pharetra leo in posuere. Proin at sapien sed nibh mattis scelerisque ut at ex. Pellentesque lacus magna, aliquet in dolor et, volutpat commodo nisi. Morbi viverra malesuada eros, viverra condimentum urna luctus sed."

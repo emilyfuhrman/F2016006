@@ -22,6 +22,14 @@ var init = function(){
 			'50-65',
 			'>65'
 		],
+		buckets_gender:[
+			'M',
+			'F'
+		],
+		buckets_country:[],
+		buckets_grade:d3.range(1,13),
+
+		col_w:0,
 
 		w:window.innerWidth,
 		h:window.innerHeight,
@@ -38,9 +46,9 @@ var init = function(){
 		],
 
 		getData:function(_callback){
-			var datasets = ['math','science'];
+			var datasets = ['math','science','dummy_sample_math','dummy_sample_science'];
 			datasets.forEach(function(d){
-				d3.csv('data/dummy_full_' +d +'.csv',function(e,_d){
+				d3.csv('data/' +d +'.csv',function(e,_d){
 					self.data[d] = _d;
 					datasets = datasets.filter(function(__d){ return __d !== d; });
 					if(datasets.length === 0){
@@ -71,6 +79,7 @@ var init = function(){
 			self.modes.forEach(function(d){
 				self.data[d].forEach(function(_d){
 					_d.rating = +_d.rating;
+					_d.grade = +_d.grade;
 					_d.age = +_d.age;
 
 					_d.age_bucket = util_resolveBucket(_d.age);
@@ -82,12 +91,77 @@ var init = function(){
 				self.data[d].sort(function(a,b){
 					return d3.descending(a.rating,b.rating);
 				});
+				self.data['dummy_sample_' +d].forEach(function(_d){
+					_d.rating = +_d.rating;
+					_d.grade = +_d.grade;
+					_d.age = +_d.age;
+
+					_d.age_bucket = util_resolveBucket(_d.age);
+				});
+				self.data['dummy_sample_' +d].sort(function(a,b){
+					return d3.descending(a.rating,b.rating);
+				});
 			});
 
 			self.generate();
 		},
 		filterData:function(){
-			return self.data[self.modes[self.mode]];
+			var d, f, b;
+			if(self.filters.length === 0){
+				d = self.data[self.modes[self.mode]];
+				self.col_w = 0;
+			} else{
+				d = {};
+
+				//get top countries, for buckets
+				function util_getTopCountries(){
+					var arr_countries = {};
+					var data = self.data['dummy_sample_' +self.modes[self.mode]];
+					for(var i=0; i<data.length; i++){
+						if(!arr_countries[data[i].country]){
+							arr_countries[data[i].country] = 0;
+						}
+						arr_countries[data[i].country]++;
+					}
+					var arr_countries_sorted = d3.entries(arr_countries).sort(function(a,b){ return b.value -a.value; });
+					for(var i=0; i<5; i++){
+						if(arr_countries_sorted[i]){
+							self.buckets_country.push(arr_countries_sorted[i].key);
+						}
+					}
+				}
+
+				util_getTopCountries();
+
+				if(self.filters.length === 1){
+					f = self.filters[0];
+					b = self['buckets_' +f];
+
+					//set width of buckets
+					self.col_w = Math.floor((self.w -self.w*0.25)/b.length);
+
+					b.forEach(function(_b){
+						d[_b] = [];
+					});
+					self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
+						if(d[_d[f]]){ d[_d[f]].push(_d); }
+					});
+				} else if(self.filters.length === 2){
+
+				}
+				//convert back to array
+				d = d3.entries(d);
+				d.forEach(function(_d){ 
+					_d.value = _d.value.sort(function(a,b){ 
+						if(a.rating === b.rating){
+							return b.age_bucket -a.age_bucket;
+						}
+						return b.rating -a.rating; 
+					});
+				});
+				d.reverse();
+			}
+			return d;
 		},
 
 		//thanks for all the help, http://www.redblobgames.com/grids/hexagons/!
@@ -257,7 +331,7 @@ var init = function(){
 
 			function detail_update(_d){
 				var str_comment = '&ldquo;' +_d.comment +'&rdquo;',
-					str_userDetail = 'Grade ' +_d.grade +' rating: ' +_d.rating +'/5 &#124; ' +util_resolveGender(_d.gender) +', ' +_d.age +', ' +_d.location;
+					str_userDetail = 'Grade ' +_d.grade +' rating: ' +_d.rating +'/5 &#124; ' +util_resolveGender(_d.gender) +', ' +_d.age +', ' +_d.country;
 				self.anno_comment.html(str_comment);
 				self.anno_userDetail.html(str_userDetail);
 			}
@@ -324,7 +398,7 @@ var init = function(){
 			hexG.enter().append('g')
 				.classed('hexG',true);
 			hexG
-				.attr('transform','translate(' +self.w/2 +',' +self.h/2 +')rotate(90)')
+				.attr('transform','translate(' +self.w/2 +',' +self.h/2 +')')
 				;
 			hexG
 				.on('mouseout',function(d){
@@ -338,18 +412,23 @@ var init = function(){
 				.classed('hexesG',true);
 			hexesG
 				.attr('transform',function(d,i){
-					var x = d.pos.pixel.x ? d.pos.pixel.x : 0,
-						y = d.pos.pixel.y ? d.pos.pixel.y : 0;
+					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : -self.h*0.125,
+						y = d.pos && d.pos.pixel ? d.pos.pixel.x : i*self.col_w;
 					return 'translate(' +x +',' +y +')';
 				});
 			hexesG.exit().remove();
 			hexes = hexesG.selectAll('path.hex')
-				.data(function(d){ return [d]; });
+				.data(function(d){ return self.filters.length === 0 ? [d] : d.value; });
 			hexes.enter().append('path')
 				.classed('hex',true);
 			hexes
 				.attr('d',function(d){
 					return self.filters.length === 0 ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age_bucket));
+				})
+				.attr('transform',function(d,i){
+					var x = self.filters.length === 0 ? 0 : i*(hex_rad*1.75),
+						y = 0;
+					return 'translate(' +x +',' +y +')rotate(90)';
 				})
 				.style('stroke',self.colors[self.mode])
 				.style('fill-opacity',function(d){
@@ -357,13 +436,17 @@ var init = function(){
 				});
 			hexes
 				.on('mousemove',function(d){
-					var x = d.pos.pixel.x ? d.pos.pixel.x : 0,
-						y = d.pos.pixel.y ? d.pos.pixel.y : 0;
+					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : 0,
+						y = d.pos && d.pos.pixel ? d.pos.pixel.x : 0;
 					var o = d.rating/5;
+
+					x +=self.w/2;
+					y +=self.h/2;
+					
 					hexTTG
 						.classed('hidden',false)
 						.attr('transform',function(){
-							return 'translate(' +x +',' +y +')';
+							return 'translate(' +x +',' +y +')rotate(90)';
 						});
 					hexTT
 						.style('fill-opacity',o);
@@ -372,7 +455,7 @@ var init = function(){
 			hexes.exit().remove();
 
 			//create tooltip group
-			hexTTG = hexG.selectAll('g.hexTTG')
+			hexTTG = self.svg.selectAll('g.hexTTG')
 				.data([self.data_display]);
 			hexTTG.enter().append('g')
 				.classed('hexTTG',true);
