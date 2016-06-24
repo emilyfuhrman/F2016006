@@ -214,20 +214,17 @@ var init = function(){
 			return d;
 		},
 
-		//thanks for all the help, http://www.redblobgames.com/grids/hexagons/!
-		generate:function(){
-			self.w = window.innerWidth;
-			self.h = window.innerHeight;
+		setup:function(){
 
 			self.svg = d3.select('#container').selectAll('svg.vis')
 				.data([self]);
 			self.svg.enter().append('svg')
 				.classed('vis',true);
 			self.svg
-				.style('background',self.colors[self.mode]);
+				.style('background',self.colors[self.mode])
 			self.svg
 				.on('click',function(){
-					form_hide();
+					self.util_form_hide();
 				});
 			self.svg.exit().remove();
 
@@ -258,27 +255,28 @@ var init = function(){
 				.style('left',self.w/2 -250 +'px')
 				.style('top','150px');
 
-			//grab buttons, add click handlers
+			//grab form buttons, add click handlers
+			self.form_submit = d3.select('#form #submit').on('click',function(){
+        		d3.event.preventDefault();
+				d3.event.stopPropagation();
+				self.util_form_submit();
+			});
+			self.form_submit_tweet = d3.select('#submit_tweet').on('click',function(){
+        		d3.event.preventDefault();
+				d3.event.stopPropagation();
+				self.util_form_submit_tweet();
+			});
+
+			//grab navigation buttons, add click handlers
 			self.mode_switch = d3.select('#menu .btn#mode').on('click',function(){
 				d3.event.stopPropagation();
-				filters_clear();
-
+				self.util_filters_clear();
 				self.mode = 1 -self.mode;
 				self.generate();
 			});
 			self.add = d3.select('#menu .btn#add').on('click',function(){
 				d3.event.stopPropagation();
-				form_show();
-			});
-			self.form_submit = d3.select('#form #submit').on('click',function(){
-        		d3.event.preventDefault();
-				d3.event.stopPropagation();
-				form_submit();
-			});
-			self.form_submit = d3.select('#submit_tweet').on('click',function(){
-        		d3.event.preventDefault();
-				d3.event.stopPropagation();
-				form_submit_tweet();
+				self.util_form_show();
 			});
 
 			//grab buttons (filters), add click handlers
@@ -295,7 +293,7 @@ var init = function(){
 					self.filters = self.filters.filter(function(d){ return d !== btn_id; });
 				}
 				if(self.filters.length === 0){
-					filters_clear();
+					self.util_filters_clear();
 				} else{
 					self.btn_filters_clear.classed('visible',true);
 					d3.select('#sampled').classed('visible',true);
@@ -334,10 +332,17 @@ var init = function(){
 			});
 			self.btn_filters_clear = d3.select('#clear').on('click',function(){
 				d3.event.stopPropagation();
-				filters_clear();
-
+				self.util_filters_clear();
 				self.generate();
 			});
+		},
+
+		//thanks for all the help, http://www.redblobgames.com/grids/hexagons/!
+		generate:function(){
+			self.w = window.innerWidth;
+			self.h = window.innerHeight;
+			
+			self.svg.style('background',self.colors[self.mode]);
 
 			//update all mode spans to reflect current mode
 			d3.select('#title .mode').text(util_toTitleCase(self.modes[self.mode]));
@@ -404,54 +409,6 @@ var init = function(){
 			    return _str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 			}
 
-			function util_resolveGender(_g){
-				return _g.toLowerCase() === 'f' ? 'Female' : 'Male';
-			}
-
-			function detail_update(_d){
-				var str_comment = '&ldquo;' +_d.comment +'&rdquo;',
-					str_userDetail = 'Grade ' +_d.grade +' rating: ' +_d.rating +'/5 &#124; ' +util_resolveGender(_d.gender) +', ' +_d.age +', ' +_d.country;
-				self.anno_comment.html(str_comment);
-				self.anno_userDetail.html(str_userDetail);
-			}
-			function detail_clear(){
-				var str_userDetail = 'Hover over a hexagon for detail.'
-				self.anno_comment.html('');
-				self.anno_userDetail.html(str_userDetail);
-				self.anno_tweet.html('');
-			}
-
-			function filters_clear(){
-				self.filters = [];
-
-				self.btn_filters_clear.classed('visible',false);
-				self.btn_filters
-					.classed('selected',false)
-					.classed('deactivated',false)
-					.style('color','white')
-					;
-				self.arrows.classed('visible',false);
-				d3.select('#sampled').classed('visible',false);
-			}
-
-			function form_show(){
-				self.form.classed('hidden',false);
-			}
-			function form_clear(){
-
-			}
-			function form_hide(){
-				self.form.classed('hidden',true);
-				self.form_tweet.classed('hidden',true);
-			}
-			function form_submit(){
-				self.form.classed('hidden',true);
-				self.form_tweet.classed('hidden',false);
-			}
-			function form_submit_tweet(){
-				self.form_tweet.classed('hidden',true);
-			}
-
 			//generate cube coordinates for data points
 			//thank you, http://stackoverflow.com/questions/2049196/generating-triangular-hexagonal-coordinates-xyz
 			var cube_coords = [];
@@ -484,7 +441,7 @@ var init = function(){
 			hexG
 				.on('mouseout',function(d){
 					hexTTG.classed('hidden',true);
-					detail_clear();
+					self.util_detail_clear();
 				});
 			hexG.exit().remove();
 			hexesG = hexG.selectAll('g.hexesG')
@@ -569,7 +526,7 @@ var init = function(){
 						});
 					hexTT
 						.style('fill-opacity',o);
-					detail_update(d);
+					self.util_detail_update(d);
 				});
 			hexes.exit().remove();
 
@@ -602,9 +559,59 @@ var init = function(){
 
 		resize:function(){
 			//**TODO
+		},
+
+		//INTERFACE
+		util_filters_clear:function(){
+
+			self.filters = [];
+
+			self.btn_filters_clear.classed('visible',false);
+			self.btn_filters
+				.classed('selected',false)
+				.classed('deactivated',false)
+				.style('color','white')
+				;
+			self.arrows.classed('visible',false);
+			d3.select('#sampled').classed('visible',false);
+		},
+
+		util_form_clear:function(){
+		},
+		util_form_hide:function(){
+			self.form.classed('hidden',true);
+			self.form_tweet.classed('hidden',true);
+		},
+		util_form_show:function(){
+			self.form.classed('hidden',false);
+		},
+		util_form_submit:function(){
+			self.form.classed('hidden',true);
+			self.form_tweet.classed('hidden',false);
+		},
+		util_form_submit_tweet:function(){
+			self.form_tweet.classed('hidden',true);
+		},	
+
+		util_detail_update:function(_d){
+			var str_comment = '&ldquo;' +_d.comment +'&rdquo;',
+				str_userDetail = 'Grade ' +_d.grade +' rating: ' +_d.rating +'/5 &#124; ' +self.util_resolve_gender(_d.gender) +', ' +_d.age +', ' +_d.country;
+			self.anno_comment.html(str_comment);
+			self.anno_userDetail.html(str_userDetail);
+		},
+		util_detail_clear:function(){
+			var str_userDetail = 'Hover over a hexagon for detail.'
+			self.anno_comment.html('');
+			self.anno_userDetail.html(str_userDetail);
+			self.anno_tweet.html('');
+		},
+
+		util_resolve_gender:function(_g){
+			return _g.toLowerCase() === 'f' ? 'Female' : 'Male';
 		}
 	}
 }
 
 var self = init();
+self.setup();
 self.getData(self.processData);
