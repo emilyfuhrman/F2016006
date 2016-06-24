@@ -132,6 +132,19 @@ div {
 	top:50%;
 	}
 
+#sampled {
+	opacity:0;
+	visibility:hidden;
+	font-size:0.5rem;
+	font-style:italic;
+	top:105px;
+	left:15px;
+	}
+#sampled.visible {
+	opacity:1;
+	visibility:visible;
+	}
+
 #arrows .arrow {
 	opacity:0;
 	visibility:hidden;

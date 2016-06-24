@@ -298,6 +298,7 @@ var init = function(){
 					filters_clear();
 				} else{
 					self.btn_filters_clear.classed('visible',true);
+					d3.select('#sampled').classed('visible',true);
 				}
 
 				//deactivate proper filter
@@ -341,6 +342,11 @@ var init = function(){
 			//update all mode spans to reflect current mode
 			d3.select('#title .mode').text(util_toTitleCase(self.modes[self.mode]));
 			d3.select('#form .mode').text(self.modes[self.mode]);
+
+			//update sample span to reflect sample data, if applicable
+			d3.select('#sampled .sample').text(function(){
+				return self.filters.length >0 ? 5 : 0;
+			});
 
 			//update switch button to reflect opposite mode
 			d3.select('#menu span.mode_opp').text(self.modes[1 -self.mode]);
@@ -425,6 +431,7 @@ var init = function(){
 					.style('color','white')
 					;
 				self.arrows.classed('visible',false);
+				d3.select('#sampled').classed('visible',false);
 			}
 
 			function form_show(){
