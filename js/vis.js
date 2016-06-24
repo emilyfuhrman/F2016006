@@ -79,7 +79,6 @@ var init = function(){
 			self.modes.forEach(function(d){
 				self.data[d].forEach(function(_d){
 					_d.rating = +_d.rating;
-					_d.grade = +_d.grade;
 					_d.age = +_d.age;
 
 					_d.age_bucket = util_resolveBucket(_d.age);
@@ -93,7 +92,6 @@ var init = function(){
 				});
 				self.data['dummy_sample_' +d].forEach(function(_d){
 					_d.rating = +_d.rating;
-					_d.grade = +_d.grade;
 					_d.age = +_d.age;
 
 					_d.age_bucket = util_resolveBucket(_d.age);
@@ -148,7 +146,10 @@ var init = function(){
 						d[_b] = [];
 					});
 					self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
-						if(d[_d[f]]){ d[_d[f]].push(_d); }
+						if(d[_d[f]]){ 
+							_d.idx = d3.keys(d).indexOf(_d[f]);
+							d[_d[f]].push(_d); 
+						}
 					});
 				} else if(self.filters.length === 2){
 
@@ -163,7 +164,6 @@ var init = function(){
 						return b.rating -a.rating; 
 					});
 				});
-				d.reverse();
 			}
 			return d;
 		},
@@ -411,7 +411,7 @@ var init = function(){
 				});
 			hexG.exit().remove();
 			hexesG = hexG.selectAll('g.hexesG')
-				.data(function(d){ return d; });
+				.data(function(d,i){ return d; });
 			hexesG.enter().append('g')
 				.classed('hexesG',true);
 			hexesG
@@ -422,13 +422,12 @@ var init = function(){
 				});
 			hexesG.exit().remove();
 			hexes = hexesG.selectAll('path.hex')
-				.data(function(d){ return self.filters.length === 0 ? [d] : d.value; });
+				.data(function(d,i){ return self.filters.length === 0 ? [d] : d.value; });
 			hexes.enter().append('path')
 				.classed('hex',true);
 			hexes
 				.attr('d',function(d){
 					return self.filters.length === 0 ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age_bucket));
-					//return hexbin.hexagon(hex_rad);
 				})
 				.attr('transform',function(d,i){
 					var x = self.filters.length === 0 ? 0 : Math.floor(i/10)*(hex_rad*1.5),
@@ -441,8 +440,8 @@ var init = function(){
 				});
 			hexes
 				.on('mousemove',function(d,i){
-					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : 0,
-						y = d.pos && d.pos.pixel ? d.pos.pixel.x : 0;
+					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/10)*(hex_rad*1.5)),
+						y = d.pos && d.pos.pixel ? d.pos.pixel.x : (-self.h*0.125) +((i%10)*(hex_rad*1.75) +(Math.floor(i/10)%2)*(hex_rad*0.875));
 					var o = d.rating/5;
 
 					x +=self.w/2;
