@@ -231,11 +231,14 @@ var init = function(){
 
 		setup:function(){
 
+			//<svg id='map' viewBox='0 0 1436 782' preserveAspectRatio='xMidYMid meet'></svg>
 			self.svg = d3.select('#container').selectAll('svg.vis')
 				.data([self]);
 			self.svg.enter().append('svg')
 				.classed('vis',true);
 			self.svg
+				.attr('viewBox','0 0 ' +self.w +' ' +self.h)
+				.attr('preserveAspectRatio','xMidYMid meet')
 				.style('background',self.colors[self.mode])
 			self.svg
 				.on('click',function(){
