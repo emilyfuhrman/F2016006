@@ -5,6 +5,9 @@ var init = function(){
 		data:{},
 		data_display:null,
 
+		//breakpoints
+		//320
+
 		//default mode
 		mode:0,
 		modes:[
@@ -35,6 +38,8 @@ var init = function(){
 
 		w:window.innerWidth,
 		h:window.innerHeight,
+
+		m:false,
 
 		hex_file_w:30,
 		hex_file_h:30,
@@ -231,14 +236,17 @@ var init = function(){
 
 		setup:function(){
 
+			self.w = window.innerWidth;
+			self.h = window.innerHeight;
+
 			//<svg id='map' viewBox='0 0 1436 782' preserveAspectRatio='xMidYMid meet'></svg>
 			self.svg = d3.select('#container').selectAll('svg.vis')
 				.data([self]);
 			self.svg.enter().append('svg')
 				.classed('vis',true);
 			self.svg
-				.attr('viewBox','0 0 ' +self.w +' ' +self.h)
-				.attr('preserveAspectRatio','xMidYMid meet')
+				//.attr('viewBox','0 0 1440 900')
+				//.attr('preserveAspectRatio','xMidYMid meet')
 				.style('background',self.colors[self.mode])
 			self.svg
 				.on('click',function(){
@@ -410,8 +418,10 @@ var init = function(){
 		generate:function(){
 			self.w = window.innerWidth;
 			self.h = window.innerHeight;
+
+			self.m = self.w <=400;
 			
-			self.svg.style('background',self.colors[self.mode]);
+			self.svg.style('background',(self.colors[self.mode]));
 			self.legend_body.style('background',self.colors_legend[self.mode]);
 			self.legend_comps.style('background',self.colors_legend[self.mode]);
 
@@ -650,6 +660,7 @@ var init = function(){
 
 		resize:function(){
 			//**TODO
+
 		},
 
 		//INTERFACE
@@ -712,3 +723,8 @@ var init = function(){
 var self = init();
 self.setup();
 self.getData(self.processData);
+
+window.onresize = function(){
+	self.setup();
+	self.generate();
+}
