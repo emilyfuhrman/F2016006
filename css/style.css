@@ -133,21 +133,20 @@ div {
 	}
 
 #legend {
+	position:fixed;
 	z-index:100;
 	font-size:0.6rem;
-	width:174px;
 	margin-left:15px;
 	bottom:0;
 	cursor:default;
 	}
 #legend.expanded {
-	width:351px;
 	}
 #legend.show {
 	bottom:90px;
 	}
 #legend .comp {
-	position:absolute;
+	position:fixed;
 	border:1px solid white;
 	}
 #legend_tab {
@@ -156,9 +155,12 @@ div {
 	margin-top:-30px;
 	padding:8px 9px 0;
 	}
-#legend_body {
-	width:100%;
+#legend #legend_body {
+	width:174px;
 	height:90px;
+	}
+#legend.expanded #legend_body {
+	width:351px;
 	}
 
 .legend_g {
@@ -331,5 +333,5 @@ svg {
 	----------------------------- */
 
 @media (min-width:320px) { 
-	
+
 }
