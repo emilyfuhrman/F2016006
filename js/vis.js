@@ -298,7 +298,8 @@ var init = function(){
 			});
 
 			//grab legend
-			var legend_g;
+			var legend_g,
+				legend_g_txt;
 			self.legend = d3.select('.nav#legend')
 				.on('mousemove',function(){
 					d3.select('#legend #legend_tab').html('&dArr; Hide legend');
@@ -329,6 +330,19 @@ var init = function(){
 					return 'translate(' +x +',' +y +')';
 				});
 			self.legend_g.exit().remove();
+			legend_g_txt = self.legend_g.selectAll('text.legend_g_txt')
+				.data(function(d){ return [d]; });
+			legend_g_txt.enter().append('text')
+				.classed('legend_g_txt',true);
+			legend_g_txt
+				.attr('x',function(d){
+					return d.length === 2 ? -9 : -5;
+				})
+				.attr('y',45)
+				.text(function(d){
+					return d.length === 2 ? 'Hexagon shading: rating' : 'Hexagon size: age';
+				});
+			legend_g_txt.exit().remove();
 
 			//grab buttons (filters), add click handlers
 			self.btn_filters = d3.selectAll('.btn.filter').on('click',function(){
@@ -450,7 +464,7 @@ var init = function(){
 					return d >5 ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d));
 				})
 				.attr('transform',function(d,i){
-					var x = d >5 ? i*120 : i*24,
+					var x = d >5 ? i*120 : i*30,
 						y = 0;
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})

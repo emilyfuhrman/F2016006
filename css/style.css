@@ -141,7 +141,7 @@ div {
 	cursor:default;
 	}
 #legend.expanded {
-	width:330px;
+	width:351px;
 	}
 #legend.show {
 	bottom:90px;
@@ -151,7 +151,7 @@ div {
 	border:1px solid white;
 	}
 #legend_tab {
-	width:96px;
+	width:120px;
 	height:30px;
 	margin-top:-30px;
 	padding:8px 9px 0;
@@ -168,6 +168,10 @@ div {
 .legend_g.show {
 	opacity:1;
 	visibility:visible;
+	}
+
+.legend_g_txt {
+	font-size:0.5rem;
 	}
 
 #legend .legend_hex {
