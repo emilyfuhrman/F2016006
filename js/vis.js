@@ -295,6 +295,7 @@ var init = function(){
 			});
 
 			//grab legend
+			var legend_g;
 			self.legend = d3.select('.nav#legend')
 				.on('mousemove',function(){
 					d3.select('#legend #legend_tab').html('&dArr; Hide legend');
@@ -311,6 +312,20 @@ var init = function(){
 			self.legend_body.enter().append('svg')
 				.classed('legend',true);
 			self.legend_body.exit().remove();
+			self.legend_g = self.legend_body.selectAll('g.legend_g')
+				.data([[6,7],[1,2,3,4,5]]);
+			self.legend_g.enter().append('g')
+				.classed('legend_g',true);
+			self.legend_g
+				.classed('show',function(d,i){
+					return i === 0;
+				})
+				.attr('transform',function(d,i){
+					var x = i*180 +24,
+						y = 30;
+					return 'translate(' +x +',' +y +')';
+				});
+			self.legend_g.exit().remove();
 
 			//grab buttons (filters), add click handlers
 			self.btn_filters = d3.selectAll('.btn.filter').on('click',function(){
@@ -329,7 +344,10 @@ var init = function(){
 					self.util_filters_clear();
 				} else{
 					self.btn_filters_clear.classed('visible',true);
+
 					self.legend.classed('expanded',true);
+					self.legend_g.classed('show',true);
+
 					d3.select('#sampled').classed('visible',true);
 				}
 
@@ -417,6 +435,26 @@ var init = function(){
 			var scale_age = d3.scale.linear()
 				.domain([0,self.buckets_age.length -1])
 				.range([2,hex_rad]);
+
+			//update legend
+			var legend_hexes;
+			legend_hexes = self.legend_g.selectAll('path.legend_hex')
+				.data(function(d,i){ return d; });
+			legend_hexes.enter().append('path')
+				.classed('legend_hex',true);
+			legend_hexes
+				.attr('d',function(d,i){
+					return d >5 ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d));
+				})
+				.attr('transform',function(d,i){
+					var x = d >5 ? i*120 : i*24,
+						y = 0;
+					return 'translate(' +x +',' +y +')rotate(90)';
+				})
+				.style('fill-opacity',function(d,i){
+					return d >5 ? ((d-6)*5)/5 : 1;
+				});
+			legend_hexes.exit().remove();
 
 			//INITIALIZE FUNCTIONS
 			//convert cube coordinates to pixel coordinates
@@ -609,7 +647,12 @@ var init = function(){
 				.style('color','white')
 				;
 			self.arrows.classed('visible',false);
+
 			self.legend.classed('expanded',false);
+			self.legend_g.classed('show',function(d,i){
+				return i === 0;
+			});
+
 			d3.select('#sampled').classed('visible',false);
 		},
 

@@ -135,13 +135,13 @@ div {
 #legend {
 	z-index:100;
 	font-size:0.6rem;
-	width:180px;
+	width:174px;
 	margin-left:15px;
 	bottom:0;
 	cursor:default;
 	}
 #legend.expanded {
-	width:360px;
+	width:330px;
 	}
 #legend.show {
 	bottom:90px;
@@ -157,7 +157,24 @@ div {
 	padding:8px 9px 0;
 	}
 #legend_body {
+	width:100%;
 	height:90px;
+	}
+
+.legend_g {
+	opacity:0;
+	visibility:hidden;
+	}
+.legend_g.show {
+	opacity:1;
+	visibility:visible;
+	}
+
+#legend .legend_hex {
+	fill:white;
+	stroke:white;
+	stroke-width:0.5;
+	stroke-opacity:1;
 	}
 
 #sampled {
