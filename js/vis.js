@@ -36,8 +36,8 @@ var init = function(){
 
 		col_w:0,
 
-		w:window.innerWidth,
-		h:window.innerHeight,
+		w:1440,//window.innerWidth,
+		h:900,//window.innerHeight,
 
 		m:false,
 
@@ -236,8 +236,8 @@ var init = function(){
 
 		setup:function(){
 
-			self.w = window.innerWidth;
-			self.h = window.innerHeight;
+			//self.w = window.innerWidth;
+			//self.h = window.innerHeight;
 
 			//<svg id='map' viewBox='0 0 1436 782' preserveAspectRatio='xMidYMid meet'></svg>
 			self.svg = d3.select('#container').selectAll('svg.vis')
@@ -245,8 +245,8 @@ var init = function(){
 			self.svg.enter().append('svg')
 				.classed('vis',true);
 			self.svg
-				//.attr('viewBox','0 0 1440 900')
-				//.attr('preserveAspectRatio','xMidYMid meet')
+				.attr('viewBox','0 0 1440 900')
+				.attr('preserveAspectRatio','xMidYMid meet')
 				.style('background',self.colors[self.mode])
 			self.svg
 				.on('click',function(){
@@ -416,8 +416,8 @@ var init = function(){
 
 		//thanks for all the help, http://www.redblobgames.com/grids/hexagons/!
 		generate:function(){
-			self.w = window.innerWidth;
-			self.h = window.innerHeight;
+			//self.w = window.innerWidth;
+			//self.h = window.innerHeight;
 
 			self.m = self.w <=400;
 			
@@ -725,6 +725,6 @@ self.setup();
 self.getData(self.processData);
 
 window.onresize = function(){
-	self.setup();
-	self.generate();
+	//self.setup();
+	//self.generate();
 }
