@@ -746,6 +746,10 @@ self.setup();
 self.getData(self.processData);
 
 window.onresize = function(){
-	self.device = self.util_resolve_device(window.innerWidth);
-	console.log(self.device);
+	var device = self.util_resolve_device(window.innerWidth);
+	if(device !== self.device){
+		console.log(self.device +'->' +device);
+		self.setup();
+		self.generate();
+	}
 }
