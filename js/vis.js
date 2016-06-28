@@ -5,8 +5,21 @@ var init = function(){
 		data:{},
 		data_display:null,
 
-		//breakpoints
-		//320
+		device:'default',
+		device_dimensions:{
+			'default':{
+				w:1440,
+				h:900
+			},
+			'tablet':{
+				w:640,
+				h:960
+			},
+			'mobile':{
+				w:480,
+				h:640
+			}
+		},
 
 		//default mode
 		mode:0,
@@ -35,9 +48,6 @@ var init = function(){
 		state_grade:0,
 
 		col_w:0,
-
-		w:1440,//window.innerWidth,
-		h:900,//window.innerHeight,
 
 		m:false,
 
@@ -236,8 +246,10 @@ var init = function(){
 
 		setup:function(){
 
-			//self.w = window.innerWidth;
-			//self.h = window.innerHeight;
+			self.device = self.util_resolve_device(window.innerWidth);
+
+			self.w = self.device_dimensions[self.device].w;
+			self.h = self.device_dimensions[self.device].h;
 
 			//<svg id='map' viewBox='0 0 1436 782' preserveAspectRatio='xMidYMid meet'></svg>
 			self.svg = d3.select('#container').selectAll('svg.vis')
@@ -418,8 +430,6 @@ var init = function(){
 		generate:function(){
 			//self.w = window.innerWidth;
 			//self.h = window.innerHeight;
-
-			self.m = self.w <=400;
 			
 			self.svg.style('background',(self.colors[self.mode]));
 			self.legend_body.style('background',self.colors_legend[self.mode]);
@@ -716,6 +726,17 @@ var init = function(){
 
 		util_resolve_gender:function(_g){
 			return _g.toLowerCase() === 'f' ? 'Female' : 'Male';
+		},
+		util_resolve_device:function(_w){
+			var device = 'default';
+			if(_w >self.device_dimensions.tablet.w){
+				device = 'default';
+			} else if(_w <=self.device_dimensions.tablet.w && _w >self.device_dimensions.mobile.w){
+				device = 'tablet';
+			} else if(_w <=self.device_dimensions.mobile.w){
+				device = 'mobile';
+			}
+			return device;
 		}
 	}
 }
@@ -725,6 +746,6 @@ self.setup();
 self.getData(self.processData);
 
 window.onresize = function(){
-	//self.setup();
-	//self.generate();
+	self.device = self.util_resolve_device(window.innerWidth);
+	console.log(self.device);
 }

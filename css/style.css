@@ -331,7 +331,12 @@ svg {
 
 /*	FLUIDITY
 	----------------------------- */
-
 @media (min-width:320px) { 
+	/* smartphones, iPhone, portrait 480x320 phones */
 
-}
+	}
+
+@media (min-width:640px) { 
+	/* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+
+	}
