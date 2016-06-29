@@ -680,15 +680,15 @@ var init = function(){
 					var x, y;
 					var o = d.rating/5;
 
+					var padL = self.device === 'tablet' ? padding.left : 0,
+						padT = self.device === 'tablet' ? padding.top : 0;
+
 					if(dev_off){
 						x = self.filters.length === 0 ? d.pos.pixel.y : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +d.idx_g*(hex_rad*8);
 						y = self.filters.length === 0 ? d.pos.pixel.x : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875));
-
-						// x +=self.w/2;
-						// y +=self.h/2;
 					} else{
-						x = self.filters.length === 0 ? d.pos.pixel.y : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875)) +padding.left;
-						y = self.filters.length === 0 ? d.pos.pixel.x : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +padding.top : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +(d.idx_g*(hex_rad*8))/2 +padding.top;
+						x = self.filters.length === 0 ? d.pos.pixel.y : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875)) +padL;
+						y = self.filters.length === 0 ? d.pos.pixel.x : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +padT : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +(d.idx_g*(hex_rad*8))/2 +padT;
 					}
 
 					x +=self.w/2;
