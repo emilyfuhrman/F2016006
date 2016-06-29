@@ -314,6 +314,7 @@ svg {
 	}
 
 .hexesGT {
+	text-anchor:start;
 	font-size:0.8rem;
 	}
 .hexesGGT {
@@ -356,6 +357,10 @@ svg {
 		opacity:0;
 		visibility:hidden;
 		}
+
+	.hexesGT {
+		text-anchor:end;
+		}
 	}
 
 @media (min-width:768px) { 
@@ -396,6 +401,10 @@ svg {
 		opacity:1;
 		visibility:visible;
 		}
+
+	.hexesGT {
+		text-anchor:end;
+		}
 	}
 
 @media (min-width:1024px) { 
@@ -435,5 +444,9 @@ svg {
 	#menu .btn.clear.visible {
 		opacity:1;
 		visibility:visible;
+		}
+
+	.hexesGT {
+		text-anchor:start;
 		}
 	}

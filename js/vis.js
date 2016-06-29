@@ -12,8 +12,8 @@ var init = function(){
 				h:900
 			},
 			'tablet':{
-				w:1024,
-				h:768
+				w:768,
+				h:1024
 			},
 			'mobile':{
 				w:480,
@@ -257,7 +257,12 @@ var init = function(){
 			self.svg.enter().append('svg')
 				.classed('vis',true);
 			self.svg
-				.attr('viewBox','0 0 1440 900')
+				//.attr('viewBox','0 0 1440 900')
+				.attr('viewBox',function(d){
+					var x = self.device_dimensions[self.device].w,
+						y = self.device_dimensions[self.device].h;
+					return '0 0 ' +x +' ' +y;
+				})
 				.attr('preserveAspectRatio','xMidYMid meet')
 				.style('background',self.colors[self.mode])
 			self.svg
@@ -475,6 +480,13 @@ var init = function(){
 				.domain([0,self.buckets_age.length -1])
 				.range([2,hex_rad]);
 
+			var padding = {
+				'top':30,
+				'right':0,
+				'bottom':0,
+				'left':90
+			};
+
 			//update legend
 			var legend_hexes;
 			legend_hexes = self.legend_g.selectAll('path.legend_hex')
@@ -549,8 +561,12 @@ var init = function(){
 			hexG.enter().append('g')
 				.classed('hexG',true);
 			hexG
-				.attr('transform','translate(' +self.w/2 +',' +self.h/2 +')')
-				;
+				.attr('transform',function(d){
+					var noT = self.device === 'default' || self.device === 'mobile' || self.filters.length === 0,
+						x = noT ? self.w/2 : self.w/2 +padding.left,
+						y = noT ? self.h/2 : self.h/2 +padding.top;
+					return 'translate(' +x +',' +y +')';
+				});
 			hexG
 				.on('mouseout',function(d){
 					hexTTG.classed('hidden',true);
@@ -565,7 +581,7 @@ var init = function(){
 				.attr('transform',function(d,i){
 					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : i*self.col_w -self.w/2 +self.w*0.125,
 						y = d.pos && d.pos.pixel ? d.pos.pixel.x : -self.h*0.25;
-					return 'translate(' +x +',' +y +')';
+					return self.device === 'default' || self.filters.length === 0 ? 'translate(' +x +',' +y +')' : 'translate(' +y +',' +x +')';
 				});
 			hexesG.exit().remove();
 			hexesGT = hexesG.selectAll('text.hexesGT')
@@ -576,7 +592,7 @@ var init = function(){
 				.attr('transform',function(d,i){
 					var x = 0,
 						y = hex_row_height*(hex_rad*2) -hex_rad*2;
-					return 'translate(' +x +',' +y +')';
+					return self.device === 'default' ? 'translate(' +x +',' +y +')' : 'translate(-60,' +hex_rad +')';
 				})
 				.text(function(d){ 
 					var str = self.filters.length === 0 ? '' : d.key;
@@ -591,7 +607,7 @@ var init = function(){
 				.attr('transform',function(d,i){
 					var x = i*(hex_rad*8),
 						y = 0;
-					return 'translate(' +x +',' +y +')';
+					return self.device === 'default' ? 'translate(' +x +',' +y +')' : 'translate(' +y +',' +x/2 +')';
 				});
 			hexesGG.exit().remove();
 			hexesGGT = hexesGG.selectAll('text.hexesGGT')
@@ -602,7 +618,7 @@ var init = function(){
 				.attr('transform',function(d){
 					var x = 0,
 						y = hex_row_height*(hex_rad*2) +hex_rad*2;
-					return 'translate(' +x +',' +y +')';
+					return self.device === 'default' ? 'translate(' +x +',' +y +')' : 'translate(-30,' +hex_rad +')';
 				})
 				.text(function(d,i){ return d[0].gender; });
 			hexesGGT.exit().remove();
@@ -617,7 +633,7 @@ var init = function(){
 				.attr('transform',function(d,i){
 					var x = self.filters.length === 0 ? 0 : Math.floor(i/hex_row_height)*(hex_rad*1.5),
 						y = self.filters.length === 0 ? 0 : (i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875); //why?
-					return 'translate(' +x +',' +y +')rotate(90)';
+					return self.device === 'default' || self.filters.length === 0 ? 'translate(' +x +',' +y +')rotate(90)' : 'translate(' +y +',' +x +')';
 				})
 				.style('stroke',self.colors[self.mode])
 				.style('fill-opacity',function(d){
@@ -625,9 +641,20 @@ var init = function(){
 				});
 			hexes
 				.on('mousemove',function(d,i){
-					var x = self.filters.length === 0 ? d.pos.pixel.y : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +d.idx_g*(hex_rad*8),
-						y = self.filters.length === 0 ? d.pos.pixel.x : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875));
+					var dev_off = self.device === 'default' || self.filters.length === 0;
+					var x, y;
 					var o = d.rating/5;
+
+					if(dev_off){
+						x = self.filters.length === 0 ? d.pos.pixel.y : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +d.idx_g*(hex_rad*8);
+						y = self.filters.length === 0 ? d.pos.pixel.x : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875));
+
+						// x +=self.w/2;
+						// y +=self.h/2;
+					} else{
+						x = self.filters.length === 0 ? d.pos.pixel.y : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875)) +padding.left;
+						y = self.filters.length === 0 ? d.pos.pixel.x : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +padding.top : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +(d.idx_g*(hex_rad*8))/2 +padding.top;
+					}
 
 					x +=self.w/2;
 					y +=self.h/2;
@@ -635,7 +662,8 @@ var init = function(){
 					hexTTG
 						.classed('hidden',false)
 						.attr('transform',function(){
-							return 'translate(' +x +',' +y +')rotate(90)';
+							var str = dev_off ? 'translate(' +x +',' +y +')rotate(90)' : 'translate(' +x +',' +y +')'; 
+							return str;
 						});
 					hexTT
 						.style('fill-opacity',o);
@@ -679,6 +707,8 @@ var init = function(){
 		util_filters_clear:function(){
 
 			self.filters = [];
+
+			self.state_grade = 0;
 
 			self.btn_filters_clear.classed('visible',false);
 			self.btn_filters
@@ -731,11 +761,11 @@ var init = function(){
 		},
 		util_resolve_device:function(_w){
 			var device = 'default';
-			if(_w >self.device_dimensions.tablet.w){
+			if(_w >self.device_dimensions.tablet.h){
 				device = 'default';
-			} else if(_w <=self.device_dimensions.tablet.w && _w >self.device_dimensions.mobile.w){
+			} else if(_w <=self.device_dimensions.tablet.h && _w >self.device_dimensions.tablet.w){
 				device = 'tablet';
-			} else if(_w <=self.device_dimensions.mobile.w){
+			} else if(_w <=self.device_dimensions.tablet.w){
 				device = 'mobile';
 			}
 			return device;
