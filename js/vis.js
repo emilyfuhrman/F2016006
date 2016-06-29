@@ -785,7 +785,8 @@ var init = function(){
 				.classed('comment_block',true);
 			comments
 				.html(function(d){
-					return d.comment;
+					var str = '<span class="mobile_comment_user">Grade ' +d.grade +' rating: ' +d.rating +'/5 &#124; ' +self.util_resolve_gender(d.gender) +', ' +d.age +', ' +d.country +'</span><span>&ldquo;' +d.comment +'&rdquo;</span>';
+					return str;
 				})
 				.style('color',function(d){
 					return self.colors[self.mode];

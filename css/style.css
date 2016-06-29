@@ -256,7 +256,11 @@ div {
 	height:42px;
 	right:30px;
 	top:30px;
-	border:1px solid black;
+	border:2px solid black;
+	-webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -ms-box-sizing:border-box;
+	box-sizing:border-box;
 	cursor:pointer;
 	}
 .nav_mobile #hamburger.xout {
@@ -274,6 +278,7 @@ div {
 	border-radius:15px;
 	}
 .nav_mobile #mode_mobile {
+	z-index:70;
 	background:url(../assets/icon_switch.svg) no-repeat 7px 6px;
 	background-size:16px 16px;
 	top:15px;
@@ -284,6 +289,7 @@ div {
 	font-weight:bold;
 	}
 .nav_mobile #comments {
+	z-index:70;
 	background:none;
 	top:48px;
 	padding-left:9px;
@@ -296,6 +302,7 @@ div {
 	}
 
 .nav_mobile#comments_panel .panel {
+	z-index:60;
 	position:relative;
 	background:white;
 	width:100%;
@@ -307,11 +314,21 @@ div {
 	width:100%;
 	font-size:0.6rem;
 	font-family:'Georgia', serif;
-	padding:12px;
+	padding:15px;
 	-webkit-box-sizing:border-box;
     -moz-box-sizing:border-box;
     -ms-box-sizing:border-box;
 	box-sizing:border-box;
+	}
+
+.nav_mobile#comments_panel .panel .comment_block span {
+	float:left;
+	width:100%;
+	}
+.nav_mobile#comments_panel .panel .comment_block span.mobile_comment_user {
+	font-family:sans-serif;
+	font-weight:bold;
+	padding-bottom:6px;
 	}
 
 /*	FORM
