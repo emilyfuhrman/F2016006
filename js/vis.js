@@ -271,11 +271,12 @@ var init = function(){
 				});
 			self.svg.exit().remove();
 
-			//grab all annotation elements
+			//grab menu and all annotation elements
+			self.menu = d3.select('#menu');
 			self.anno_comment = d3.select('#comment');
 			self.anno_tweet = d3.select('#anno #detail #twitter');
 			self.anno_userDetail = d3.select('#anno #detail #user').html(function(){
-				return self.device === 'default'? 'Hover over a hexagon for detail.' : 'Tap a hexagon for detail.';
+				return self.device === 'default'? 'Hover over a hexagon for detail.' : self.device === 'tablet' ? 'Tap a hexagon for detail.' : 'Swipe to explore!';
 			});
 
 			//grab arrows
@@ -430,6 +431,22 @@ var init = function(){
 				d3.event.stopPropagation();
 				self.util_filters_clear();
 				self.generate();
+			});
+
+			//grab mobile nav
+			self.mobile_ham = d3.select('#hamburger').on('click',function(){
+				var o = self.menu.style('opacity');
+				if(+o === 0){
+					self.menu
+						.style('opacity',1)
+						.style('visibility','visible');
+					self.mobile_ham.classed('xout',true);
+				} else{
+					self.menu
+						.style('opacity',0)
+						.style('visibility','hidden');
+					self.mobile_ham.classed('xout',false);
+				}
 			});
 		},
 
@@ -750,7 +767,7 @@ var init = function(){
 			self.anno_userDetail.html(str_userDetail);
 		},
 		util_detail_clear:function(){
-			var str_userDetail = self.device === 'default'? 'Hover over a hexagon for detail.' : 'Tap a hexagon for detail.';
+			var str_userDetail = self.device === 'default'? 'Hover over a hexagon for detail.' : self.device === 'tablet' ? 'Tap a hexagon for detail.' : 'Swipe to explore!';
 			self.anno_comment.html('');
 			self.anno_userDetail.html(str_userDetail);
 			self.anno_tweet.html('');
