@@ -12,8 +12,8 @@ var init = function(){
 				h:900
 			},
 			'tablet':{
-				w:640,
-				h:960
+				w:1024,
+				h:768
 			},
 			'mobile':{
 				w:480,
@@ -268,8 +268,10 @@ var init = function(){
 
 			//grab all annotation elements
 			self.anno_comment = d3.select('#comment');
-			self.anno_userDetail = d3.select('#anno #detail #user');
 			self.anno_tweet = d3.select('#anno #detail #twitter');
+			self.anno_userDetail = d3.select('#anno #detail #user').html(function(){
+				return self.device === 'default'? 'Hover over a hexagon for detail.' : 'Tap a hexagon for detail.';
+			});
 
 			//grab arrows
 			self.arrows = d3.selectAll('.arrow').on('click',function(){
@@ -718,7 +720,7 @@ var init = function(){
 			self.anno_userDetail.html(str_userDetail);
 		},
 		util_detail_clear:function(){
-			var str_userDetail = 'Hover over a hexagon for detail.'
+			var str_userDetail = self.device === 'default'? 'Hover over a hexagon for detail.' : 'Tap a hexagon for detail.';
 			self.anno_comment.html('');
 			self.anno_userDetail.html(str_userDetail);
 			self.anno_tweet.html('');

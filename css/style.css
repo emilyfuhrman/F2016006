@@ -328,15 +328,112 @@ svg {
 	cursor:pointer;
 	}
 
-
 /*	FLUIDITY
 	----------------------------- */
-@media (min-width:320px) { 
+
+@media (max-width:768px) { 
 	/* smartphones, iPhone, portrait 480x320 phones */
 
+	#menu .btn.filter#gender {
+		}
+	#menu .btn.filter#country {
+		}
+	#menu .btn.filter#grade {
+		}
+		
+	#anno {
+		width:100%;
+		}
+
+	#sampled,
+	#sampled.visible {
+		opacity:0;
+		visibility:hidden;
+		}
+
+	#menu .btn.clear,
+	#menu .btn.clear.visible {
+		opacity:0;
+		visibility:hidden;
+		}
 	}
 
-@media (min-width:640px) { 
+@media (min-width:768px) { 
 	/* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
 
+	#menu .btn.filter#gender {
+		left:15px;
+		top:54px;
+		}
+	#menu .btn.filter#country {
+		left:15px;
+		top:126px;
+		}
+	#menu .btn.filter#grade {
+		left:15px;
+		top:90px;
+		}
+
+	#anno {
+		width:300px;
+		}
+
+	#sampled {
+		top:195px;
+		}
+	#sampled.visible {
+		opacity:1;
+		visibility:visible;
+		}
+
+	#menu .btn.clear {
+		opacity:0;
+		visibility:hidden;
+		left:15px;
+		top:170px;
+		}
+	#menu .btn.clear.visible {
+		opacity:1;
+		visibility:visible;
+		}
+	}
+
+@media (min-width:1024px) { 
+	/* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+
+	#menu .btn.filter#gender {
+		left:15px;
+		top:54px;
+		}
+	#menu .btn.filter#country {
+		left:150px;
+		top:54px;
+		}
+	#menu .btn.filter#grade {
+		left:285px;
+		top:54px;
+		}
+
+	#anno {
+		width:500px;
+		}
+
+	#sampled {
+		top:105px;
+		}
+	#sampled.visible {
+		opacity:1;
+		visibility:visible;
+		}
+
+	#menu .btn.clear {
+		opacity:0;
+		visibility:hidden;
+		left:420px;
+		top:66px;
+		}
+	#menu .btn.clear.visible {
+		opacity:1;
+		visibility:visible;
+		}
 	}
