@@ -252,10 +252,11 @@ div {
 	z-index:50;
 	position:fixed;
 	background:white;
-	width:45px;
-	height:45px;
+	width:42px;
+	height:42px;
 	right:30px;
 	top:30px;
+	border:1px solid black;
 	cursor:pointer;
 	}
 .nav_mobile #hamburger.xout {
@@ -285,7 +286,32 @@ div {
 .nav_mobile #comments {
 	background:none;
 	top:48px;
-	padding-left:15px;
+	padding-left:9px;
+	}
+
+.nav_mobile#comments_panel {
+	display:none;
+	width:100%;
+	height:100%;
+	}
+
+.nav_mobile#comments_panel .panel {
+	position:relative;
+	background:white;
+	width:100%;
+	height:auto;
+	}
+
+.nav_mobile#comments_panel .panel .comment_block {
+	float:left;
+	width:100%;
+	font-size:0.6rem;
+	font-family:'Georgia', serif;
+	padding:12px;
+	-webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -ms-box-sizing:border-box;
+	box-sizing:border-box;
 	}
 
 /*	FORM

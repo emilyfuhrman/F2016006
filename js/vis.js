@@ -57,6 +57,9 @@ var init = function(){
 		hex_h:26,
 		hex_sideLength:15,
 
+		//mobile comments visible?
+		comments_on:false,
+
 		colors:[
 			'#4a78cf',
 			'#85B800'
@@ -425,7 +428,8 @@ var init = function(){
 				btn
 					.classed('selected',!btn_selected)
 					.style('color',function(){ return btn_selected ? 'white' : self.colors[self.mode]; });
-
+				
+				self.mobile_ham.classed('xout',false);
 				self.generate();
 			});
 			self.btn_filters_clear = d3.select('#clear').on('click',function(){
@@ -446,14 +450,23 @@ var init = function(){
 				}
 			});
 			self.mobile_comments = d3.select('#comments').on('click',function(){
-				self.generate_comments();
+				if(self.comments_on && self.device === 'mobile'){
+					self.comments_hide();
+				} else if(!self.comments_on && self.device === 'mobile'){
+					self.comments_show();
+				}
 			});
+			self.mobile_comments_panel = d3.select('#comments_panel');
+			self.mobile_comments_panel_body = d3.select('#comments_panel .panel');
 		},
 
 		//thanks for all the help, http://www.redblobgames.com/grids/hexagons/!
 		generate:function(){
 			//self.w = window.innerWidth;
 			//self.h = window.innerHeight;
+
+			//remove comments panel if needed
+			if(self.device !== 'mobile' || (self.device === 'mobile' && !self.comments_on)){ self.comments_hide(); }
 			
 			self.svg.style('background',(self.colors[self.mode]));
 			self.legend_body.style('background',self.colors_legend[self.mode]);
@@ -463,10 +476,7 @@ var init = function(){
 			d3.select('#title .mode').text(util_toTitleCase(self.modes[self.mode]));
 			d3.select('#form .mode').text(self.modes[self.mode]);
 
-			self.mode_switch.style('background-color',function(){
-				return d3.select(this).classed('mobile') ? self.colors_legend[self.mode] : 'transparent';
-			});
-			self.mobile_comments.style('background-color',function(){
+			d3.selectAll('.mobile.solid').style('background-color',function(){
 				return d3.select(this).classed('mobile') ? self.colors_legend[self.mode] : 'transparent';
 			});
 
@@ -732,15 +742,68 @@ var init = function(){
 			self.anno.style('background',function(){
 				return self.device === 'mobile' ? self.mode === 0 ? 'rgba(51,102,204,0.75)' : 'rgba(113,164,0,0.75)' : 'transparent';
 			});
+
+			//if on, refresh comments panel
+			if(self.comments_on){
+				self.comments_show();
+			}
 		},
 
-		generate_comments:function(){
+		comments_show:function(){
+			self.comments_on = true;
 
+			self.mobile_comments.html('&larr; View <span class="b">main</span>.');
+			self.mobile_comments_panel.style('display','block');
+
+			function getCommentData(){
+				var data = [];
+				if(self.filters.length === 1){
+					self.data_display.forEach(function(d){
+						d.value.forEach(function(_d){
+							data.push(_d);
+						});
+					});
+				} else if(self.filters.length === 2){
+					self.data_display.forEach(function(d){
+						d.value.forEach(function(_d){
+							_d.forEach(function(__d){
+								data.push(__d);
+							});
+						});
+					});
+				} else{
+					data = self.data_display;
+				}
+				return data;
+			}
+
+			var comment_data = getCommentData();
+			var comments;
+			comments = self.mobile_comments_panel_body.selectAll('div.comment_block')
+				.data(comment_data);
+			comments.enter().append('div')
+				.classed('comment_block',true);
+			comments
+				.html(function(d){
+					return d.comment;
+				})
+				.style('color',function(d){
+					return self.colors[self.mode];
+				})
+				.style('border-bottom',function(d){
+					return '2px solid ' +self.colors[self.mode];
+				});
+			comments.exit().remove();
+		},
+		comments_hide:function(){
+			self.comments_on = false;
+
+			self.mobile_comments.html('&rarr; View <span class="b">comments</span>.');
+			self.mobile_comments_panel.style('display','none');
+			self.mobile_comments_panel_body.html('');
 		},
 
 		resize:function(){
-			//**TODO
-
 		},
 
 		//INTERFACE
