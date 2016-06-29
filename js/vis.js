@@ -273,6 +273,7 @@ var init = function(){
 
 			//grab menu and all annotation elements
 			self.menu = d3.select('#menu');
+			self.anno = d3.select('#anno');
 			self.anno_comment = d3.select('#comment');
 			self.anno_tweet = d3.select('#anno #detail #twitter');
 			self.anno_userDetail = d3.select('#anno #detail #user').html(function(){
@@ -314,7 +315,7 @@ var init = function(){
 			});
 
 			//grab navigation buttons, add click handlers
-			self.mode_switch = d3.select('#menu .btn#mode').on('click',function(){
+			self.mode_switch = d3.selectAll('.btn.view.mode').on('click',function(){
 				d3.event.stopPropagation();
 				self.util_filters_clear();
 				self.mode = 1 -self.mode;
@@ -435,18 +436,17 @@ var init = function(){
 
 			//grab mobile nav
 			self.mobile_ham = d3.select('#hamburger').on('click',function(){
-				var o = self.menu.style('opacity');
-				if(+o === 0){
-					self.menu
-						.style('opacity',1)
-						.style('visibility','visible');
+				var o = self.menu.style('display');
+				if(o === 'none'){
+					self.menu.style('display','block');
 					self.mobile_ham.classed('xout',true);
 				} else{
-					self.menu
-						.style('opacity',0)
-						.style('visibility','hidden');
+					self.menu.style('display','none');
 					self.mobile_ham.classed('xout',false);
 				}
+			});
+			self.mobile_comments = d3.select('#comments').on('click',function(){
+				self.generate_comments();
 			});
 		},
 
@@ -463,13 +463,21 @@ var init = function(){
 			d3.select('#title .mode').text(util_toTitleCase(self.modes[self.mode]));
 			d3.select('#form .mode').text(self.modes[self.mode]);
 
+			self.mode_switch.style('background-color',function(){
+				return d3.select(this).classed('mobile') ? self.colors_legend[self.mode] : 'transparent';
+			});
+			self.mobile_comments.style('background-color',function(){
+				return d3.select(this).classed('mobile') ? self.colors_legend[self.mode] : 'transparent';
+			});
+
 			//update sample span to reflect sample data, if applicable
 			d3.select('#sampled .sample').text(function(){
 				return self.filters.length >0 ? 5 : 0;
 			});
 
-			//update switch button to reflect opposite mode
-			d3.select('#menu span.mode_opp').text(self.modes[1 -self.mode]);
+			//update switch buttons to reflect current/opposite modes
+			d3.selectAll('.mode_cur').text(self.modes[self.mode]);
+			d3.selectAll('.mode_opp').text(self.modes[1 -self.mode]);
 
 			//**TODO -- determine number of rings to calculate positions for
 
@@ -713,6 +721,21 @@ var init = function(){
 				.attr('d',hexbin.hexagon(hex_rad_hov))
 				.style('stroke',self.colors[self.mode]);
 			hexTT.exit().remove();
+
+			self.menu
+				.style('display',function(){
+					return self.device !== 'mobile' ? 'block' : 'none';
+				})
+				.style('background',function(){
+					return self.device === 'mobile' ? self.mode === 0 ? 'rgba(51,102,204,0.9)' : 'rgba(113,164,0,0.9)' : 'transparent';
+				});
+			self.anno.style('background',function(){
+				return self.device === 'mobile' ? self.mode === 0 ? 'rgba(51,102,204,0.75)' : 'rgba(113,164,0,0.75)' : 'transparent';
+			});
+		},
+
+		generate_comments:function(){
+
 		},
 
 		resize:function(){
@@ -761,8 +784,15 @@ var init = function(){
 		},	
 
 		util_detail_update:function(_d){
-			var str_comment = '&ldquo;' +_d.comment +'&rdquo;',
+			var str_comment,
+				str_userDetail;
+			if(self.device ==='mobile'){
+				str_comment = '';
+				str_userDetail = 'Rating: ' +_d.rating +'/5<br/><br/>' + '<span class="comment">&ldquo;' +_d.comment +'&rdquo;</span>';
+			} else{
+				str_comment = '&ldquo;' +_d.comment +'&rdquo;';
 				str_userDetail = 'Grade ' +_d.grade +' rating: ' +_d.rating +'/5 &#124; ' +self.util_resolve_gender(_d.gender) +', ' +_d.age +', ' +_d.country;
+			}
 			self.anno_comment.html(str_comment);
 			self.anno_userDetail.html(str_userDetail);
 		},

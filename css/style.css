@@ -15,6 +15,10 @@ div {
 	padding:0;
 	}
 
+.b {
+	font-weight:bold;
+	}
+
 #container {
 	width:100%;
 	height:100%;
@@ -31,20 +35,21 @@ div {
 	}
 
 #title {
+	display:block;
 	font-size:0.8rem;
 	left:15px;
 	top:24px;
 	}
 
 #menu {
+	z-index:10;
 	position:absolute;
 	width:auto;
 	height:auto;
-	background:rgba(51,102,204,0);
 	}
 
 #menu .btn {
-	position:absolute;
+	position:fixed;
 	color:white;
 	font-size:0.6rem;
 	/*padding:6px 15px;*/
@@ -53,6 +58,7 @@ div {
 	cursor:pointer;
 	}
 #menu .btn.view {
+	display:block;
 	padding:6px 0 6px 30px;
 	width:90px;
 	border-radius:15px;
@@ -63,7 +69,13 @@ div {
 	background-size:16px 16px;
 	background-color:transparent;
 	padding:6px 0 6px 30px;
-	width:90px;
+	width:120px;
+	font-size:0.6rem;
+	border:1px solid white;
+	-webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -ms-box-sizing:border-box;
+	box-sizing:border-box;
 	}
 #menu .btn.filter.selected {
 	opacity:1;
@@ -74,18 +86,17 @@ div {
 	pointer-events:none;
 	}
 #menu .btn.clear {
-	opacity:0;
-	visibility:hidden;
+	display:none;
 	font-size:0.4rem;
 	text-transform:uppercase;
 	left:420px;
 	top:66px;
+	bottom:auto;
 	padding:3px 6px 2px;
 	border-radius:9px;
 	}
 #menu .btn.clear.visible {
-	opacity:1;
-	visibility:visible;
+	display:block;
 	}
 
 #menu .btn.filter#gender {
@@ -107,6 +118,7 @@ div {
 	}
 
 #menu .btn#add {
+	display:block;
 	background:url(../assets/icon_add.svg) no-repeat 8px 6px;
 	background-size:14px 14px;
 	right:15px;
@@ -119,17 +131,24 @@ div {
 	font-size:0.6rem;
 	right:15px;
 	bottom:24px;
+	padding:0;
 	pointer-events:none;
+	-webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -ms-box-sizing:border-box;
+	box-sizing:border-box;
 	}
 
-#anno #comment {
+#anno #comment,
+#anno .comment {
 	font-family:'Georgia', serif;
+	padding-top:30px;
 	padding-bottom:15px;
 	}
 
 #anno #detail {
 	width:100%;
-	padding-top:15px;
+	padding-top:16px;
 	padding-bottom:0;
 	border-top:1px solid white;
 	}
@@ -141,8 +160,7 @@ div {
 
 #legend {
 	position:fixed;
-	opacity:1;
-	visibility:visible;
+	display:block;
 	z-index:100;
 	font-size:0.6rem;
 	margin-left:15px;
@@ -173,12 +191,10 @@ div {
 	}
 
 .legend_g {
-	opacity:0;
-	visibility:hidden;
+	display:none;
 	}
 .legend_g.show {
-	opacity:1;
-	visibility:visible;
+	display:block;
 	}
 
 .legend_g_txt {
@@ -193,21 +209,18 @@ div {
 	}
 
 #sampled {
-	opacity:0;
-	visibility:hidden;
+	display:none;
 	font-size:0.5rem;
 	font-style:italic;
 	top:105px;
 	left:15px;
 	}
 #sampled.visible {
-	opacity:1;
-	visibility:visible;
+	display:block;
 	}
 
 #arrows .arrow {
-	opacity:0;
-	visibility:hidden;
+	display:none;
 	position:absolute;
 	width:45px;
 	height:30px;
@@ -217,8 +230,7 @@ div {
 	cursor:pointer;
 	}
 #arrows .arrow.visible {
-	opacity:1;
-	visibility:visible;
+	display:block;
 	}
 #arrows .arrow#left {
 	text-align:left;
@@ -233,12 +245,11 @@ div {
 	----------------------------- */
 
 .nav_mobile {
-	opacity:0;
-	visibility:hidden;
+	display:none;
 	}
 
 .nav_mobile #hamburger {
-	z-index:1;
+	z-index:50;
 	position:fixed;
 	background:white;
 	width:45px;
@@ -248,23 +259,47 @@ div {
 	cursor:pointer;
 	}
 .nav_mobile #hamburger.xout {
-	background:blue;
+	background:black;
+	}
+
+.nav_mobile .btn {
+	position:fixed;
+	font-size:0.7rem;
+	cursor:pointer;
+	}
+.nav_mobile .btn.mobile {
+	left:15px;
+	padding:6px 15px 6px 0;
+	border-radius:15px;
+	}
+.nav_mobile #mode_mobile {
+	background:url(../assets/icon_switch.svg) no-repeat 7px 6px;
+	background-size:16px 16px;
+	top:15px;
+	padding-left:30px;
+	}
+.nav_mobile #mode_mobile .mode_cur,
+.nav_mobile #mode_mobile .mode_opp {
+	font-weight:bold;
+	}
+.nav_mobile #comments {
+	background:none;
+	top:48px;
+	padding-left:15px;
 	}
 
 /*	FORM
 	----------------------------- */
 
 .form {
-	visibility:visible;
-	opacity:1;
+	display:block;
 	position:absolute;
 	background:white;
 	width:500px;
 	margin:0 auto;
 	}
 .form.hidden {
-	visibility:hidden;
-	opacity:0;
+	display:none;
 	}
 
 .form select {
@@ -367,50 +402,82 @@ svg {
 	/* smartphones, iPhone, portrait 480x320 phones */
 
 	.nav_mobile {
-		opacity:1;
-		visibility:visible;
+		display:block;
 		}
 
 	#anno {
-		background:rgba(51,102,204,0.75);
 		width:100%;
+		font-size:0.8rem;
 		right:0;
 		bottom:0;
+		padding:15px;
 		}
 	#anno #detail {
 		padding-bottom:15px;
+		border-top:none;
 		}
 
 	#sampled,
 	#sampled.visible {
-		opacity:0;
-		visibility:hidden;
+		display:none;
+		}
+
+	#title {
+		display:none;
 		}
 
 	#menu {
-		opacity:0;
-		visibility:hidden;
+		display:none;
 		width:100%;
 		height:100%;
-		background:rgba(51,102,204,0.9);
 		}
+	
+	#menu .btn.view {
+		display:none;
+		}
+
+	#menu .btn.filter {
+		background:url(../assets/icon_filter.svg) no-repeat 12px 24px;
+		background-size:30px 30px;
+		width:80%;
+		width:calc(100% - 36px);
+		font-size:1.2rem;
+		padding:27px 0 24px 60px;
+		border:2px solid white;
+		}	
 
 	#menu .btn.filter#gender {
+		left:18px;
+		top:120px;
 		}
 	#menu .btn.filter#country {
+		left:18px;
+		top:210px;
 		}
 	#menu .btn.filter#grade {
+		left:18px;
+		top:300px;
 		}
 
-	#menu .btn.clear,
+	#menu .btn#add {
+		display:none;
+		}
+
+	#menu .btn.clear {
+		display:none;
+		font-size:1rem;
+		left:15px;
+		top:auto;
+		bottom:30px;
+		padding:13px 18px 12px;
+		border-radius:24px;
+		}
 	#menu .btn.clear.visible {
-		opacity:0;
-		visibility:hidden;
+		display:block;
 		}
 
 	#legend {
-		opacity:0;
-		visibility:hidden;
+		display:none;
 		}
 
 	.hexesGT {
@@ -422,33 +489,50 @@ svg {
 	/* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
 	
 	.nav_mobile {
-		opacity:0;
-		visibility:hidden;
+		display:none;
 		}
 
 	#anno {
 		background:transparent;
 		width:300px;
+		font-size:0.6rem;
 		right:15px;
 		bottom:24px;
+		padding:0;
 		}
 	#anno #detail {
 		padding-bottom:0;
+		border-top:1px solid white;
 		}
 
 	#sampled {
 		top:195px;
 		}
 	#sampled.visible {
-		opacity:1;
-		visibility:visible;
+		display:block;
+		}
+
+	#title {
+		display:block;
 		}
 
 	#menu {
 		width:auto;
 		height:auto;
-		background:rgba(51,102,204,0);
 		}
+	
+	#menu .btn.view {
+		display:block;
+		}
+
+	#menu .btn.filter {
+		background:url(../assets/icon_filter.svg) no-repeat 6px 5px;
+		background-size:16px 16px;
+		width:120px;
+		font-size:0.6rem;
+		padding:6px 0 6px 30px;
+		border:1px solid white;
+		}	
 
 	#menu .btn.filter#gender {
 		left:15px;
@@ -463,20 +547,25 @@ svg {
 		top:90px;
 		}
 
+	#menu .btn#add {
+		display:block;
+		}
+
 	#menu .btn.clear {
-		opacity:0;
-		visibility:hidden;
+		display:none;
+		font-size:0.4rem;
 		left:15px;
 		top:170px;
+		bottom:auto;
+		padding:3px 6px 2px;
+		border-radius:9px;
 		}
 	#menu .btn.clear.visible {
-		opacity:1;
-		visibility:visible;
+		display:block;
 		}
 
 	#legend {
-		opacity:1;
-		visibility:visible;
+		display:block;
 		}
 
 	.hexesGT {
@@ -488,33 +577,50 @@ svg {
 	/* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
 	
 	.nav_mobile {
-		opacity:0;
-		visibility:hidden;
+		display:none;
 		}
 
 	#anno {
 		background:transparent;
 		width:500px;
+		font-size:0.6rem;
 		right:15px;
 		bottom:24px;
+		padding:0;
 		}
 	#anno #detail {
-		padding-bottom:0
+		padding-bottom:0;
+		border-top:1px solid white;
 		}
 
 	#sampled {
 		top:105px;
 		}
 	#sampled.visible {
-		opacity:1;
-		visibility:visible;
+		display:block;
+		}
+
+	#title {
+		display:block;
 		}
 
 	#menu {
 		width:auto;
 		height:auto;
-		background:rgba(51,102,204,0);
 		}
+	
+	#menu .btn.view {
+		display:block;
+		}
+
+	#menu .btn.filter {
+		background:url(../assets/icon_filter.svg) no-repeat 6px 5px;
+		background-size:16px 16px;
+		width:120px;
+		font-size:0.6rem;
+		padding:6px 0 6px 30px;
+		border:1px solid white;
+		}	
 
 	#menu .btn.filter#gender {
 		left:15px;
@@ -529,20 +635,25 @@ svg {
 		top:54px;
 		}
 
+	#menu .btn#add {
+		display:block;
+		}
+
 	#menu .btn.clear {
-		opacity:0;
-		visibility:hidden;
+		display:none;
+		font-size:0.4rem;
 		left:420px;
 		top:66px;
+		bottom:auto;
+		padding:3px 6px 2px;
+		border-radius:9px;
 		}
 	#menu .btn.clear.visible {
-		opacity:1;
-		visibility:visible;
+		display:block;
 		}
 
 	#legend {
-		opacity:1;
-		visibility:visible;
+		display:block;
 		}
 
 	.hexesGT {
