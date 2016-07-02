@@ -297,12 +297,12 @@ var init = function(){
 			//grab forms and inputs
 			self.form = d3.select('#form')
 				.classed('hidden',true)
-				.style('left',self.w/2 -250 +'px')
+				.style('left',window.innerWidth/2 -250 +'px')
 				.style('top','150px')
 				;
 			self.form_tweet = d3.select('#form_tweet')
 				.classed('hidden',true)
-				.style('left',self.w/2 -250 +'px')
+				.style('left',window.innerWidth/2 -250 +'px')
 				.style('top','150px');
 
 			//grab form buttons, add click handlers
@@ -834,6 +834,10 @@ var init = function(){
 			d3.select('#sampled').classed('visible',false);
 		},
 
+		util_form_center:function(){
+			self.form.style('left',window.innerWidth/2 -250 +'px');
+			self.form_tweet.style('left',window.innerWidth/2 -250 +'px');
+		},
 		util_form_clear:function(){
 		},
 		util_form_hide:function(){
@@ -893,6 +897,9 @@ self.setup();
 self.getData(self.processData);
 
 window.onresize = function(){
+
+	self.util_form_center();
+
 	var device = self.util_resolve_device(window.innerWidth);
 	if(device !== self.device){
 		console.log(self.device +'->' +device);
