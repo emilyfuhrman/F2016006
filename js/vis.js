@@ -326,6 +326,7 @@ var init = function(){
 			});
 			self.add = d3.select('#menu .btn#add').on('click',function(){
 				d3.event.stopPropagation();
+				self.util_form_hide();
 				self.util_form_show();
 			});
 
