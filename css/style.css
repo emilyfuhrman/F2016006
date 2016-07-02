@@ -358,7 +358,9 @@ div {
 	}
 
 .form select {
+	background:white;
 	width:120px;
+	border:1px solid black;
 	}
 
 .form button {
@@ -369,6 +371,16 @@ div {
 	border:none;
 	border-radius:15px;
 	cursor:pointer;
+	}
+
+.form textarea {
+	width:100%;
+	height:100%;
+	border:1px solid black;
+	resize:none;
+	}
+.form textarea.body {
+	padding-bottom:36px;
 	}
 
 .form .section {
@@ -411,16 +423,6 @@ div {
 .form .input {
 	position:absolute;
 	left:300px;
-	}
-
-.form textarea {
-	width:100%;
-	height:100%;
-	border:1px solid black;
-	resize:none;
-	}
-.form textarea.body {
-	padding-bottom:36px;
 	}
 
 #form {
