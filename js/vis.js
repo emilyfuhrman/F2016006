@@ -471,6 +471,10 @@ var init = function(){
 			self.svg.style('background',(self.colors[self.mode]));
 			self.legend_body.style('background',self.colors_legend[self.mode]);
 			self.legend_comps.style('background',self.colors_legend[self.mode]);
+			self.btn_filters.attr('class',function(){
+				var sel = d3.select(this).classed('selected') ? 'selected' : '';
+				return 'btn filter ' +self.modes[self.mode] + ' ' +sel;
+			});
 
 			//update all mode spans to reflect current mode
 			d3.select('#title .mode').text(util_toTitleCase(self.modes[self.mode]));

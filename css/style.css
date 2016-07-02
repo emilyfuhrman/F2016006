@@ -65,9 +65,11 @@ div {
 	}
 #menu .btn.filter {
 	opacity:1;
-	background:url(../assets/icon_filter.svg) no-repeat 6px 5px;
-	background-size:16px 16px;
 	background-color:transparent;
+	background-image:url(../assets/icon_filter.svg);
+	background-repeat:no-repeat;
+	background-size:16px 16px;
+	background-position:6px 5px;
 	padding:6px 0 6px 30px;
 	width:120px;
 	font-size:0.6rem;
@@ -80,6 +82,16 @@ div {
 #menu .btn.filter.selected {
 	opacity:1;
 	background-color:white;
+	}
+#menu .btn.filter.selected.math {
+	background-image:url(../assets/icon_filter_math.svg);
+	background-size:19px 19px;
+	background-position:4px 4px;
+	}
+#menu .btn.filter.selected.science {
+	background-image:url(../assets/icon_filter_science.svg);
+	background-size:19px 19px;
+	background-position:4px 4px;
 	}
 #menu .btn.filter.deactivated {
 	opacity:0.5;
@@ -480,14 +492,25 @@ svg {
 		}
 
 	#menu .btn.filter {
-		background:url(../assets/icon_filter.svg) no-repeat 12px 24px;
+		background-image:url(../assets/icon_filter.svg);
 		background-size:30px 30px;
+		background-position:12px 24px;
 		width:80%;
 		width:calc(100% - 36px);
 		font-size:1.2rem;
 		padding:27px 0 24px 60px;
 		border:2px solid white;
-		}	
+		}
+	#menu .btn.filter.selected.math {
+		background-image:url(../assets/icon_filter_math.svg);
+		background-size:36px 36px;
+		background-position:10px 22px;
+		}
+	#menu .btn.filter.selected.science {
+		background-image:url(../assets/icon_filter_science.svg);
+		background-size:36px 36px;
+		background-position:10px 22px;		
+		}
 
 	#menu .btn.filter#gender {
 		left:18px;
@@ -569,13 +592,24 @@ svg {
 		}
 
 	#menu .btn.filter {
-		background:url(../assets/icon_filter.svg) no-repeat 6px 5px;
+		background-image:url(../assets/icon_filter.svg);
 		background-size:16px 16px;
+		background-position:6px 5px;
 		width:120px;
 		font-size:0.6rem;
 		padding:6px 0 6px 30px;
 		border:1px solid white;
 		}	
+	#menu .btn.filter.selected.math {
+		background-image:url(../assets/icon_filter_math.svg);
+		background-size:19px 19px;
+		background-position:4px 4px;
+		}
+	#menu .btn.filter.selected.science {
+		background-image:url(../assets/icon_filter_science.svg);
+		background-size:19px 19px;
+		background-position:4px 4px;
+		}
 
 	#menu .btn.filter#gender {
 		left:15px;
@@ -657,13 +691,24 @@ svg {
 		}
 
 	#menu .btn.filter {
-		background:url(../assets/icon_filter.svg) no-repeat 6px 5px;
+		background-image:url(../assets/icon_filter.svg);
 		background-size:16px 16px;
+		background-position:6px 5px;
 		width:120px;
 		font-size:0.6rem;
 		padding:6px 0 6px 30px;
 		border:1px solid white;
-		}	
+		}
+	#menu .btn.filter.selected.math {
+		background-image:url(../assets/icon_filter_math.svg);
+		background-size:19px 19px;
+		background-position:4px 4px;
+		}
+	#menu .btn.filter.selected.science {
+		background-image:url(../assets/icon_filter_science.svg);
+		background-size:19px 19px;
+		background-position:4px 4px;
+		}
 
 	#menu .btn.filter#gender {
 		left:15px;
