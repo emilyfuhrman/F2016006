@@ -1,8 +1,17 @@
+@font-face {
+  font-family:'FuturaLT-Book';
+  src: url('../fonts/FuturaLT-Book.ttf');
+}
+@font-face {
+  font-family:'FuturaLT-Light';
+  src: url('../fonts/FuturaLT-Light.ttf');
+}
+
 html,
 body {
 	width:100%;
 	height:100%;
-	font-family:'Arial',sans-serif;
+	font-family:'FuturaLT-Book','Arial',sans-serif;
 	font-size:20px;
 	margin:0;
 	padding:0;
@@ -59,8 +68,9 @@ div {
 	}
 #menu .btn.view {
 	display:block;
-	padding:6px 0 6px 30px;
+	padding:6px 0 4px 30px;
 	width:90px;
+	height:17px;
 	border-radius:15px;
 	}
 #menu .btn.filter {
@@ -68,11 +78,12 @@ div {
 	background-color:transparent;
 	background-image:url(../assets/icon_filter.svg);
 	background-repeat:no-repeat;
-	background-size:16px 16px;
+	background-size:15px 15px;
 	background-position:6px 5px;
-	padding:6px 0 6px 30px;
+	padding:4px 0 3px 30px;
 	width:120px;
-	font-size:0.6rem;
+	height:27px;
+	font-size:0.625rem;
 	border:1px solid white;
 	-webkit-box-sizing:border-box;
     -moz-box-sizing:border-box;
@@ -85,12 +96,12 @@ div {
 	}
 #menu .btn.filter.selected.math {
 	background-image:url(../assets/icon_filter_math.svg);
-	background-size:19px 19px;
+	background-size:17px 17px;
 	background-position:4px 4px;
 	}
 #menu .btn.filter.selected.science {
 	background-image:url(../assets/icon_filter_science.svg);
-	background-size:19px 19px;
+	background-size:17px 17px;
 	background-position:4px 4px;
 	}
 #menu .btn.filter.deactivated {
@@ -99,13 +110,15 @@ div {
 	}
 #menu .btn.clear {
 	display:none;
-	font-size:0.4rem;
+	font-size:0.35rem;
 	text-transform:uppercase;
+	letter-spacing:0.015em;
+	line-height:2.5em;
 	left:420px;
-	top:66px;
+	top:63px;
 	bottom:auto;
-	padding:3px 6px 2px;
-	border-radius:9px;
+	padding:0 12px;
+	border-radius:12px;
 	}
 #menu .btn.clear.visible {
 	display:block;
@@ -153,14 +166,16 @@ div {
 
 #anno #comment,
 #anno .comment {
+	position:absolute;
 	font-family:'Georgia', serif;
+	bottom:24px;
 	padding-top:30px;
 	padding-bottom:15px;
 	}
 
 #anno #detail {
 	width:100%;
-	padding-top:16px;
+	padding-top:6px;
 	padding-bottom:0;
 	border-top:1px solid white;
 	}
@@ -222,6 +237,7 @@ div {
 
 #sampled {
 	display:none;
+	font-family:'FuturaLT-Light';
 	font-size:0.5rem;
 	font-style:italic;
 	top:105px;
@@ -383,6 +399,31 @@ div {
 	padding-bottom:36px;
 	}
 
+input[type=radio]:not(old){
+	width:18px;
+	opacity:0;
+	margin:0;
+	padding:0;
+	cursor:pointer;
+	}
+input[type=radio]:not(old) + label{
+	display:inline-block;
+	margin-left:-18px;
+	padding-left:18px;
+	background-image:url(../assets/icon_radio.svg);
+	background-size:13px 30px;
+	background-position:0 0;
+	background-repeat:no-repeat;
+	line-height:15px;
+	}
+input[type=radio]:not(old):checked + label{
+	background-position:0 -17px;
+	}
+
+input.second {
+	margin-left:15px !important;
+	}
+
 .form .section {
 	width:100%;
 	padding:30px 0;
@@ -437,6 +478,10 @@ div {
 	}
 #form_tweet .section:first-child {
 	padding-bottom:21px;
+	}
+
+.input.gender {
+	margin-left:-2px;
 	}
 
 /*	HEXAGONS
@@ -504,6 +549,10 @@ svg {
 		bottom:0;
 		padding:15px;
 		}
+	#anno #comment,
+	#anno .comment {
+		position:static;
+		}
 	#anno #detail {
 		padding-bottom:15px;
 		border-top:none;
@@ -534,8 +583,9 @@ svg {
 		background-position:12px 24px;
 		width:80%;
 		width:calc(100% - 36px);
-		font-size:1.2rem;
-		padding:27px 0 24px 60px;
+		height:auto;
+		font-size:1.325rem;
+		padding:21px 0 20px 60px;
 		border:2px solid white;
 		}
 	#menu .btn.filter.selected.math {
@@ -572,8 +622,7 @@ svg {
 		left:15px;
 		top:auto;
 		bottom:30px;
-		padding:13px 18px 12px;
-		border-radius:24px;
+		border-radius:30px;
 		}
 	#menu .btn.clear.visible {
 		display:block;
@@ -603,6 +652,10 @@ svg {
 		bottom:24px;
 		padding:0;
 		}
+	#anno #comment,
+	#anno .comment {
+		position:absolute;
+		}
 	#anno #detail {
 		padding-bottom:0;
 		border-top:1px solid white;
@@ -630,21 +683,22 @@ svg {
 
 	#menu .btn.filter {
 		background-image:url(../assets/icon_filter.svg);
-		background-size:16px 16px;
+		background-size:15px 15px;
 		background-position:6px 5px;
 		width:120px;
-		font-size:0.6rem;
-		padding:6px 0 6px 30px;
+		height:27px;
+		font-size:0.625rem;
+		padding:4px 0 3px 30px;
 		border:1px solid white;
 		}	
 	#menu .btn.filter.selected.math {
 		background-image:url(../assets/icon_filter_math.svg);
-		background-size:19px 19px;
+		background-size:17px 17px;
 		background-position:4px 4px;
 		}
 	#menu .btn.filter.selected.science {
 		background-image:url(../assets/icon_filter_science.svg);
-		background-size:19px 19px;
+		background-size:17px 17px;
 		background-position:4px 4px;
 		}
 
@@ -667,12 +721,11 @@ svg {
 
 	#menu .btn.clear {
 		display:none;
-		font-size:0.4rem;
+		font-size:0.35rem;
 		left:15px;
 		top:170px;
 		bottom:auto;
-		padding:3px 6px 2px;
-		border-radius:9px;
+		border-radius:12px;
 		}
 	#menu .btn.clear.visible {
 		display:block;
@@ -702,6 +755,10 @@ svg {
 		bottom:24px;
 		padding:0;
 		}
+	#anno #comment,
+	#anno .comment {
+		position:absolute;
+		}
 	#anno #detail {
 		padding-bottom:0;
 		border-top:1px solid white;
@@ -729,21 +786,22 @@ svg {
 
 	#menu .btn.filter {
 		background-image:url(../assets/icon_filter.svg);
-		background-size:16px 16px;
+		background-size:15px 15px;
 		background-position:6px 5px;
 		width:120px;
-		font-size:0.6rem;
-		padding:6px 0 6px 30px;
+		height:27px;
+		font-size:0.625rem;
+		padding:4px 0 3px 30px;
 		border:1px solid white;
 		}
 	#menu .btn.filter.selected.math {
 		background-image:url(../assets/icon_filter_math.svg);
-		background-size:19px 19px;
+		background-size:17px 17px;
 		background-position:4px 4px;
 		}
 	#menu .btn.filter.selected.science {
 		background-image:url(../assets/icon_filter_science.svg);
-		background-size:19px 19px;
+		background-size:17px 17px;
 		background-position:4px 4px;
 		}
 
@@ -766,12 +824,11 @@ svg {
 
 	#menu .btn.clear {
 		display:none;
-		font-size:0.4rem;
+		font-size:0.35rem;
 		left:420px;
-		top:66px;
+		top:63px;
 		bottom:auto;
-		padding:3px 6px 2px;
-		border-radius:9px;
+		border-radius:12px;
 		}
 	#menu .btn.clear.visible {
 		display:block;
