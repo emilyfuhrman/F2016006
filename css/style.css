@@ -368,6 +368,7 @@ div {
 	background:white;
 	width:500px;
 	margin:0 auto;
+	box-shadow: 0 0 30px rgba(0,0,0,0.25);
 	}
 .form.hidden {
 	display:none;
@@ -382,8 +383,9 @@ div {
 .form button {
 	background:black;
 	color:white;
-	font-size:0.55rem;
-	padding:5px 30px 6px;
+	font-family:'FuturaLT-Book';
+	font-size:0.65rem;
+	padding:5px 30px 4px;
 	border:none;
 	border-radius:15px;
 	cursor:pointer;
@@ -442,6 +444,8 @@ input.second {
 
 .form .elem.header {
 	font-size:1rem;
+	font-weight:bold;
+	letter-spacing:0.05em;
 	margin-left:24px;
 	padding:24px 0;
 	}
@@ -457,7 +461,7 @@ input.second {
 	color:#aaa;
 	font-size:0.45rem;
 	font-weight:bold;
-	letter-spacing:0.025rem;
+	letter-spacing:0.125em;
 	text-transform:uppercase;
 	}
 
