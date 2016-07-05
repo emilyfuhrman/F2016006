@@ -473,8 +473,9 @@ var init = function(){
 			self.legend_body.style('background',self.colors_legend[self.mode]);
 			self.legend_comps.style('background',self.colors_legend[self.mode]);
 			self.btn_filters.attr('class',function(){
-				var sel = d3.select(this).classed('selected') ? 'selected' : '';
-				return 'btn filter ' +self.modes[self.mode] + ' ' +sel;
+				var sel = d3.select(this).classed('selected') ? 'selected' : '',
+					deact = d3.select(this).classed('deactivated') ? 'deactivated' : '';
+				return 'btn filter ' +self.modes[self.mode] + ' ' +sel + ' ' +deact;
 			});
 
 			//update all mode spans to reflect current mode
