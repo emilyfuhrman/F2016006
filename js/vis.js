@@ -57,6 +57,9 @@ var init = function(){
 		hex_h:26,
 		hex_sideLength:15,
 
+		path_legend:"M0,120V34.7c0-6.4,0-11.6,0-11.5c0,0,0-5.2,0-11.5S5.2,0,11.6,0H88 c6.4,0,11.6,5.2,11.6,11.5c0,6.4,5.2,11.5,11.6,11.5h53.1c6.4,0,11.6,5.2,11.6,11.6V120",
+		path_legend_exp:"M0,120V34.7c0-6.4,0-11.6,0-11.5c0,0,0-5.2,0-11.5S5.2,0,11.6,0H88 c6.4,0,11.6,5.2,11.6,11.5c0,6.4,5.2,11.5,11.6,11.5h234.8c6.4,0,11.6,5.2,11.6,11.6V120",
+
 		//mobile comments visible?
 		comments_on:false,
 
@@ -330,25 +333,35 @@ var init = function(){
 				self.util_form_show();
 			});
 
-			//grab legend
-			var legend_g,
-				legend_g_txt;
+			//grab legend and customize
+			var legend_g_txt;
 			self.legend = d3.select('.nav#legend')
 				.on('mousemove',function(){
-					d3.select('#legend #legend_tab').html('&dArr; Hide legend');
+					d3.select('#legend #legend_tab').html('Hide legend');
 					self.legend.classed('show',true);
 				})
 				.on('mouseout',function(){
-					d3.select('#legend #legend_tab').html('&#10595; View legend');
+					d3.select('#legend #legend_tab').html('View legend');
 					self.legend.classed('show',false);
 				});
-			self.legend_comps = self.legend.selectAll('.comp')
-				.style('background',self.colors_legend[self.mode]);
+			
 			self.legend_body = d3.select('#legend_body').selectAll('svg.legend')
 				.data([self]);
 			self.legend_body.enter().append('svg')
 				.classed('legend',true);
 			self.legend_body.exit().remove();
+			self.legend_bg = self.legend_body.selectAll('path.legend_bg')
+				.data([self]);
+			self.legend_bg.enter().append('path')
+				.classed('legend_bg',true);
+			self.legend_bg
+				.attr('d',function(){
+					return self.filters.length === 0 ? self.path_legend : self.path_legend_exp;
+				})
+				.attr('transform','translate(1,1)')
+				;
+			self.legend_bg.exit().remove();
+
 			self.legend_g = self.legend_body.selectAll('g.legend_g')
 				.data([[6,7],[1,2,3,4,5]]);
 			self.legend_g.enter().append('g')
@@ -359,7 +372,7 @@ var init = function(){
 				})
 				.attr('transform',function(d,i){
 					var x = i*180 +24,
-						y = 30;
+						y = 50;
 					return 'translate(' +x +',' +y +')';
 				});
 			self.legend_g.exit().remove();
@@ -395,6 +408,7 @@ var init = function(){
 				} else{
 					self.btn_filters_clear.classed('visible',true);
 
+					self.legend_bg.attr('d',self.path_legend_exp);
 					self.legend.classed('expanded',true);
 					self.legend_g.classed('show',true);
 
@@ -470,8 +484,7 @@ var init = function(){
 			if(self.device !== 'mobile' || (self.device === 'mobile' && !self.comments_on)){ self.comments_hide(); }
 			
 			self.svg.style('background',(self.colors[self.mode]));
-			self.legend_body.style('background',self.colors_legend[self.mode]);
-			self.legend_comps.style('background',self.colors_legend[self.mode]);
+			self.legend_body.style('fill',self.colors_legend[self.mode]);
 			self.btn_filters.attr('class',function(){
 				var sel = d3.select(this).classed('selected') ? 'selected' : '',
 					deact = d3.select(this).classed('deactivated') ? 'deactivated' : '';
@@ -828,6 +841,7 @@ var init = function(){
 				;
 			self.arrows.classed('visible',false);
 
+			self.legend_bg.attr('d',self.path_legend);
 			self.legend.classed('expanded',false);
 			self.legend_g.classed('show',function(d,i){
 				return i === 0;
