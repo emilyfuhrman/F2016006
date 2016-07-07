@@ -198,7 +198,7 @@ div {
 	width:351px;
 	}
 #legend.show {
-	bottom:110px;
+	bottom:126px;
 	}
 
 #legend svg {
@@ -213,7 +213,7 @@ div {
 	background-position:9px 2px;
 	background-repeat:no-repeat;
 	background-size:10px 24px;
-	margin:7px 9px 0 0;
+	margin:9px 9px 0 0;
 	padding-left:24px;
 	}
 #legend.show #legend_tab{
@@ -247,11 +247,26 @@ div {
 	fill:white;
 	}
 
+.legend_g_line {
+	stroke:white;
+	stroke-width:1;
+	}
+
 #legend .legend_hex {
 	fill:white;
 	stroke:white;
 	stroke-width:0.5;
 	stroke-opacity:1;
+	}
+#legend .legend_hex_txt {
+	font-size:0.4rem;
+	text-anchor:middle;
+	fill:white;
+	stroke:none;
+	}
+#legend .legend_hex_arr {
+	stroke:white;
+	stroke-width:0.5;
 	}
 
 #sampled {

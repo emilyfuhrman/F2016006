@@ -57,8 +57,8 @@ var init = function(){
 		hex_h:26,
 		hex_sideLength:15,
 
-		path_legend:"M0,120V34.7c0-6.4,0-11.6,0-11.5c0,0,0-5.2,0-11.5S5.2,0,11.6,0H88 c6.4,0,11.6,5.2,11.6,11.5c0,6.4,5.2,11.5,11.6,11.5h53.1c6.4,0,11.6,5.2,11.6,11.6V120",
-		path_legend_exp:"M0,120V34.7c0-6.4,0-11.6,0-11.5c0,0,0-5.2,0-11.5S5.2,0,11.6,0H88 c6.4,0,11.6,5.2,11.6,11.5c0,6.4,5.2,11.5,11.6,11.5h234.8c6.4,0,11.6,5.2,11.6,11.6V120",
+		path_legend:"M0,130.9V34.7c0-6.4,0-11.6,0-11.5c0,0,0-5.2,0-11.5S5.2,0,11.6,0 h76.3c6.4,0,11.6,5.2,11.6,11.5c0,0.2,0,16.3,0,16.5c0.3,6.1,5.4,11,11.6,11h53c6.4,0,11.6,5.2,11.6,11.6v80.3",
+		path_legend_exp:"M0,130.9V34.7c0-6.4,0-11.6,0-11.5c0,0,0-5.2,0-11.5S5.2,0,11.6,0H88 c6.4,0,11.6,5.2,11.6,11.5c0,0.2,0,16.3,0,16.5c0.3,6.1,5.4,11,11.6,11h233.8c6.4,0,11.6,5.2,11.6,11.6v80.2",
 
 		//mobile comments visible?
 		comments_on:false,
@@ -277,6 +277,24 @@ var init = function(){
 				});
 			self.svg.exit().remove();
 
+			//add defs
+			//thanks, http://bl.ocks.org/tomgp/d59de83f771ca2b6f1d4
+			var defs = self.svg.append("defs");
+			defs.append("marker")
+				.attr({
+					"id":"arrow",
+					"viewBox":"0 -5 10 10",
+					"refX":5,
+					"refY":0,
+					"markerWidth":8,
+					"markerHeight":8,
+					"orient":"auto"
+				})
+				.append("path")
+					.attr("d", "M0,-5L10,0L0,5")
+					.attr("class","arrowHead")
+					.style('fill','white');
+
 			//grab menu and all annotation elements
 			self.menu = d3.select('#menu');
 			self.anno = d3.select('#anno');
@@ -334,7 +352,8 @@ var init = function(){
 			});
 
 			//grab legend and customize
-			var legend_g_txt;
+			var legend_g_txt,
+				legend_g_line;
 			self.legend = d3.select('.nav#legend')
 				.on('mousemove',function(){
 					d3.select('#legend #legend_tab').html('Hide legend');
@@ -372,7 +391,7 @@ var init = function(){
 				})
 				.attr('transform',function(d,i){
 					var x = i*180 +24,
-						y = 50;
+						y = 68;
 					return 'translate(' +x +',' +y +')';
 				});
 			self.legend_g.exit().remove();
@@ -384,11 +403,23 @@ var init = function(){
 				.attr('x',function(d){
 					return d.length === 2 ? -9 : -5;
 				})
-				.attr('y',45)
+				.attr('y',48)
 				.text(function(d){
 					return d.length === 2 ? 'Hexagon shading: rating' : 'Hexagon size: age';
 				});
 			legend_g_txt.exit().remove();
+			legend_g_line = self.legend_g.selectAll('line.legend_g_line')
+				.data(function(d){ return [d]; });
+			legend_g_line.enter().append('line')
+				.classed('legend_g_line',true);
+			legend_g_line
+				.attr('x1',function(d){
+					return d.length === 2 ? -9 : -5;
+				})
+				.attr('y1',33)
+				.attr('x2',139)
+				.attr('y2',33);
+			legend_g_line.exit().remove();
 
 			//grab buttons (filters), add click handlers
 			self.btn_filters = d3.selectAll('.btn.filter').on('click',function(){
@@ -542,7 +573,9 @@ var init = function(){
 			};
 
 			//update legend
-			var legend_hexes;
+			var legend_hexes,
+				legend_hexes_txt,
+				legend_hexes_arr;
 			legend_hexes = self.legend_g.selectAll('path.legend_hex')
 				.data(function(d,i){ return d; });
 			legend_hexes.enter().append('path')
@@ -553,13 +586,39 @@ var init = function(){
 				})
 				.attr('transform',function(d,i){
 					var x = d >5 ? i*120 : i*30,
-						y = 0;
+						y = 12;
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})
 				.style('fill-opacity',function(d,i){
 					return d >5 ? ((d-6)*5)/5 : 1;
 				});
 			legend_hexes.exit().remove();
+			legend_hexes_txt = self.legend_g.selectAll('text.legend_hex_txt')
+				.data(function(d,i){ return d; });
+			legend_hexes_txt.enter().append('text')
+				.classed('legend_hex_txt',true);
+			legend_hexes_txt
+				.attr('transform',function(d,i){
+					var x = d >5 ? i*120 : i*30,
+						y = -6;
+					return 'translate(' +x +',' +y +')';
+				})
+				.text(function(d,i){
+					return d >5 ? (d === 6 ? '1' : '5') : self.buckets_age[d-1]; 
+				});
+			legend_hexes_txt.exit().remove();
+			legend_hexes_arr = self.legend_g.selectAll('line.legend_hex_arr')
+				.data(function(d,i){ return d.length === 2 ? d : false; });
+			legend_hexes_arr.enter().append('line')
+				.classed('legend_hex_arr',true);
+			legend_hexes_arr
+				.attr('marker-end','url(#arrow)')
+				.attr('x1',6)
+				.attr('y1',-9)
+				.attr('x2',111)
+				.attr('y2',-9)
+				;
+			legend_hexes_txt.exit().remove();
 
 			//INITIALIZE FUNCTIONS
 			//convert cube coordinates to pixel coordinates
