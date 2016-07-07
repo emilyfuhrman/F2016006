@@ -396,6 +396,12 @@ div {
 /*	FORM
 	----------------------------- */
 
+textarea,
+select,
+input {
+	outline:none;
+	}
+
 .form {
 	display:block;
 	position:absolute;
@@ -409,10 +415,14 @@ div {
 	}
 
 .form select {
-	background:white;
+	background:transparent;
 	width:120px;
+	border:none;
+	cursor:pointer;
+	}
+.form .input.select {
+	background:white;
 	border:1px solid black;
-	border-radius:0px !important;
 	}
 
 .form button {

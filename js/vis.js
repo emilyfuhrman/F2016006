@@ -134,6 +134,7 @@ var init = function(){
 			//create grades dataset
 
 			//create countries dataset
+			self.util_getTopCountries();
 
 			//create gender-countries dataset
 
@@ -148,30 +149,6 @@ var init = function(){
 				self.col_w = 0;
 			} else{
 				d = {};
-
-				//get top countries, for buckets
-				function util_getTopCountries(){
-					var arr_countries = {};
-					var data = self.data['dummy_sample_' +self.modes[self.mode]];
-					for(var i=0; i<data.length; i++){
-						if(!arr_countries[data[i].country]){
-							arr_countries[data[i].country] = 0;
-						}
-						arr_countries[data[i].country]++;
-					}
-					var arr_countries_sorted = d3.entries(arr_countries).sort(function(a,b){ return b.value -a.value; });
-
-					//clear out array
-					self.buckets_country = [];
-
-					for(var i=0; i<5; i++){
-						if(arr_countries_sorted[i]){
-							self.buckets_country.push(arr_countries_sorted[i].key);
-						}
-					}
-				}
-
-				util_getTopCountries();
 
 				if(self.filters.length === 1){
 					f = self.filters[0];
@@ -538,6 +515,32 @@ var init = function(){
 			//update switch buttons to reflect current/opposite modes
 			d3.selectAll('.mode_cur').text(self.modes[self.mode]);
 			d3.selectAll('.mode_opp').text(self.modes[1 -self.mode]);
+
+			//update form options
+			var sel_ops_country,
+				sel_ops_rating,
+				sel_ops_grade;
+			sel_ops_country = d3.select('.input.select #input_country').selectAll('option.sel_ops_country')
+				.data(self.buckets_country.sort());
+			sel_ops_country.enter().append('option')
+				.classed('sel_ops_country',true);
+			sel_ops_country
+				.html(function(d,i){ return i >0 ? d : ''; });
+			sel_ops_country.exit().remove();
+			sel_ops_rating = d3.select('.input.select #input_rating').selectAll('option.sel_ops_rating')
+				.data(d3.range(6));
+			sel_ops_rating.enter().append('option')
+				.classed('sel_ops_rating',true);
+			sel_ops_rating
+				.html(function(d,i){ return i >0 ? d : ''; });
+			sel_ops_rating.exit().remove();
+			sel_ops_grade = d3.select('.input.select #input_grade').selectAll('option.sel_ops_grade')
+				.data(d3.range(13));
+			sel_ops_grade.enter().append('option')
+				.classed('sel_ops_grade',true);
+			sel_ops_grade
+				.html(function(d,i){ return i >0 ? 'Grade ' +d : ''; });
+			sel_ops_grade.exit().remove();
 
 			//**TODO -- determine number of rings to calculate positions for
 
@@ -909,11 +912,19 @@ var init = function(){
 			d3.select('#sampled').classed('visible',false);
 		},
 
+		//Forms
 		util_form_center:function(){
 			self.form.style('left',window.innerWidth/2 -250 +'px');
 			self.form_tweet.style('left',window.innerWidth/2 -250 +'px');
 		},
 		util_form_clear:function(){
+			document.getElementById('input_female').checked = false;
+			document.getElementById('input_male').checked = false;
+			document.getElementById('input_country').selectedIndex = 0;
+			document.getElementById('input_age').value = '';
+			document.getElementById('input_grade').selectedIndex = 0;
+			document.getElementById('input_rating').selectedIndex = 0;
+			document.getElementById('input_experience').value = '';
 		},
 		util_form_hide:function(){
 			self.form.classed('hidden',true);
@@ -923,12 +934,81 @@ var init = function(){
 			self.form.classed('hidden',false);
 		},
 		util_form_submit:function(){
-			self.form.classed('hidden',true);
-			self.form_tweet.classed('hidden',false);
+			var obj = {};
+
+			//gather values into new data object
+			obj.gender = document.getElementById('input_female').checked ? 'F' : document.getElementById('input_male').checked ? 'M' : '';
+			obj.country = document.getElementById('input_country').value;
+			obj.age = document.getElementById('input_age').value;
+			obj.grade = document.getElementById('input_grade').value;
+			obj.rating = document.getElementById('input_rating').value;
+			obj.experience = document.getElementById('input_experience').value;
+
+			//make sure none are blank
+			if(	obj.gender === ''
+				|| obj.country === ''
+				|| obj.age === ''
+				|| obj.grade === ''
+				|| obj.rating === ''
+				|| obj.experience === ''){
+				alert('Please fill out form completely.')
+			} else{
+
+				//**TODO submit object to database
+
+				self.util_form_clear();
+				self.util_form_compose_tweet(obj);
+
+				self.form.classed('hidden',true);
+				self.form_tweet.classed('hidden',false);
+			}
+		},
+		util_form_compose_tweet:function(_obj){
+			var str = 'I rated my ' +self.modes[self.mode] +' education in ' +_obj.grade.toLowerCase() +' a ' +_obj.rating +'/5. See more ratings and stories at http://www.quantamagazine.org.';
+			document.getElementById('tweet_body').value = str;
+		},
+		util_form_clear_tweet:function(){
+			document.getElementById('tweet_body').value = '';
 		},
 		util_form_submit_tweet:function(){
+			var body = document.getElementById('tweet_body').value.split('http://')[0],
+				form = 'text=' +self.util_encode(body),
+				link = 'url=' +self.util_encode('http://www.quantamagazine.org'),
+				hand = 'via=QuantaMagazine',
+				twit = 'https://twitter.com/intent/tweet?' +form +'&' +link +'&' +hand;
+
+			window.open(twit,'_blank');
+
+			self.util_form_clear_tweet();
 			self.form_tweet.classed('hidden',true);
 		},	
+		util_encode:function(_text){
+			var self = this;
+			var text = encodeURIComponent(_text).replace(/'/g,"%27").replace(/"/g,"%22");
+			return text;
+		},
+
+		//Data
+		util_getTopCountries:function(){
+			var arr_countries = {};
+			var data = self.data['dummy_sample_' +self.modes[self.mode]];
+			for(var i=0; i<data.length; i++){
+				if(!arr_countries[data[i].country]){
+					arr_countries[data[i].country] = 0;
+				}
+				arr_countries[data[i].country]++;
+			}
+			var arr_countries_sorted = d3.entries(arr_countries).sort(function(a,b){ return b.value -a.value; });
+
+			//clear out array
+			self.buckets_country = [];
+
+			for(var i=0; i<5; i++){
+				if(arr_countries_sorted[i]){
+					self.buckets_country.push(arr_countries_sorted[i].key);
+				}
+			}
+		},
 
 		util_detail_update:function(_d){
 			var str_comment,
