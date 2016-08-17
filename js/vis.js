@@ -964,18 +964,55 @@ var init = function(){
 			}
 		},
 		util_form_compose_tweet:function(_obj){
-			var str = 'I rated my ' +self.modes[self.mode] +' education in ' +_obj.grade.toLowerCase() +' a ' +_obj.rating +'/5. See more ratings and stories at http://www.quantamagazine.org.';
+			var str,
+
+				str_begin,
+				str_mid,
+				str_end,
+				str_rating,
+
+				char_limit = 140;
+
+			//turn to integer
+			_obj.rating = +_obj.rating;
+			
+			//compose rating portion
+			if(_obj.rating === 1){
+				str_rating = 'HATE ' +self.modes[self.mode];
+			} else if(_obj.rating === 2){
+				str_rating = 'DISLIKE ' +self.modes[self.mode];
+			} else if(_obj.rating === 3){
+				str_rating = 'find ' +self.modes[self.mode] + ' OK';
+			} else if(_obj.rating === 4){
+				str_rating = 'LIKE ' +self.modes[self.mode];
+			} else if(_obj.rating === 5){
+				str_rating = 'LOVE ' +self.modes[self.mode];
+			}
+
+			str_begin = 'I ' +str_rating +' because "',
+			str_end = '..." Share your story at www.quantamagazine.org. #LoveHateSciMath';
+
+			//if needed, truncate experience blurb
+			var str_length = str_begin.length +_obj.experience.length +str_end.length;
+			if(str_length >char_limit){
+				str_mid = _obj.experience.substring(0,(_obj.experience.length -(str_length -char_limit) -1));
+			} else{
+				str_mid = _obj.experience;
+			}
+
+			str = str_begin +str_mid +str_end;
 			document.getElementById('tweet_body').value = str;
 		},
 		util_form_clear_tweet:function(){
 			document.getElementById('tweet_body').value = '';
 		},
 		util_form_submit_tweet:function(){
-			var body = document.getElementById('tweet_body').value.split('http://')[0],
+			var body = document.getElementById('tweet_body').value,
 				form = 'text=' +self.util_encode(body),
-				link = 'url=' +self.util_encode('http://www.quantamagazine.org'),
-				hand = 'via=QuantaMagazine',
-				twit = 'https://twitter.com/intent/tweet?' +form +'&' +link +'&' +hand;
+				//link = 'url=' +self.util_encode('http://www.quantamagazine.org'),
+				//hand = 'via=QuantaMagazine',
+				//twit = 'https://twitter.com/intent/tweet?' +form +'&' +link +'&' +hand;
+				twit = 'https://twitter.com/intent/tweet?' +form;
 
 			window.open(twit,'_blank');
 
