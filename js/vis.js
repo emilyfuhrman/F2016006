@@ -56,9 +56,6 @@ var init = function(){
 			'4':'DISLIKE',
 			'5':'HATE'
 		},
-		//buckets_grade:d3.range(1,13),
-
-		state_grade:0,
 
 		col_w:0,
 
@@ -86,7 +83,7 @@ var init = function(){
 		],
 
 		getData:function(_callback){
-			var datasets = ['math','science','dummy_sample_math','dummy_sample_science'];
+			var datasets = ['math','science','dummy_sample_math','dummy_sample_science','countries'];
 			datasets.forEach(function(d){
 				d3.csv('data/' +d +'.csv',function(e,_d){
 					self.data[d] = _d;
@@ -99,29 +96,14 @@ var init = function(){
 		},
 		processData:function(){
 
-			function util_resolveBucket(_n){
-				var bucket;
-				if(_n <18){
-					bucket = 0;
-				} else if(_n >=18 && _n <=33){
-					bucket = 1;
-				} else if(_n >=34 && _n <=49){
-					bucket = 2;
-				} else if(_n >=50 && _n <=65){
-					bucket = 3;
-				} else if(_n >65){
-					bucket = 4;
-				}
-				return bucket;
-			}
-
 			//create position placeholders
 			self.modes.forEach(function(d){
 				self.data[d].forEach(function(_d){
 					_d.rating = +_d.rating;
 					_d.age = +_d.age;
 
-					_d.age_bucket = util_resolveBucket(_d.age);
+					_d.age_bucket = self.util_resolve_age(_d.age);
+					_d.grade_bucket = self.util_resolve_grade(_d.grade);
 
 					_d.pos = {};
 					_d.pos.cube  = {};
@@ -134,7 +116,8 @@ var init = function(){
 					_d.rating = +_d.rating;
 					_d.age = +_d.age;
 
-					_d.age_bucket = util_resolveBucket(_d.age);
+					_d.age_bucket = self.util_resolve_age(_d.age);
+					_d.grade_bucket = self.util_resolve_grade(_d.grade);
 				});
 				self.data['dummy_sample_' +d].sort(function(a,b){
 					return d3.descending(a.rating,b.rating);
@@ -165,13 +148,8 @@ var init = function(){
 
 				if(self.filters.length === 1){
 					f = self.filters[0];
-					b = self['buckets_' +f];
-
-					if(f === 'grade'){
-						var s = self.state_grade === 0 ? 0 : 6,
-							e = self.state_grade === 0 ? 6 : 12;
-						b = b.slice(s,e);
-					}
+					f = f === 'grade' ? 'grade_bucket' : f;
+					b = self[(f === 'grade_bucket' ? 'buckets_grade' : 'buckets_' +f)];
 
 					//set width of buckets
 					self.col_w = Math.floor((self.w -self.w*0.25)/b.length);
@@ -179,6 +157,7 @@ var init = function(){
 					b.forEach(function(_b){
 						d[_b] = [];
 					});
+
 					self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
 						if(d[_d[f]]){ 
 							_d.idx = d3.keys(d).indexOf(_d[f]);
@@ -198,13 +177,8 @@ var init = function(){
 					});
 				} else{
 					f = self.filters.filter(function(d){ return d !== 'gender'; })[0];
-					b = self['buckets_' +f];
-
-					if(f === 'grade'){
-						var s = self.state_grade === 0 ? 0 : 6,
-							e = self.state_grade === 0 ? 6 : 12;
-						b = b.slice(s,e);
-					}
+					f = f === 'grade' ? 'grade_bucket' : f;
+					b = self[(f === 'grade_bucket' ? 'buckets_grade' : 'buckets_' +f)];
 
 					//set width of buckets
 					self.col_w = Math.floor((self.w -self.w*0.25)/b.length);
@@ -214,6 +188,7 @@ var init = function(){
 						d[_b].push([]); //array -- M
 						d[_b].push([]); //array -- F
 					});
+
 					self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
 						if(d[_d[f]]){ 
 							var arr_g = _d.gender === 'M' ? 0 : 1;
@@ -292,17 +267,6 @@ var init = function(){
 			self.anno_tweet = d3.select('#anno #detail #twitter');
 			self.anno_userDetail = d3.select('#anno #detail #user').html(function(){
 				return self.device === 'default'? 'Hover over a hexagon for detail.' : self.device === 'tablet' ? 'Tap a hexagon for detail.' : 'Swipe to explore!';
-			});
-
-			//grab arrows
-			self.arrows = d3.selectAll('.arrow').on('click',function(){
-				d3.event.stopPropagation();
-				self.state_grade === 0 ? self.state_grade++ : self.state_grade--;
-				self.arrows.classed('visible',function(d,i){
-					return i !== self.state_grade;
-				});
-
-				self.generate();
 			});
 
 			//grab forms and inputs
@@ -453,14 +417,6 @@ var init = function(){
 					}
 				}
 
-				if(self.filters.filter(function(d){ return d === 'grade'; }).length >0){
-					self.arrows.classed('visible',function(d,i){
-						return i !== self.state_grade;
-					});
-				} else{
-					self.arrows.classed('visible',false);
-				}
-
 				btn
 					.classed('selected',!btn_selected)
 					.style('color',function(){ return btn_selected ? 'white' : self.colors[self.mode]; });
@@ -535,11 +491,13 @@ var init = function(){
 				sel_ops_grade;
 			var data_rating = d3.entries(self.buckets_rating).map(function(d){ return d.key +'=' +d.value; });
 			sel_ops_country = d3.select('.input.select #input_country').selectAll('option.sel_ops_country')
-				.data(self.buckets_country.sort());
+				.data(self.data.countries.sort(function(a,b){
+					return a.name <b.name ? -1 : a.name >b.name ? 1 : 0;
+				}));
 			sel_ops_country.enter().append('option')
 				.classed('sel_ops_country',true);
 			sel_ops_country
-				.html(function(d,i){ return i >0 ? d : ''; });
+				.html(function(d,i){ return i >0 ? d.name : ''; });
 			sel_ops_country.exit().remove();
 			sel_ops_rating = d3.select('.input.select #input_rating').selectAll('option.sel_ops_rating')
 				.data([""].concat(data_rating));
@@ -740,6 +698,8 @@ var init = function(){
 					return self.device === 'default' ? 'translate(' +x +',' +y +')' : 'translate(' +y +',' +x/2 +')';
 				});
 			hexesGG.exit().remove();
+
+			var counter = 0;
 			hexesGGT = hexesGG.selectAll('text.hexesGGT')
 				.data(function(d,i){ return self.filters.length === 2 ? [d] : []; });
 			hexesGGT.enter().append('text')
@@ -750,8 +710,13 @@ var init = function(){
 						y = hex_row_height*(hex_rad*2) +hex_rad*2;
 					return self.device === 'default' ? 'translate(' +x +',' +y +')' : 'translate(-30,' +hex_rad +')';
 				})
-				.text(function(d,i){ return d[0].gender; });
+				.text(function(d,i){ 
+					var label = counter%2 === 0 ? 'M' : 'F';
+					counter++;
+					return label;
+				});
 			hexesGGT.exit().remove();
+
 			hexes = hexesGG.selectAll('path.hex')
 				.data(function(d,i){ return self.filters.length === 0 ? [d] : self.filters.length === 1 ? d.value : d; });
 			hexes.enter().append('path')
@@ -902,12 +867,10 @@ var init = function(){
 		resize:function(){
 		},
 
-		//INTERFACE
+		//Interface
 		util_filters_clear:function(){
 
 			self.filters = [];
-
-			self.state_grade = 0;
 
 			self.btn_filters_clear.classed('visible',false);
 			self.btn_filters
@@ -915,7 +878,6 @@ var init = function(){
 				.classed('deactivated',false)
 				.style('color','white')
 				;
-			self.arrows.classed('visible',false);
 
 			self.legend_bg.attr('d',self.path_legend);
 			self.legend.classed('expanded',false);
@@ -1081,19 +1043,49 @@ var init = function(){
 			self.anno_tweet.html('');
 		},
 
-		util_resolve_gender:function(_g){
-			return _g.toLowerCase() === 'f' ? 'Female' : 'Male';
+		//Resolving values to buckets
+		util_resolve_age:function(_n){
+			var bucket;
+			if(_n <18){
+				bucket = 0;
+			} else if(_n >=18 && _n <=33){
+				bucket = 1;
+			} else if(_n >=34 && _n <=49){
+				bucket = 2;
+			} else if(_n >=50 && _n <=65){
+				bucket = 3;
+			} else if(_n >65){
+				bucket = 4;
+			}
+			return bucket;
 		},
-		util_resolve_device:function(_w){
+		util_resolve_device:function(_n){
 			var device = 'default';
-			if(_w >self.device_dimensions.tablet.h){
+			if(_n >self.device_dimensions.tablet.h){
 				device = 'default';
-			} else if(_w <=self.device_dimensions.tablet.h && _w >self.device_dimensions.tablet.w){
+			} else if(_n <=self.device_dimensions.tablet.h && _n >self.device_dimensions.tablet.w){
 				device = 'tablet';
-			} else if(_w <=self.device_dimensions.tablet.w){
+			} else if(_n <=self.device_dimensions.tablet.w){
 				device = 'mobile';
 			}
 			return device;
+		},
+		util_resolve_gender:function(_n){
+			return _n.toLowerCase() === 'f' ? 'Female' : 'Male';
+		},
+		util_resolve_grade:function(_n){
+			var g = +_n,
+				group;
+			if(g >0 && g <=5){
+				group = self.buckets_grade[0];
+			} else if(g >5 && g <=8){
+				group = self.buckets_grade[1];
+			} else if(g >8 && g <= 12){
+				group = self.buckets_grade[2];
+			} else{
+				group = self.buckets_grade[3];
+			}
+			return group;
 		}
 	}
 }
@@ -1108,7 +1100,8 @@ window.onresize = function(){
 
 	var device = self.util_resolve_device(window.innerWidth);
 	if(device !== self.device){
-		console.log(self.device +'->' +device);
+
+		//console.log(self.device +'->' +device);
 		self.setup();
 		self.generate();
 	}
