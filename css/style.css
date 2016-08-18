@@ -442,12 +442,14 @@ input {
 	}
 
 .form textarea {
-	width:100%;
 	height:100%;
+	padding-left:6px;
 	border:1px solid black;
 	resize:none;
 	}
 .form textarea.body {
+	width:100%;
+	width:calc(100% - 12px);
 	padding-bottom:36px;
 	}
 
@@ -517,6 +519,8 @@ input.second {
 
 .form .input {
 	position:absolute;
+	line-height:1rem;
+	margin-top:-0.6rem;
 	left:300px;
 	}
 

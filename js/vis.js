@@ -43,7 +43,20 @@ var init = function(){
 			'F'
 		],
 		buckets_country:[],
-		buckets_grade:d3.range(1,13),
+		buckets_grade:[
+			'Grades 1-5',
+			'Grades 6-8',
+			'Grades 9-12',
+			'College'
+		],
+		buckets_rating:{
+			'1':'LOVE',
+			'2':'LIKE',
+			'3':'OK',
+			'4':'DISLIKE',
+			'5':'HATE'
+		},
+		//buckets_grade:d3.range(1,13),
 
 		state_grade:0,
 
@@ -501,7 +514,7 @@ var init = function(){
 
 			//update all mode spans to reflect current mode
 			d3.select('#title .mode').text(util_toTitleCase(self.modes[self.mode]));
-			d3.select('#form .mode').text(self.modes[self.mode]);
+			d3.selectAll('#form .mode').text(self.modes[self.mode]);
 
 			d3.selectAll('.mobile.solid').style('background-color',function(){
 				return d3.select(this).classed('mobile') ? self.colors_legend[self.mode] : 'transparent';
@@ -520,6 +533,7 @@ var init = function(){
 			var sel_ops_country,
 				sel_ops_rating,
 				sel_ops_grade;
+			var data_rating = d3.entries(self.buckets_rating).map(function(d){ return d.key +'=' +d.value; });
 			sel_ops_country = d3.select('.input.select #input_country').selectAll('option.sel_ops_country')
 				.data(self.buckets_country.sort());
 			sel_ops_country.enter().append('option')
@@ -528,18 +542,18 @@ var init = function(){
 				.html(function(d,i){ return i >0 ? d : ''; });
 			sel_ops_country.exit().remove();
 			sel_ops_rating = d3.select('.input.select #input_rating').selectAll('option.sel_ops_rating')
-				.data(d3.range(6));
+				.data([""].concat(data_rating));
 			sel_ops_rating.enter().append('option')
 				.classed('sel_ops_rating',true);
 			sel_ops_rating
 				.html(function(d,i){ return i >0 ? d : ''; });
 			sel_ops_rating.exit().remove();
 			sel_ops_grade = d3.select('.input.select #input_grade').selectAll('option.sel_ops_grade')
-				.data(d3.range(13));
+				.data([""].concat(self.buckets_grade));
 			sel_ops_grade.enter().append('option')
 				.classed('sel_ops_grade',true);
 			sel_ops_grade
-				.html(function(d,i){ return i >0 ? 'Grade ' +d : ''; });
+				.html(function(d,i){ return d; });
 			sel_ops_grade.exit().remove();
 
 			//**TODO -- determine number of rings to calculate positions for
@@ -974,7 +988,7 @@ var init = function(){
 				char_limit = 140;
 
 			//turn to integer
-			_obj.rating = +_obj.rating;
+			_obj.rating = +_obj.rating.split('=')[0];
 			
 			//compose rating portion
 			if(_obj.rating === 1){
