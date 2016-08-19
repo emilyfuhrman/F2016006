@@ -43,6 +43,24 @@ div {
 	letter-spacing:0.025rem;
 	}
 
+#logo {
+	opacity:1;
+	background:transparent;
+	background:url(../assets/logo.svg) no-repeat 45px 30px;
+	background-size:45px 45px;
+	display:block;
+	width:90px;
+	height:90px;
+	top:0;
+	right:15px;
+	}
+#logo:hover {
+	opacity:0.6;	
+	}
+#logo a {
+	cursor:pointer;
+	}
+
 #title {
 	display:block;
 	font-size:0.8rem;
@@ -140,6 +158,7 @@ div {
 	background:url(../assets/icon_switch.svg) no-repeat 6px 5px;
 	background-size:16px 16px;
 	right:15px;
+	top:90px;
 	}
 
 #menu .btn#add {
@@ -147,7 +166,7 @@ div {
 	background:url(../assets/icon_add.svg) no-repeat 8px 6px;
 	background-size:14px 14px;
 	right:15px;
-	top:90px;
+	top:126px;
 	}
 
 #anno {
@@ -621,6 +640,7 @@ svg {
 		display:none;
 		}
 
+	#logo,
 	#title {
 		display:none;
 		}
@@ -726,6 +746,7 @@ svg {
 		display:block;
 		}
 
+	#logo,
 	#title {
 		display:block;
 		}
@@ -829,6 +850,7 @@ svg {
 		display:block;
 		}
 
+	#logo,
 	#title {
 		display:block;
 		}
