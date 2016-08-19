@@ -61,6 +61,21 @@ div {
 	cursor:pointer;
 	}
 
+#logo_tweet {
+	opacity:1;
+	background:transparent;
+	background:url(../assets/icon_twitter.svg) no-repeat 0 0;
+	background-size:18px 18px;
+	width:18px;
+	height:18px;
+	top:168px;
+	right:15px;
+	cursor:pointer;
+	}
+#logo_tweet:hover {
+	opacity:0.6;
+	}
+
 #title {
 	display:block;
 	font-size:0.8rem;
@@ -76,6 +91,7 @@ div {
 	}
 
 #menu .btn {
+	opacity:1;
 	position:fixed;
 	color:white;
 	font-size:0.6rem;
@@ -83,6 +99,9 @@ div {
 	top:54px;
 	border:1px solid white;
 	cursor:pointer;
+	}
+#menu .btn:hover {
+	opacity:0.6;
 	}
 #menu .btn.view {
 	display:block;
@@ -639,9 +658,9 @@ svg {
 	#sampled.visible {
 		display:none;
 		}
-
+	#title,
 	#logo,
-	#title {
+	#logo_tweet {
 		display:none;
 		}
 
@@ -746,8 +765,9 @@ svg {
 		display:block;
 		}
 
+	#title,
 	#logo,
-	#title {
+	#logo_tweet {
 		display:block;
 		}
 
@@ -850,8 +870,9 @@ svg {
 		display:block;
 		}
 
+	#title,
 	#logo,
-	#title {
+	#logo_tweet {
 		display:block;
 		}
 

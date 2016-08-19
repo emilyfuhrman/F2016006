@@ -291,6 +291,13 @@ var init = function(){
 				d3.event.stopPropagation();
 				self.util_form_submit_tweet();
 			});
+			self.twit = d3.select('#logo_tweet').on('click',function(){
+        		d3.event.preventDefault();
+				d3.event.stopPropagation();
+				
+				var tweetString = "Why I #LoveHateSciMath: Share your story at http://quantamagazine.org via @QuantaMagazine";
+				self.util_form_submit_tweet(tweetString);
+			});
 
 			//grab navigation buttons, add click handlers
 			self.mode_switch = d3.selectAll('.btn.view.mode').on('click',function(){
@@ -982,8 +989,8 @@ var init = function(){
 		util_form_clear_tweet:function(){
 			document.getElementById('tweet_body').value = '';
 		},
-		util_form_submit_tweet:function(){
-			var body = document.getElementById('tweet_body').value,
+		util_form_submit_tweet:function(_body){
+			var body = _body || document.getElementById('tweet_body').value,
 				form = 'text=' +self.util_encode(body),
 				//link = 'url=' +self.util_encode('http://www.quantamagazine.org'),
 				//hand = 'via=QuantaMagazine',
@@ -995,6 +1002,7 @@ var init = function(){
 			self.util_form_clear_tweet();
 			self.form_tweet.classed('hidden',true);
 		},	
+
 		util_encode:function(_text){
 			var self = this;
 			var text = encodeURIComponent(_text).replace(/'/g,"%27").replace(/"/g,"%22");
