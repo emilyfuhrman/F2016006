@@ -78,8 +78,8 @@ var init = function(){
 			'#85B800'
 		],
 		colors_legend:[
-			'#3366CC',
-			'#71A400'
+			'#295ccc',
+			'#67a400'
 		],
 
 		getData:function(_callback){
@@ -383,7 +383,7 @@ var init = function(){
 			legend_g_line.exit().remove();
 
 			//grab buttons (filters), add click handlers
-			self.btn_filters = d3.selectAll('.btn.filter').on('click',function(){
+			self.btn_filters = self.menu.selectAll('.btn.filter').on('click',function(){
 				d3.event.stopPropagation();
 
 				var btn = d3.select(this),
@@ -424,9 +424,8 @@ var init = function(){
 					}
 				}
 
-				btn
-					.classed('selected',!btn_selected)
-					.style('color',function(){ return btn_selected ? 'white' : self.colors[self.mode]; });
+				//class button as selected or not
+				btn.classed('selected',!btn_selected);
 				
 				self.mobile_ham.classed('xout',false);
 				self.generate();
@@ -469,11 +468,21 @@ var init = function(){
 			
 			self.svg.style('background',(self.colors[self.mode]));
 			self.legend_body.style('fill',self.colors_legend[self.mode]);
-			self.btn_filters.attr('class',function(){
-				var sel = d3.select(this).classed('selected') ? 'selected' : '',
-					deact = d3.select(this).classed('deactivated') ? 'deactivated' : '';
-				return 'btn filter ' +self.modes[self.mode] + ' ' +sel + ' ' +deact;
-			});
+
+			//class and style filter buttons
+			self.btn_filters
+				.attr('class',function(){
+					var sel = d3.select(this).classed('selected') ? 'selected' : '',
+						deact = d3.select(this).classed('deactivated') ? 'deactivated' : '';
+					return 'btn filter ' +self.modes[self.mode] + ' ' +sel + ' ' +deact;
+				})
+				.style('color',function(){
+					return d3.select(this).classed('selected') ? self.colors_legend[self.mode] : 'white';
+				})
+				/*.style('background-color',function(){
+					return d3.select(this).classed('selected') ? 'white' : self.colors_legend[self.mode];
+				})*/
+				;
 
 			//update all mode spans to reflect current mode
 			d3.select('#title .mode').text(util_toTitleCase(self.modes[self.mode]));
@@ -803,11 +812,11 @@ var init = function(){
 				.style('display',function(){
 					return self.device !== 'mobile' ? 'block' : 'none';
 				})
-				.style('background',function(){
-					return self.device === 'mobile' ? self.mode === 0 ? 'rgba(51,102,204,0.9)' : 'rgba(113,164,0,0.9)' : 'transparent';
+				.style('background-color',function(){
+					return self.colors[self.mode];
 				});
 			self.anno.style('background',function(){
-				return self.device === 'mobile' ? self.mode === 0 ? 'rgba(51,102,204,0.75)' : 'rgba(113,164,0,0.75)' : 'transparent';
+				return self.device === 'mobile' ? self.mode === 0 ? 'rgba(41, 92, 204, 0.75)' : 'rgba(103,164,0,0.75)' : 'transparent';
 			});
 
 			//if on, refresh comments panel
@@ -884,6 +893,9 @@ var init = function(){
 				.classed('selected',false)
 				.classed('deactivated',false)
 				.style('color','white')
+				/*.style('background-color',function(){
+					return self.colors_legend[self.mode];
+				})*/
 				;
 
 			self.legend_bg.attr('d',self.path_legend);
