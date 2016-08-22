@@ -238,16 +238,14 @@ div {
 	position:fixed;
 	display:block;
 	z-index:100;
-	font-size:0.55rem;
+	font-size:0.725rem;
+	letter-spacing:0.025rem;
 	margin-left:15px;
-	bottom:30px;
+	bottom:47px;
 	cursor:pointer;
 	}
-#legend.expanded {
-	width:351px;
-	}
 #legend.show {
-	bottom:126px;
+	bottom:132px;
 	}
 
 #legend svg {
@@ -259,19 +257,19 @@ div {
 	}
 #legend #legend_tab {
 	background-image:url(../assets/legend_arrows.svg);
-	background-position:9px 2px;
+	background-position:12px 2px;
 	background-repeat:no-repeat;
 	background-size:10px 24px;
-	margin:9px 9px 0 0;
-	padding-left:24px;
+	margin:6px 9px 0 0;
+	padding-left:30px;
 	}
 #legend.show #legend_tab{
-	background-position:9px -16px;
+	background-position:12px -16px;
 	}
 #legend #legend_body {
 	fill:transparent;
 	stroke:white;
-	stroke-width:2;
+	stroke-width:1;
 	width:180px;
 	}
 #legend.expanded #legend_body {
@@ -291,7 +289,7 @@ div {
 	}
 
 .legend_g_txt {
-	font-size:0.5rem;
+	font-size:0.55rem;
 	stroke:none;
 	fill:white;
 	}
@@ -308,7 +306,7 @@ div {
 	stroke-opacity:1;
 	}
 #legend .legend_hex_txt {
-	font-size:0.4rem;
+	font-size:0.45rem;
 	text-anchor:middle;
 	fill:white;
 	stroke:none;

@@ -317,11 +317,11 @@ var init = function(){
 				legend_g_line;
 			self.legend = d3.select('.nav#legend')
 				.on('mousemove',function(){
-					d3.select('#legend #legend_tab').html('Hide legend');
+					//d3.select('#legend #legend_tab').html('Hide');
 					self.legend.classed('show',true);
 				})
 				.on('mouseout',function(){
-					d3.select('#legend #legend_tab').html('View legend');
+					//d3.select('#legend #legend_tab').html('View');
 					self.legend.classed('show',false);
 				});
 			
@@ -338,7 +338,7 @@ var init = function(){
 				.attr('d',function(){
 					return self.filters.length === 0 ? self.path_legend : self.path_legend_exp;
 				})
-				.attr('transform','translate(1,1)')
+				.attr('transform','translate(1,1)')//scale(1.35)')
 				;
 			self.legend_bg.exit().remove();
 
@@ -352,7 +352,7 @@ var init = function(){
 				})
 				.attr('transform',function(d,i){
 					var x = i*180 +24,
-						y = 68;
+						y = 72;
 					return 'translate(' +x +',' +y +')';
 				});
 			self.legend_g.exit().remove();
@@ -577,7 +577,7 @@ var init = function(){
 				})
 				.attr('transform',function(d,i){
 					var x = d >5 ? i*120 : i*30,
-						y = 12;
+						y = 9;
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})
 				.style('fill-opacity',function(d,i){
@@ -591,7 +591,7 @@ var init = function(){
 			legend_hexes_txt
 				.attr('transform',function(d,i){
 					var x = d >5 ? i*120 : i*30,
-						y = -6;
+						y = -9;
 					return 'translate(' +x +',' +y +')';
 				})
 				.text(function(d,i){
@@ -605,9 +605,9 @@ var init = function(){
 			legend_hexes_arr
 				.attr('marker-end','url(#arrow)')
 				.attr('x1',6)
-				.attr('y1',-9)
+				.attr('y1',-12)
 				.attr('x2',111)
-				.attr('y2',-9)
+				.attr('y2',-12)
 				;
 			legend_hexes_txt.exit().remove();
 
