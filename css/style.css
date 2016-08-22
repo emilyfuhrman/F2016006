@@ -151,7 +151,7 @@ div {
 	}
 #menu .btn.clear {
 	display:none;
-	font-size:0.35rem;
+	font-size:0.4rem;
 	text-transform:uppercase;
 	letter-spacing:0.05em;
 	line-height:2.5em;
@@ -194,8 +194,11 @@ div {
 
 #anno {
 	background:transparent;
-	width:500px;
-	font-size:0.55rem;
+	/*width:500px;*/
+	min-width:250px;
+	width:auto;
+	font-size:0.725rem;
+	line-height:0.85rem;
 	right:15px;
 	bottom:24px;
 	padding:0;
@@ -217,9 +220,13 @@ div {
 
 #anno #detail {
 	width:100%;
-	padding-top:6px;
+	padding-top:4px;
 	padding-bottom:0;
 	border-top:1px solid white;
+	}
+
+#anno #detail #user {
+	padding-right:30px;
 	}
 
 #arrows {
@@ -314,7 +321,7 @@ div {
 #sampled {
 	display:none;
 	font-family:'FuturaLT-Light';
-	font-size:0.5rem;
+	font-size:0.6rem;
 	font-style:italic;
 	top:135px;
 	left:15px;
@@ -643,7 +650,7 @@ svg {
 
 	#anno {
 		width:100%;
-		font-size:0.8rem;
+		font-size:0.725rem;
 		right:0;
 		bottom:0;
 		padding:15px;
@@ -748,8 +755,8 @@ svg {
 
 	#anno {
 		background:transparent;
-		width:300px;
-		font-size:0.55rem;
+		width:auto;
+		font-size:0.725rem;
 		right:15px;
 		bottom:24px;
 		padding:0;
@@ -827,7 +834,7 @@ svg {
 
 	#menu .btn.clear {
 		display:none;
-		font-size:0.35rem;
+		font-size:0.4rem;
 		left:15px;
 		top:214px;
 		bottom:auto;
@@ -855,8 +862,9 @@ svg {
 
 	#anno {
 		background:transparent;
-		width:500px;
-		font-size:0.55rem;
+		/*width:500px;*/
+		width:auto;
+		font-size:0.725rem;
 		right:15px;
 		bottom:24px;
 		padding:0;
@@ -934,7 +942,7 @@ svg {
 
 	#menu .btn.clear {
 		display:none;
-		font-size:0.35rem;
+		font-size:0.4rem;
 		left:450px;
 		top:90px;
 		bottom:auto;
