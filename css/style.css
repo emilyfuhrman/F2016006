@@ -245,7 +245,7 @@ div {
 	cursor:pointer;
 	}
 #legend.show {
-	bottom:132px;
+	margin-bottom:85px;
 	}
 
 #legend svg {
@@ -257,7 +257,7 @@ div {
 	}
 #legend #legend_tab {
 	background-image:url(../assets/legend_arrows.svg);
-	background-position:12px 2px;
+	background-position:12px 3px;
 	background-repeat:no-repeat;
 	background-size:10px 24px;
 	margin:6px 9px 0 0;
