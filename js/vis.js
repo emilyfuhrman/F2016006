@@ -132,8 +132,6 @@ var init = function(){
 			//create countries dataset
 			self.util_getTopCountries();
 
-			//create gender-countries dataset
-
 			//create gender-grades dataset
 
 			self.generate();
@@ -242,8 +240,7 @@ var init = function(){
 				});
 			self.svg.exit().remove();
 
-			//add defs
-			//thanks, http://bl.ocks.org/tomgp/d59de83f771ca2b6f1d4
+			//add defs (thanks, http://bl.ocks.org/tomgp/d59de83f771ca2b6f1d4)
 			var defs = self.svg.append("defs");
 			defs.append("marker")
 				.attr({
@@ -312,9 +309,14 @@ var init = function(){
 				self.util_form_show();
 			});
 
-			//grab legend and customize
+		/*	---------------------------------------------------------------------- 
+			LEGEND
+			---------------------------------------------------------------------- */
+
 			var legend_g_txt,
 				legend_g_line;
+
+			//grab legend, add interaction
 			self.legend = d3.select('.nav#legend')
 				.on('mousemove',function(){
 					//d3.select('#legend #legend_tab').html('Hide');
@@ -325,11 +327,14 @@ var init = function(){
 					self.legend.classed('show',false);
 				});
 			
+			//legend SVG container
 			self.legend_body = d3.select('#legend_body').selectAll('svg.legend')
 				.data([self]);
 			self.legend_body.enter().append('svg')
 				.classed('legend',true);
 			self.legend_body.exit().remove();
+
+			//legend background path
 			self.legend_bg = self.legend_body.selectAll('path.legend_bg')
 				.data([self]);
 			self.legend_bg.enter().append('path')
@@ -338,10 +343,10 @@ var init = function(){
 				.attr('d',function(){
 					return self.filters.length === 0 ? self.path_legend : self.path_legend_exp;
 				})
-				.attr('transform','translate(1,1)')//scale(1.35)')
-				;
+				.attr('transform','translate(1,1)');
 			self.legend_bg.exit().remove();
 
+			//legend hexagon groups
 			self.legend_g = self.legend_body.selectAll('g.legend_g')
 				.data([[6,7],[1,2,3,4,5]]);
 			self.legend_g.enter().append('g')
@@ -356,6 +361,8 @@ var init = function(){
 					return 'translate(' +x +',' +y +')';
 				});
 			self.legend_g.exit().remove();
+
+			//legend hexagon group captions
 			legend_g_txt = self.legend_g.selectAll('text.legend_g_txt')
 				.data(function(d){ return [d]; });
 			legend_g_txt.enter().append('text')
@@ -369,6 +376,8 @@ var init = function(){
 					return d.length === 2 ? 'Hexagon shading: rating' : 'Hexagon size: age';
 				});
 			legend_g_txt.exit().remove();
+
+			//legend hexagon group dividers
 			legend_g_line = self.legend_g.selectAll('line.legend_g_line')
 				.data(function(d){ return [d]; });
 			legend_g_line.enter().append('line')
@@ -382,8 +391,13 @@ var init = function(){
 				.attr('y2',33);
 			legend_g_line.exit().remove();
 
-			//grab buttons (filters), add click handlers
+		/*	---------------------------------------------------------------------- 
+			FILTERS
+			---------------------------------------------------------------------- */
+
+			//grab filters, add click handlers
 			self.btn_filters = self.menu.selectAll('.btn.filter').on('click',function(){
+
 				d3.event.stopPropagation();
 
 				var btn = d3.select(this),
@@ -407,7 +421,6 @@ var init = function(){
 					d3.select('#sampled').classed('visible',true);
 				}
 
-				//deactivate proper filter
 				//if button is just being selected, deactivate incompatible filter
 				if(btn_id !== 'gender' && !btn_selected){
 					if(btn_id === 'country'){
@@ -415,6 +428,7 @@ var init = function(){
 					} else if(btn_id === 'grade'){
 						d3.select('.btn.filter#country').classed('deactivated',true);
 					}
+
 				//if button is being deselected, reactivate incompatible filter
 				} else if(btn_id !== 'gender' && btn_selected){
 					if(btn_id === 'country'){
@@ -436,7 +450,11 @@ var init = function(){
 				self.generate();
 			});
 
-			//grab mobile nav
+		/*	---------------------------------------------------------------------- 
+			MOBILE NAV
+			---------------------------------------------------------------------- */
+
+			//grab mobile hamburger menu, add click handler
 			self.mobile_ham = d3.select('#hamburger').on('click',function(){
 				var o = self.menu.style('display');
 				if(o === 'none'){
@@ -447,6 +465,8 @@ var init = function(){
 					self.mobile_ham.classed('xout',false);
 				}
 			});
+
+			//grab mobile comments button, add click handler
 			self.mobile_comments = d3.select('#comments').on('click',function(){
 				if(self.comments_on && self.device === 'mobile'){
 					self.comments_hide();
@@ -454,6 +474,8 @@ var init = function(){
 					self.comments_show();
 				}
 			});
+
+			//grab mobile comments panel elements
 			self.mobile_comments_panel = d3.select('#comments_panel');
 			self.mobile_comments_panel_body = d3.select('#comments_panel .panel');
 		},
@@ -531,12 +553,16 @@ var init = function(){
 			sel_ops_grade.exit().remove();
 
 			//**TODO -- determine number of rings to calculate positions for
+			var num_rings = 80;
 
-			//**TODO -- determine how to size hexagons in order for the group to fit nicely on a screen
-
-			//**TODO -- calculate correct radius for hexagon group
-			var hex_rad = 8,
+			//calculate radius for hexagon group based on height of screen and number of rings to be drawn
+			var hex_rad = Math.floor(self.h/num_rings),
 				hex_rad_hov = hex_rad*2.25;
+
+			//extrapolate hex height and width
+			var hex_w = hex_rad*2,
+				hex_h = (Math.sqrt(3)/2)*hex_w;
+
 			var hex_row_height = Math.floor((self.h/4)/hex_rad);
 
 			//INITIALIZE VARIABLES
@@ -591,7 +617,7 @@ var init = function(){
 			legend_hexes_txt
 				.attr('transform',function(d,i){
 					var x = d >5 ? i*120 : i*30,
-						y = -9;
+						y = -6;
 					return 'translate(' +x +',' +y +')';
 				})
 				.text(function(d,i){
@@ -605,9 +631,9 @@ var init = function(){
 			legend_hexes_arr
 				.attr('marker-end','url(#arrow)')
 				.attr('x1',6)
-				.attr('y1',-12)
+				.attr('y1',-9)
 				.attr('x2',111)
-				.attr('y2',-12)
+				.attr('y2',-9)
 				;
 			legend_hexes_txt.exit().remove();
 
@@ -825,6 +851,11 @@ var init = function(){
 			}
 		},
 
+		/*	====================================================================== 
+			UTILITY FUNCTIONS
+			====================================================================== */
+
+		//mobile comments view
 		comments_show:function(){
 			self.comments_on = true;
 
@@ -880,10 +911,11 @@ var init = function(){
 			self.mobile_comments_panel_body.html('');
 		},
 
+		//resizing logic
 		resize:function(){
 		},
 
-		//Interface
+		//interface
 		util_filters_clear:function(){
 
 			self.filters = [];
@@ -893,9 +925,6 @@ var init = function(){
 				.classed('selected',false)
 				.classed('deactivated',false)
 				.style('color','white')
-				/*.style('background-color',function(){
-					return self.colors_legend[self.mode];
-				})*/
 				;
 
 			self.legend_bg.attr('d',self.path_legend);
@@ -907,7 +936,7 @@ var init = function(){
 			d3.select('#sampled').classed('visible',false);
 		},
 
-		//Forms
+		//forms
 		util_form_center:function(){
 			self.form.style('left',window.innerWidth/2 -250 +'px');
 			self.form_tweet.style('left',window.innerWidth/2 -250 +'px');
@@ -1003,8 +1032,8 @@ var init = function(){
 		},
 		util_form_submit_tweet:function(_body){
 			var body = _body || document.getElementById('tweet_body').value,
-				form = 'text=' +self.util_encode(body),
-				//link = 'url=' +self.util_encode('http://www.quantamagazine.org'),
+				form = 'text=' +self.util_encode_tweet(body),
+				//link = 'url=' +self.util_encode_tweet('http://www.quantamagazine.org'),
 				//hand = 'via=QuantaMagazine',
 				//twit = 'https://twitter.com/intent/tweet?' +form +'&' +link +'&' +hand;
 				twit = 'https://twitter.com/intent/tweet?' +form;
@@ -1014,14 +1043,13 @@ var init = function(){
 			self.util_form_clear_tweet();
 			self.form_tweet.classed('hidden',true);
 		},	
-
-		util_encode:function(_text){
+		util_encode_tweet:function(_text){
 			var self = this;
 			var text = encodeURIComponent(_text).replace(/'/g,"%27").replace(/"/g,"%22");
 			return text;
 		},
 
-		//Data
+		//data
 		util_getTopCountries:function(){
 			var arr_countries = {};
 			var data = self.data['dummy_sample_' +self.modes[self.mode]];
@@ -1043,6 +1071,7 @@ var init = function(){
 			}
 		},
 
+		//updating lower right hover annotations
 		util_detail_update:function(_d){
 			var str_comment,
 				str_userDetail;
@@ -1063,7 +1092,7 @@ var init = function(){
 			self.anno_tweet.html('');
 		},
 
-		//Resolving values to buckets
+		//resolving values to buckets
 		util_resolve_age:function(_n){
 			var bucket;
 			if(_n <18){
