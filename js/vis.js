@@ -63,8 +63,6 @@ var init = function(){
 
 		hex_file_w:30,
 		hex_file_h:30,
-		hex_w:30,
-		hex_h:26,
 		hex_sideLength:15,
 
 		path_legend:"M0,130.9V34.7c0-6.4,0-11.6,0-11.5c0,0,0-5.2,0-11.5S5.2,0,11.6,0 h76.3c6.4,0,11.6,5.2,11.6,11.5c0,0.2,0,16.3,0,16.5c0.3,6.1,5.4,11,11.6,11h53c6.4,0,11.6,5.2,11.6,11.6v80.3",
@@ -552,18 +550,24 @@ var init = function(){
 				.html(function(d,i){ return d; });
 			sel_ops_grade.exit().remove();
 
-			//**TODO -- determine number of rings to calculate positions for
-			var num_rings = 80;
+			//prepare data to be displayed
+			self.data_display = self.filters.length === 0 ? self.data[self.modes[self.mode]] : self.filterData();
 
-			//calculate radius for hexagon group based on height of screen and number of rings to be drawn
-			var hex_rad = Math.floor(self.h/num_rings),
-				hex_rad_hov = hex_rad*2.25;
+			//HEX GRID CALCULATIONS
+			//thank you, https://en.wikipedia.org/wiki/Centered_hexagonal_number
+			var num_rings = self.calc_hex_rings(self.data_display.length),
 
-			//extrapolate hex height and width
-			var hex_w = hex_rad*2,
-				hex_h = (Math.sqrt(3)/2)*hex_w;
+				//calculate radius for hexagon group based on height of screen and number of rings to be drawn
+				hex_h = Math.floor(self.h/(num_rings*2)),
 
-			var hex_row_height = Math.floor((self.h/4)/hex_rad);
+				hex_rad = hex_h/2,
+				hex_rad_hov = hex_rad*2.25,
+
+				//extrapolate hex height and width
+				//hex_w = (Math.sqrt(3)/2)*hex_h,
+
+				//row height for filtered views
+				hex_row_height = Math.floor((self.h/4)/hex_rad);
 
 			//INITIALIZE VARIABLES
 			//this is just used to neatly generate a hexagon path
@@ -646,16 +650,6 @@ var init = function(){
 				obj.x = s * Math.sqrt(3) * (_cube.x +_cube.z/2);
 				obj.y = s * 3/2 * _cube.z;
 
-				// thank you, http://stackoverflow.com/questions/2459402/hexagonal-grid-coordinates-to-pixel-coordinates?rq=1
-				// y = 3/2 * s * b
-				// b = 2/3 * y / s
-				// x = sqrt(3) * s * ( b/2 + r)
-				// x = - sqrt(3) * s * ( b/2 + g )
-				// r = (sqrt(3)/3 * x - y/3 ) / s
-				// g = -(sqrt(3)/3 * x + y/3 ) / s
-
-				// r + b + g = 0
-
 				return obj;
 			}
 
@@ -683,8 +677,6 @@ var init = function(){
 			self.data[self.modes[self.mode]].forEach(function(d,i){
 				d.pos.pixel = util_cubeToPix(cube_coords[i]);
 			});
-
-			self.data_display = self.filters.length === 0 ? self.data[self.modes[self.mode]] : self.filterData();
 
 			hexG = self.svg.selectAll('g.hexG')
 				.data([self.data_display]);
@@ -913,6 +905,18 @@ var init = function(){
 
 		//resizing logic
 		resize:function(){
+		},
+
+		//HEXAGON CALCULATIONS
+		//calculate the number of rings in a radial hex grid
+		//takes number of total data points
+		calc_hex_rings:function(_n){
+			var num_hexes = 0,
+				c;
+			for(var num_rings=0; num_hexes <=_n; num_rings++){
+				num_hexes = 1 +6*((0.5*num_rings)*(num_rings -1));
+			}
+			return num_rings -1;
 		},
 
 		//interface
