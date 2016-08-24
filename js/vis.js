@@ -355,7 +355,7 @@ var init = function(){
 				})
 				.attr('transform',function(d,i){
 					var x = i*180 +24,
-						y = 72;
+						y = 69;
 					return 'translate(' +x +',' +y +')';
 				});
 			self.legend_g.exit().remove();
@@ -670,13 +670,13 @@ var init = function(){
 				for(var j=-i; j<=i; j++)
 				for(var k=-i; k<=i; k++)
 				for(var l=-i; l<=i; l++)
-					if(Math.abs(j) +Math.abs(k) +Math.abs(l) == i*2 && j +k +l == 0){
-						var obj = {};
-						obj.x =j;
-						obj.y =k;
-						obj.z =l;
-						cube_coords.push(obj);
-					}
+				if(Math.abs(j) +Math.abs(k) +Math.abs(l) == i*2 && j +k +l == 0){
+					var obj = {};
+					obj.x =j;
+					obj.y =k;
+					obj.z =l;
+					cube_coords.push(obj);
+				}
 			}
 			//convert to pixel coordinates
 			self.data[self.modes[self.mode]].forEach(function(d,i){
@@ -700,7 +700,7 @@ var init = function(){
 					self.util_detail_clear();
 				});
 			hexG.exit().remove();
-			
+
 			/*hexesG = hexG.selectAll('g.hexesG')
 				.data(function(d,i){ return d; });
 			hexesG.enter().append('g')
