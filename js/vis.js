@@ -122,15 +122,8 @@ var init = function(){
 				});
 			});
 
-			//**TODOS -- create all datasets here, access them in filterData();
-			//create gender dataset
-
-			//create grades dataset
-
 			//create countries dataset
-			self.util_getTopCountries();
-
-			//create gender-grades dataset
+			self.util_get_top_countries();
 
 			self.generate();
 		},
@@ -211,6 +204,10 @@ var init = function(){
 			return d;
 		},
 
+		/*	====================================================================== 
+			SETUP -- Run on initial load and device change reload
+			====================================================================== */
+
 		setup:function(){
 
 			self.device = self.util_resolve_device(window.innerWidth);
@@ -230,8 +227,7 @@ var init = function(){
 						y = self.device_dimensions[self.device].h;
 					return '0 0 ' +x +' ' +y;
 				})
-				.attr('preserveAspectRatio','xMidYMid meet')
-				.style('background',self.colors[self.mode])
+				.attr('preserveAspectRatio','xMidYMid meet');
 			self.svg
 				.on('click',function(){
 					self.util_form_hide();
@@ -317,11 +313,9 @@ var init = function(){
 			//grab legend, add interaction
 			self.legend = d3.select('.nav#legend')
 				.on('mousemove',function(){
-					//d3.select('#legend #legend_tab').html('Hide');
 					self.legend.classed('show',true);
 				})
 				.on('mouseout',function(){
-					//d3.select('#legend #legend_tab').html('View');
 					self.legend.classed('show',false);
 				});
 			
@@ -478,6 +472,10 @@ var init = function(){
 			self.mobile_comments_panel_body = d3.select('#comments_panel .panel');
 		},
 
+		/*	====================================================================== 
+			GENERATE -- Run on initial load, mode change, filter change, device change
+			====================================================================== */
+
 		//thanks for all the help, http://www.redblobgames.com/grids/hexagons/!
 		generate:function(){
 			//self.w = window.innerWidth;
@@ -486,23 +484,34 @@ var init = function(){
 			//remove comments panel if needed
 			if(self.device !== 'mobile' || (self.device === 'mobile' && !self.comments_on)){ self.comments_hide(); }
 			
-			self.svg.style('background',(self.colors[self.mode]));
-			self.legend_body.style('fill',self.colors_legend[self.mode]);
+			d3.select('body').attr('class',self.modes[self.mode]);
 
 			//class and style filter buttons
-			self.btn_filters
-				.attr('class',function(){
-					var sel = d3.select(this).classed('selected') ? 'selected' : '',
-						deact = d3.select(this).classed('deactivated') ? 'deactivated' : '';
-					return 'btn filter ' +self.modes[self.mode] + ' ' +sel + ' ' +deact;
-				})
-				.style('color',function(){
-					return d3.select(this).classed('selected') ? self.colors_legend[self.mode] : 'white';
-				})
-				/*.style('background-color',function(){
-					return d3.select(this).classed('selected') ? 'white' : self.colors_legend[self.mode];
-				})*/
-				;
+			self.btn_filters.attr('class',function(){
+				var sel = d3.select(this).classed('selected') ? 'selected' : '',
+					deact = d3.select(this).classed('deactivated') ? 'deactivated' : '';
+				return 'btn filter ' +self.modes[self.mode] + ' ' +sel + ' ' +deact;
+			});
+
+			//create dropdown for country filter
+			var countries_menu_items;
+			countries_menu_items = d3.select('.btn.filter#country .expand').selectAll('li.option')
+				.data(self.data.countries.sort(function(a,b){
+					return a.name <b.name ? -1 : a.name >b.name ? 1 : 0;
+				}));
+			countries_menu_items.enter().append('li')
+				.classed('option',true);
+			countries_menu_items
+				.html(function(d){ return d.name; });
+			countries_menu_items
+				.on('click',function(d){
+					d3.event.stopPropagation();
+
+					var selection = d3.select(this),
+						selected = selection.classed('selected');
+					selection.classed('selected',!selected);
+				});
+			countries_menu_items.exit().remove();
 
 			//update all mode spans to reflect current mode
 			d3.select('#title .mode').text(util_toTitleCase(self.modes[self.mode]));
@@ -558,14 +567,11 @@ var init = function(){
 			var num_rings = self.calc_hex_rings(self.data_display.length),
 
 				//calculate radius for hexagon group based on height of screen and number of rings to be drawn
-				hex_h = Math.floor(self.h/(num_rings*2)),
+				hex_h = Math.floor(self.h/(num_rings*(self.device === 'mobile' ? 0.75 : 2))),
 
 				hex_rad = hex_h/2,
 				hex_rad_hov = hex_rad*2.25,
 				hex_rad_legend = 8,
-
-				//extrapolate hex height and width
-				//hex_w = (Math.sqrt(3)/2)*hex_h,
 
 				//row height for filtered views
 				hex_row_height = Math.floor((self.h/4)/hex_rad);
@@ -577,10 +583,10 @@ var init = function(){
 				hexTTback,
 				hexTT;
 			var hexG,
-				hexesG,
-				hexesGT,
-				hexesGG,
-				hexesGGT,
+				// hexesG,
+				// hexesGT,
+				// hexesGG,
+				// hexesGGT,
 				hexes;
 
 			var scale_age = d3.scale.linear()
@@ -607,7 +613,6 @@ var init = function(){
 				.classed('legend_hex',true);
 			legend_hexes
 				.attr('d',function(d,i){
-					//return d >5 ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d));
 					return d >5 ? hexbin.hexagon(hex_rad_legend) : hexbin.hexagon(scale_age_legend(d));
 				})
 				.attr('transform',function(d,i){
@@ -849,9 +854,6 @@ var init = function(){
 			self.menu
 				.style('display',function(){
 					return self.device !== 'mobile' ? 'block' : 'none';
-				})
-				.style('background-color',function(){
-					return self.colors[self.mode];
 				});
 			self.anno.style('background',function(){
 				return self.device === 'mobile' ? self.mode === 0 ? 'rgba(41, 92, 204, 0.75)' : 'rgba(103,164,0,0.75)' : 'transparent';
@@ -907,9 +909,6 @@ var init = function(){
 					var str = '<span class="mobile_comment_user">Grade ' +d.grade +' rating: ' +d.rating +'/5 &#124; ' +self.util_resolve_gender(d.gender) +', ' +d.age +', ' +d.country +'</span><span>&ldquo;' +d.comment +'&rdquo;</span>';
 					return str;
 				})
-				.style('color',function(d){
-					return self.colors[self.mode];
-				})
 				.style('border-bottom',function(d){
 					return '2px solid ' +self.colors[self.mode];
 				});
@@ -947,9 +946,10 @@ var init = function(){
 			self.btn_filters_clear.classed('visible',false);
 			self.btn_filters
 				.classed('selected',false)
-				.classed('deactivated',false)
-				.style('color','white')
-				;
+				.classed('deactivated',false);
+
+			//deselect all dropdown menu selections
+			d3.selectAll('li.option').classed('selected',false);
 
 			self.legend_bg.attr('d',self.path_legend);
 			self.legend.classed('expanded',false);
@@ -1074,7 +1074,7 @@ var init = function(){
 		},
 
 		//data
-		util_getTopCountries:function(){
+		util_get_top_countries:function(){
 			var arr_countries = {};
 			var data = self.data['dummy_sample_' +self.modes[self.mode]];
 			for(var i=0; i<data.length; i++){
