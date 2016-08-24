@@ -104,7 +104,6 @@ var init = function(){
 					_d.grade_bucket = self.util_resolve_grade(_d.grade);
 
 					_d.pos = {};
-					_d.pos.cube  = {};
 					_d.pos.pixel = {};
 				});
 				self.data[d].sort(function(a,b){
@@ -571,10 +570,10 @@ var init = function(){
 
 				hex_rad = hex_h/2,
 				hex_rad_hov = hex_rad*2.25,
-				hex_rad_legend = 8,
+				hex_rad_legend = 8;
 
 				//row height for filtered views
-				hex_row_height = Math.floor((self.h/4)/hex_rad);
+				//hex_row_height = Math.floor((self.h/4)/hex_rad);
 
 			//INITIALIZE VARIABLES
 			//this is just used to neatly generate a hexagon path
@@ -795,20 +794,22 @@ var init = function(){
 				;
 			hexes
 				.on('mousemove',function(d,i){
-					var dev_off = self.device === 'default' || self.filters.length === 0;
+					//var dev_off = self.device === 'default' || self.filters.length === 0;
 					var x, y;
 					var o = d.rating/5;
 
 					var padL = self.device === 'tablet' ? padding.left : 0,
 						padT = self.device === 'tablet' ? padding.top : 0;
 
-					if(dev_off){
+					/*if(dev_off){
 						x = self.filters.length === 0 ? d.pos.pixel.y : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +d.idx_g*(hex_rad*8);
 						y = self.filters.length === 0 ? d.pos.pixel.x : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875));
 					} else{
 						x = self.filters.length === 0 ? d.pos.pixel.y : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875)) +padL;
 						y = self.filters.length === 0 ? d.pos.pixel.x : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +padT : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +(d.idx_g*(hex_rad*8))/2 +padT;
-					}
+					}*/
+					x = d.pos.pixel.y;
+					y = d.pos.pixel.x;
 
 					x +=self.w/2;
 					y +=self.h/2;
@@ -816,7 +817,8 @@ var init = function(){
 					hexTTG
 						.classed('hidden',false)
 						.attr('transform',function(){
-							var str = dev_off ? 'translate(' +x +',' +y +')rotate(90)' : 'translate(' +x +',' +y +')'; 
+							//var str = dev_off ? 'translate(' +x +',' +y +')rotate(90)' : 'translate(' +x +',' +y +')'; 
+							var str = 'translate(' +x +',' +y +')rotate(90)'; 
 							return str;
 						});
 					hexTT
