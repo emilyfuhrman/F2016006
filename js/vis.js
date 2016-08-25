@@ -30,6 +30,7 @@ var init = function(){
 
 		//holds any selected filters
 		filters:[],
+		filters_sub:[],
 
 		buckets_age:[
 			'<18',
@@ -378,7 +379,9 @@ var init = function(){
 			//grab filters, add click handlers
 			self.btn_filters = self.menu.selectAll('.btn.filter').on('click',function(){
 				d3.event.stopPropagation();
-				self.filter(this);
+
+				//check to make sure it's not a dropdown 
+				if(!d3.select(this).classed('dd')){ self.filter(this); }
 			});
 			self.btn_filters_clear = d3.select('#clear').on('click',function(){
 				d3.event.stopPropagation();
@@ -430,9 +433,11 @@ var init = function(){
 
 			//class and style filter buttons
 			self.btn_filters.attr('class',function(){
-				var sel = d3.select(this).classed('selected') ? 'selected' : '',
-					deact = d3.select(this).classed('deactivated') ? 'deactivated' : '';
-				return 'btn filter ' +self.modes[self.mode] + ' ' +sel + ' ' +deact;
+				var elem = d3.select(this),
+					p_01 = elem.classed('dd') ? 'dd' : '',
+					p_02 = elem.classed('selected') ? 'selected' : '',
+					p_03 = elem.classed('deactivated') ? 'deactivated' : '';
+				return 'btn filter ' +self.modes[self.mode] +' ' +p_01 +' ' +p_02 +' ' +p_03;
 			});
 
 			//create dropdown for country filter
@@ -448,12 +453,7 @@ var init = function(){
 			countries_menu_items
 				.on('click',function(d){
 					d3.event.stopPropagation();
-
-					var selection = d3.select(this),
-						selected = selection.classed('selected');
-					selection.classed('selected',!selected);
-
-					self.filter(this.parentNode.parentNode,d);
+					self.filter(this.parentNode.parentNode,this);
 				});
 			countries_menu_items.exit().remove();
 
@@ -742,43 +742,55 @@ var init = function(){
 			var btn = d3.select(_elem),
 				btn_id = btn.attr('id'),
 				btn_selected = btn.classed('selected');
+			var item,
+				item_selected;
 
-			if(self.filters.indexOf(btn_id) <0){
-				self.filters.push(btn_id);
+			if(_item){
+				
+				item = d3.select(_item);
+				item_selected = item.classed('selected');
+
+				//class item as selected or not
+				item.classed('selected',!item_selected);
+
 			} else{
-				self.filters = self.filters.filter(function(d){ return d !== btn_id; });
-			}
-			if(self.filters.length === 0){
-				self.util_filters_clear();
-			} else{
-				self.btn_filters_clear.classed('visible',true);
+				if(self.filters.indexOf(btn_id) <0){
+					self.filters.push(btn_id);
+				} else{
+					self.filters = self.filters.filter(function(d){ return d !== btn_id; });
+				}
+				if(self.filters.length === 0){
+					self.util_filters_clear();
+				} else{
+					self.btn_filters_clear.classed('visible',true);
 
-				self.legend_bg.attr('d',self.path_legend_exp);
-				self.legend.classed('expanded',true);
-				self.legend_g.classed('show',true);
+					self.legend_bg.attr('d',self.path_legend_exp);
+					self.legend.classed('expanded',true);
+					self.legend_g.classed('show',true);
 
-				d3.select('#sampled').classed('visible',true);
-			}
-
-			//if button is just being selected, deactivate incompatible filter
-			if(btn_id !== 'gender' && !btn_selected){
-				if(btn_id === 'country'){
-					d3.select('.btn.filter#grade').classed('deactivated',true);
-				} else if(btn_id === 'grade'){
-					d3.select('.btn.filter#country').classed('deactivated',true);
+					d3.select('#sampled').classed('visible',true);
 				}
 
-			//if button is being deselected, reactivate incompatible filter
-			} else if(btn_id !== 'gender' && btn_selected){
-				if(btn_id === 'country'){
-					d3.select('.btn.filter#grade').classed('deactivated',false);
-				} else if(btn_id === 'grade'){
-					d3.select('.btn.filter#country').classed('deactivated',false);
-				}
-			}
+				//if button is just being selected, deactivate incompatible filter
+				if(btn_id !== 'gender' && !btn_selected){
+					if(btn_id === 'country'){
+						d3.select('.btn.filter#grade').classed('deactivated',true);
+					} else if(btn_id === 'grade'){
+						d3.select('.btn.filter#country').classed('deactivated',true);
+					}
 
-			//class button as selected or not
-			btn.classed('selected',!btn_selected);
+				//if button is being deselected, reactivate incompatible filter
+				} else if(btn_id !== 'gender' && btn_selected){
+					if(btn_id === 'country'){
+						d3.select('.btn.filter#grade').classed('deactivated',false);
+					} else if(btn_id === 'grade'){
+						d3.select('.btn.filter#country').classed('deactivated',false);
+					}
+				}
+
+				//class button as selected or not
+				btn.classed('selected',!btn_selected);
+			}
 			
 			self.mobile_ham.classed('xout',false);
 			self.generate();
@@ -861,6 +873,7 @@ var init = function(){
 		util_filters_clear:function(){
 
 			self.filters = [];
+			self.filters_sub = [];
 
 			self.btn_filters_clear.classed('visible',false);
 			self.btn_filters
