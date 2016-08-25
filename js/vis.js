@@ -104,7 +104,6 @@ var init = function(){
 					_d.grade_bucket = self.util_resolve_grade(_d.grade);
 
 					_d.pos = {};
-					_d.pos.pixel = {};
 				});
 				self.data[d].sort(function(a,b){
 					return d3.descending(a.rating,b.rating);
@@ -477,8 +476,6 @@ var init = function(){
 
 		//thanks for all the help, http://www.redblobgames.com/grids/hexagons/!
 		generate:function(){
-			//self.w = window.innerWidth;
-			//self.h = window.innerHeight;
 
 			//remove comments panel if needed
 			if(self.device !== 'mobile' || (self.device === 'mobile' && !self.comments_on)){ self.comments_hide(); }
@@ -559,11 +556,11 @@ var init = function(){
 			sel_ops_grade.exit().remove();
 
 			//prepare data to be displayed
-			self.data_display = self.filters.length === 0 ? self.data[self.modes[self.mode]] : self.filterData();
+			self.data_display = self.filters.length === 0 ? [self.data[self.modes[self.mode]]] : self.filterData();
 
 			//HEX GRID CALCULATIONS
 			//thank you, https://en.wikipedia.org/wiki/Centered_hexagonal_number
-			var num_rings = self.calc_hex_rings(self.data_display.length),
+			var num_rings = self.calc_hex_rings(self.data_display[0].length),
 
 				//calculate radius for hexagon group based on height of screen and number of rings to be drawn
 				hex_h = Math.floor(self.h/(num_rings*(self.device === 'mobile' ? 0.75 : 2))),
@@ -587,6 +584,47 @@ var init = function(){
 				// hexesGG,
 				// hexesGGT,
 				hexes;
+			var legend_hexes,
+				legend_hexes_txt,
+				legend_hexes_arr;
+
+			//INITIALIZE FUNCTIONS
+			//convert cube coordinates to pixel coordinates
+			function util_cubeToPix(_cube){
+				var obj = {};
+				var s = hex_rad;
+
+				obj.x = s * Math.sqrt(3) * (_cube.x +_cube.z/2);
+				obj.y = s * 3/2 * _cube.z;
+
+				return obj;
+			}
+
+			//thank you, http://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
+			function util_toTitleCase(_str){
+			    return _str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+			}
+
+			//generate cube coordinates for data points
+			//thank you, http://stackoverflow.com/questions/2049196/generating-triangular-hexagonal-coordinates-xyz
+			var cube_coords = [];
+			for(var i=0; i<50; i++){
+				for(var j=-i; j<=i; j++)
+				for(var k=-i; k<=i; k++)
+				for(var l=-i; l<=i; l++)
+				if(Math.abs(j) +Math.abs(k) +Math.abs(l) == i*2 && j +k +l == 0){
+					var obj = {};
+					obj.x =j;
+					obj.y =k;
+					obj.z =l;
+					cube_coords.push(obj);
+				}
+			}
+
+			//convert to pixel coordinates
+			self.data[self.modes[self.mode]].forEach(function(d,i){
+				d.pos = util_cubeToPix(cube_coords[i]);
+			});
 
 			var scale_age = d3.scale.linear()
 				.domain([0,self.buckets_age.length -1])
@@ -602,10 +640,7 @@ var init = function(){
 				'left':90
 			};
 
-			//update legend
-			var legend_hexes,
-				legend_hexes_txt,
-				legend_hexes_arr;
+			//UPDATE LEGEND
 			legend_hexes = self.legend_g.selectAll('path.legend_hex')
 				.data(function(d,i){ return d; });
 			legend_hexes.enter().append('path')
@@ -650,43 +685,8 @@ var init = function(){
 				;
 			legend_hexes_txt.exit().remove();
 
-			//INITIALIZE FUNCTIONS
-			//convert cube coordinates to pixel coordinates
-			function util_cubeToPix(_cube){
-				var obj = {};
-				var s = hex_rad;
-
-				obj.x = s * Math.sqrt(3) * (_cube.x +_cube.z/2);
-				obj.y = s * 3/2 * _cube.z;
-
-				return obj;
-			}
-
-			//thank you, http://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
-			function util_toTitleCase(_str){
-			    return _str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-			}
-
-			//generate cube coordinates for data points
-			//thank you, http://stackoverflow.com/questions/2049196/generating-triangular-hexagonal-coordinates-xyz
-			var cube_coords = [];
-			for(var i=0; i<50; i++){
-				for(var j=-i; j<=i; j++)
-				for(var k=-i; k<=i; k++)
-				for(var l=-i; l<=i; l++)
-				if(Math.abs(j) +Math.abs(k) +Math.abs(l) == i*2 && j +k +l == 0){
-					var obj = {};
-					obj.x =j;
-					obj.y =k;
-					obj.z =l;
-					cube_coords.push(obj);
-				}
-			}
-			//convert to pixel coordinates
-			self.data[self.modes[self.mode]].forEach(function(d,i){
-				d.pos.pixel = util_cubeToPix(cube_coords[i]);
-			});
-
+			//UPDATE HEXAGONS
+			//hexagon container
 			hexG = self.svg.selectAll('g.hexG')
 				.data([self.data_display]);
 			hexG.enter().append('g')
@@ -705,18 +705,20 @@ var init = function(){
 				});
 			hexG.exit().remove();
 
-			/*hexesG = hexG.selectAll('g.hexesG')
+			//hexagon sub-containers
+			hexesG = hexG.selectAll('g.hexesG')
 				.data(function(d,i){ return d; });
 			hexesG.enter().append('g')
 				.classed('hexesG',true);
-			hexesG
+			/*hexesG
 				.attr('transform',function(d,i){
-					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : i*self.col_w -self.w/2 +self.w*0.125,
-						y = d.pos && d.pos.pixel ? d.pos.pixel.x : -self.h*0.25;
+					var x = d.pos && d.pos ? d.pos.y : i*self.col_w -self.w/2 +self.w*0.125,
+						y = d.pos && d.pos ? d.pos.x : -self.h*0.25;
 					return self.device === 'default' || self.filters.length === 0 ? 'translate(' +x +',' +y +')' : 'translate(' +y +',' +x +')';
-				});
+				});*/
 			hexesG.exit().remove();
-			hexesGT = hexesG.selectAll('text.hexesGT')
+
+			/*hexesGT = hexesG.selectAll('text.hexesGT')
 				.data(function(d,i){ return [d]; });
 			hexesGT.enter().append('text')
 				.classed('hexesGT',true);
@@ -762,7 +764,9 @@ var init = function(){
 			hexesGGT.exit().remove();*/
 
 			//hexes = hexesGG.selectAll('path.hex')
-			hexes = hexG.selectAll('path.hex')
+
+			//hexagons
+			hexes = hexesG.selectAll('path.hex')
 				//.data(function(d,i){ return self.filters.length === 0 ? [d] : self.filters.length === 1 ? d.value : d; });
 				.data(function(d){ return d; });
 			hexes.enter().append('path')
@@ -777,8 +781,8 @@ var init = function(){
 					// 	y = self.filters.length === 0 ? 0 : (i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875); //why?
 					// return self.device === 'default' || self.filters.length === 0 ? 'translate(' +x +',' +y +')rotate(90)' : 'translate(' +y +',' +x +')';
 
-					var x = d.pos && d.pos.pixel ? d.pos.pixel.y : i*self.col_w -self.w/2 +self.w*0.125,
-						y = d.pos && d.pos.pixel ? d.pos.pixel.x : -self.h*0.25;
+					var x = d.pos ? d.pos.y : i*self.col_w -self.w/2 +self.w*0.125,
+						y = d.pos ? d.pos.x : -self.h*0.25;
 					//return self.device === 'default' || self.filters.length === 0 ? 'translate(' +x +',' +y +')' : 'translate(' +y +',' +x +')';
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})
@@ -802,14 +806,14 @@ var init = function(){
 						padT = self.device === 'tablet' ? padding.top : 0;
 
 					/*if(dev_off){
-						x = self.filters.length === 0 ? d.pos.pixel.y : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +d.idx_g*(hex_rad*8);
-						y = self.filters.length === 0 ? d.pos.pixel.x : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875));
+						x = self.filters.length === 0 ? d.pos.y : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +d.idx_g*(hex_rad*8);
+						y = self.filters.length === 0 ? d.pos.x : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875));
 					} else{
-						x = self.filters.length === 0 ? d.pos.pixel.y : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875)) +padL;
-						y = self.filters.length === 0 ? d.pos.pixel.x : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +padT : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +(d.idx_g*(hex_rad*8))/2 +padT;
+						x = self.filters.length === 0 ? d.pos.y : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875)) +padL;
+						y = self.filters.length === 0 ? d.pos.x : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +padT : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +(d.idx_g*(hex_rad*8))/2 +padT;
 					}*/
-					x = d.pos.pixel.y;
-					y = d.pos.pixel.x;
+					x = d.pos.y;
+					y = d.pos.x;
 
 					x +=self.w/2;
 					y +=self.h/2;
