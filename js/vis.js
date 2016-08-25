@@ -126,80 +126,76 @@ var init = function(){
 		},
 		filterData:function(){
 			var d, f, b;
-			if(self.filters.length === 0){
-				d = [self.data[self.modes[self.mode]]];
-			} else{
 				d = {};
 
-				//if only one filter is selected
-				if(self.filters.length === 1){
-					f = self.filters[0];
-					f = f === 'grade' ? 'grade_bucket' : f;
+			//if only one filter is selected
+			if(self.filters.length === 1){
+				f = self.filters[0];
+				f = f === 'grade' ? 'grade_bucket' : f;
 
-					//get buckets that correspond to filter
-					b = self[(f === 'grade_bucket' ? 'buckets_grade' : 'buckets_' +f)];
+				//get buckets that correspond to filter
+				b = self[(f === 'grade_bucket' ? 'buckets_grade' : 'buckets_' +f)];
 
-					//in data object, create new array for every bucket
-					b.forEach(function(_b){ d[_b] = []; });
+				//in data object, create new array for every bucket
+				b.forEach(function(_b){ d[_b] = []; });
 
-					//cycle through sampled dataset to add values to their accordant arrays
-					self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
-						var hash = f === 'country' ? _d[f].split(' ').join('_').toLowerCase() : _d[f];
-						if(d[hash]){
-							_d.idx = d3.keys(d).indexOf(d[hash]);
-							d[hash].push(_d);
+				//cycle through sampled dataset to add values to their accordant arrays
+				self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
+					var hash = f === 'country' ? _d[f].split(' ').join('_').toLowerCase() : _d[f];
+					if(d[hash]){
+						_d.idx = d3.keys(d).indexOf(d[hash]);
+						d[hash].push(_d);
+					}
+				});
+
+				//convert back to array
+				d = d3.entries(d);
+				d.forEach(function(_d){ 
+					_d.value = _d.value.sort(function(a,b){ 
+						if(a.rating === b.rating){
+							return b.age_bucket -a.age_bucket;
 						}
+						return b.rating -a.rating; 
 					});
+				});
 
-					//convert back to array
-					d = d3.entries(d);
-					d.forEach(function(_d){ 
-						_d.value = _d.value.sort(function(a,b){ 
+			//if more than one filter is selected (must be gender + {something})
+			} else{
+				f = self.filters.filter(function(d){ return d !== 'gender'; })[0];
+				f = f === 'grade' ? 'grade_bucket' : f;
+
+				//get buckets that correspond to filter
+				b = self[(f === 'grade_bucket' ? 'buckets_grade' : 'buckets_' +f)];
+
+				b.forEach(function(_b){
+					d[_b] = [];
+					d[_b].push([]); //array -- M
+					d[_b].push([]); //array -- F
+				});
+
+				self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
+					var hash = f === 'country' ? _d[f].split(' ').join('_').toLowerCase() : _d[f];
+					if(d[hash]){ 
+						var arr_g = _d.gender === 'M' ? 0 : 1;
+						_d.idx = d3.keys(d).indexOf(hash);
+						_d.idx_g = arr_g;
+						d[hash][arr_g].push(_d); 
+					}
+				});
+
+				//convert back to array
+				//sorted primarily by rating and secondarily by age
+				d = d3.entries(d);
+				d.forEach(function(_d){ 
+					_d.value.forEach(function(__d){
+						__d = __d.sort(function(a,b){ 
 							if(a.rating === b.rating){
 								return b.age_bucket -a.age_bucket;
 							}
 							return b.rating -a.rating; 
 						});
 					});
-
-				//if more than one filter is selected (must be gender + {something})
-				} else{
-					f = self.filters.filter(function(d){ return d !== 'gender'; })[0];
-					f = f === 'grade' ? 'grade_bucket' : f;
-
-					//get buckets that correspond to filter
-					b = self[(f === 'grade_bucket' ? 'buckets_grade' : 'buckets_' +f)];
-
-					b.forEach(function(_b){
-						d[_b] = [];
-						d[_b].push([]); //array -- M
-						d[_b].push([]); //array -- F
-					});
-
-					self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
-						var hash = f === 'country' ? _d[f].split(' ').join('_').toLowerCase() : _d[f];
-						if(d[hash]){ 
-							var arr_g = _d.gender === 'M' ? 0 : 1;
-							_d.idx = d3.keys(d).indexOf(hash);
-							_d.idx_g = arr_g;
-							d[hash][arr_g].push(_d); 
-						}
-					});
-
-					//convert back to array
-					//sorted primarily by rating and secondarily by age
-					d = d3.entries(d);
-					d.forEach(function(_d){ 
-						_d.value.forEach(function(__d){
-							__d = __d.sort(function(a,b){ 
-								if(a.rating === b.rating){
-									return b.age_bucket -a.age_bucket;
-								}
-								return b.rating -a.rating; 
-							});
-						});
-					});
-				}
+				});
 			}
 			return d;
 		},
@@ -514,7 +510,7 @@ var init = function(){
 			sel_ops_grade.exit().remove();
 
 			//prepare data to be displayed
-			self.data_display = self.filterData();
+			self.data_display = self.filters.length === 0 ? [self.data[self.modes[self.mode]]] : self.filterData();
 
 			//HEX GRID CALCULATIONS
 			//thank you, https://en.wikipedia.org/wiki/Centered_hexagonal_number
