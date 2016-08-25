@@ -743,32 +743,41 @@ var init = function(){
 				btn_id = btn.attr('id'),
 				btn_selected = btn.classed('selected');
 			var item,
-				item_selected;
+				item_id;
 
 			if(_item){
 				
 				item = d3.select(_item);
-				item_selected = item.classed('selected');
+				item_id = item.data()[0].code;
+					
+				//if dropdown option has not yet been accounted for, add to sub-filters array
+				if(self.filters_sub.length <5 && self.filters_sub.indexOf(item_id) <0){
 
-				//class item as selected or not
-				item.classed('selected',!item_selected);
+					//if top-level filter has not yet been accounted for, add to filters array
+					//deactivate incompatible filter if 'country' is selected
+					if(self.filters.indexOf(btn_id) <0){
+						self.filters.push(btn_id);
+						if(btn_id === 'country'){ d3.select('.btn.filter#grade').classed('deactivated',true); }
+					}
+					self.filters_sub.push(item_id);
+					item.classed('selected',true);
+				} else{
+					self.filters_sub = self.filters_sub.filter(function(d){ return d !== item_id; });
+					item.classed('selected',false);
+
+					//if no more sub-filters, remove top-level filter from filters array
+					//reactivate incompatible filter if 'country' is deselected
+					if(self.filters_sub.length === 0){
+						self.filters = self.filters.filter(function(d){ return d !== btn_id; });
+						if(btn_id === 'country'){ d3.select('.btn.filter#grade').classed('deactivated',false); }
+					}
+				}
 
 			} else{
 				if(self.filters.indexOf(btn_id) <0){
 					self.filters.push(btn_id);
 				} else{
 					self.filters = self.filters.filter(function(d){ return d !== btn_id; });
-				}
-				if(self.filters.length === 0){
-					self.util_filters_clear();
-				} else{
-					self.btn_filters_clear.classed('visible',true);
-
-					self.legend_bg.attr('d',self.path_legend_exp);
-					self.legend.classed('expanded',true);
-					self.legend_g.classed('show',true);
-
-					d3.select('#sampled').classed('visible',true);
 				}
 
 				//if button is just being selected, deactivate incompatible filter
@@ -790,6 +799,17 @@ var init = function(){
 
 				//class button as selected or not
 				btn.classed('selected',!btn_selected);
+			}
+			if(self.filters.length === 0 && self.filters_sub.length === 0){
+				self.util_filters_clear();
+			} else{
+				self.btn_filters_clear.classed('visible',true);
+
+				self.legend_bg.attr('d',self.path_legend_exp);
+				self.legend.classed('expanded',true);
+				self.legend_g.classed('show',true);
+
+				d3.select('#sampled').classed('visible',true);
 			}
 			
 			self.mobile_ham.classed('xout',false);
