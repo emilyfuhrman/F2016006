@@ -218,6 +218,14 @@ div {
     -ms-box-sizing:border-box;
 	box-sizing:border-box;
 	}
+
+.math #menu .btn.filter .expand {
+	background:#4a78cf;
+	}
+.science #menu .btn.filter .expand {
+	background:#85B800;
+	}
+
 #menu .btn.filter:hover .expand {
 	display:block;
 	opacity:1;

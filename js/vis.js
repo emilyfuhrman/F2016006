@@ -57,8 +57,6 @@ var init = function(){
 			'5':'HATE'
 		},
 
-		col_w:0,
-
 		m:false,
 
 		hex_file_w:30,
@@ -128,8 +126,7 @@ var init = function(){
 		filterData:function(){
 			var d, f, b;
 			if(self.filters.length === 0){
-				d = self.data[self.modes[self.mode]];
-				self.col_w = 0;
+				d = [self.data[self.modes[self.mode]]];
 			} else{
 				d = {};
 
@@ -137,9 +134,6 @@ var init = function(){
 					f = self.filters[0];
 					f = f === 'grade' ? 'grade_bucket' : f;
 					b = self[(f === 'grade_bucket' ? 'buckets_grade' : 'buckets_' +f)];
-
-					//set width of buckets
-					self.col_w = Math.floor((self.w -self.w*0.25)/b.length);
 
 					b.forEach(function(_b){
 						d[_b] = [];
@@ -166,9 +160,6 @@ var init = function(){
 					f = self.filters.filter(function(d){ return d !== 'gender'; })[0];
 					f = f === 'grade' ? 'grade_bucket' : f;
 					b = self[(f === 'grade_bucket' ? 'buckets_grade' : 'buckets_' +f)];
-
-					//set width of buckets
-					self.col_w = Math.floor((self.w -self.w*0.25)/b.length);
 
 					b.forEach(function(_b){
 						d[_b] = [];
@@ -219,7 +210,6 @@ var init = function(){
 			self.svg.enter().append('svg')
 				.classed('vis',true);
 			self.svg
-				//.attr('viewBox','0 0 1440 900')
 				.attr('viewBox',function(d){
 					var x = self.device_dimensions[self.device].w,
 						y = self.device_dimensions[self.device].h;
@@ -387,52 +377,8 @@ var init = function(){
 
 			//grab filters, add click handlers
 			self.btn_filters = self.menu.selectAll('.btn.filter').on('click',function(){
-
 				d3.event.stopPropagation();
-
-				var btn = d3.select(this),
-					btn_id = btn.attr('id'),
-					btn_selected = btn.classed('selected');
-
-				if(self.filters.indexOf(btn_id) <0){
-					self.filters.push(btn_id);
-				} else{
-					self.filters = self.filters.filter(function(d){ return d !== btn_id; });
-				}
-				if(self.filters.length === 0){
-					self.util_filters_clear();
-				} else{
-					self.btn_filters_clear.classed('visible',true);
-
-					self.legend_bg.attr('d',self.path_legend_exp);
-					self.legend.classed('expanded',true);
-					self.legend_g.classed('show',true);
-
-					d3.select('#sampled').classed('visible',true);
-				}
-
-				//if button is just being selected, deactivate incompatible filter
-				if(btn_id !== 'gender' && !btn_selected){
-					if(btn_id === 'country'){
-						d3.select('.btn.filter#grade').classed('deactivated',true);
-					} else if(btn_id === 'grade'){
-						d3.select('.btn.filter#country').classed('deactivated',true);
-					}
-
-				//if button is being deselected, reactivate incompatible filter
-				} else if(btn_id !== 'gender' && btn_selected){
-					if(btn_id === 'country'){
-						d3.select('.btn.filter#grade').classed('deactivated',false);
-					} else if(btn_id === 'grade'){
-						d3.select('.btn.filter#country').classed('deactivated',false);
-					}
-				}
-
-				//class button as selected or not
-				btn.classed('selected',!btn_selected);
-				
-				self.mobile_ham.classed('xout',false);
-				self.generate();
+				self.filter(this);
 			});
 			self.btn_filters_clear = d3.select('#clear').on('click',function(){
 				d3.event.stopPropagation();
@@ -506,6 +452,8 @@ var init = function(){
 					var selection = d3.select(this),
 						selected = selection.classed('selected');
 					selection.classed('selected',!selected);
+
+					self.filter(this.parentNode.parentNode,d);
 				});
 			countries_menu_items.exit().remove();
 
@@ -556,11 +504,11 @@ var init = function(){
 			sel_ops_grade.exit().remove();
 
 			//prepare data to be displayed
-			self.data_display = self.filters.length === 0 ? [self.data[self.modes[self.mode]]] : self.filterData();
+			self.data_display = self.filterData();
 
 			//HEX GRID CALCULATIONS
 			//thank you, https://en.wikipedia.org/wiki/Centered_hexagonal_number
-			var num_rings = self.calc_hex_rings(self.data_display[0].length),
+			var num_rings = self.calc_hex_rings(self.data[self.modes[self.mode]].length),
 
 				//calculate radius for hexagon group based on height of screen and number of rings to be drawn
 				hex_h = Math.floor(self.h/(num_rings*(self.device === 'mobile' ? 0.75 : 2))),
@@ -569,9 +517,6 @@ var init = function(){
 				hex_rad_hov = hex_rad*2.25,
 				hex_rad_legend = 8;
 
-				//row height for filtered views
-				//hex_row_height = Math.floor((self.h/4)/hex_rad);
-
 			//INITIALIZE VARIABLES
 			//this is just used to neatly generate a hexagon path
 			var hexbin = d3.hexbin();
@@ -579,10 +524,7 @@ var init = function(){
 				hexTTback,
 				hexTT;
 			var hexG,
-				// hexesG,
-				// hexesGT,
-				// hexesGG,
-				// hexesGGT,
+				hexesG,
 				hexes;
 			var legend_hexes,
 				legend_hexes_txt,
@@ -710,123 +652,45 @@ var init = function(){
 				.data(function(d,i){ return d; });
 			hexesG.enter().append('g')
 				.classed('hexesG',true);
-			/*hexesG
-				.attr('transform',function(d,i){
-					var x = d.pos && d.pos ? d.pos.y : i*self.col_w -self.w/2 +self.w*0.125,
-						y = d.pos && d.pos ? d.pos.x : -self.h*0.25;
-					return self.device === 'default' || self.filters.length === 0 ? 'translate(' +x +',' +y +')' : 'translate(' +y +',' +x +')';
-				});*/
 			hexesG.exit().remove();
-
-			/*hexesGT = hexesG.selectAll('text.hexesGT')
-				.data(function(d,i){ return [d]; });
-			hexesGT.enter().append('text')
-				.classed('hexesGT',true);
-			hexesGT
-				.attr('transform',function(d,i){
-					var x = 0,
-						y = hex_row_height*(hex_rad*2) -hex_rad*2;
-					return self.device === 'default' ? 'translate(' +x +',' +y +')' : 'translate(-60,' +hex_rad +')';
-				})
-				.text(function(d){ 
-					var str = self.filters.length === 0 ? '' : d.key;
-					return str;
-				});
-			hexesGT.exit().remove();
-			hexesGG = hexesG.selectAll('g.hexesGG')
-				.data(function(d,i){ return self.filters.length === 2 ? d.value : [d]; });
-			hexesGG.enter().append('g')
-				.classed('hexesGG',true);
-			hexesGG
-				.attr('transform',function(d,i){
-					var x = i*(hex_rad*8),
-						y = 0;
-					return self.device === 'default' ? 'translate(' +x +',' +y +')' : 'translate(' +y +',' +x/2 +')';
-				});
-			hexesGG.exit().remove();
-
-			var counter = 0;
-			hexesGGT = hexesGG.selectAll('text.hexesGGT')
-				.data(function(d,i){ return self.filters.length === 2 ? [d] : []; });
-			hexesGGT.enter().append('text')
-				.classed('hexesGGT',true);
-			hexesGGT
-				.attr('transform',function(d){
-					var x = 0,
-						y = hex_row_height*(hex_rad*2) +hex_rad*2;
-					return self.device === 'default' ? 'translate(' +x +',' +y +')' : 'translate(-30,' +hex_rad +')';
-				})
-				.text(function(d,i){ 
-					var label = counter%2 === 0 ? 'M' : 'F';
-					counter++;
-					return label;
-				});
-			hexesGGT.exit().remove();*/
-
-			//hexes = hexesGG.selectAll('path.hex')
 
 			//hexagons
 			hexes = hexesG.selectAll('path.hex')
-				//.data(function(d,i){ return self.filters.length === 0 ? [d] : self.filters.length === 1 ? d.value : d; });
-				.data(function(d){ return d; });
+				.data(function(d){ return d.value || d; });
 			hexes.enter().append('path')
 				.classed('hex',true);
 			hexes
-				// .style('opacity',0)
 				.attr('d',function(d){
 					return self.filters.length === 0 ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age_bucket));
 				})
 				.attr('transform',function(d,i){
-					// var x = self.filters.length === 0 ? 0 : Math.floor(i/hex_row_height)*(hex_rad*1.5),
-					// 	y = self.filters.length === 0 ? 0 : (i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875); //why?
-					// return self.device === 'default' || self.filters.length === 0 ? 'translate(' +x +',' +y +')rotate(90)' : 'translate(' +y +',' +x +')';
-
-					var x = d.pos ? d.pos.y : i*self.col_w -self.w/2 +self.w*0.125,
-						y = d.pos ? d.pos.x : -self.h*0.25;
-					//return self.device === 'default' || self.filters.length === 0 ? 'translate(' +x +',' +y +')' : 'translate(' +y +',' +x +')';
+					var x = self.filters.length === 0 ? d.pos.y : 0,
+						y = self.filters.length === 0 ? d.pos.x : 0;
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})
 				.style('stroke',self.colors[self.mode])
 				.style('fill-opacity',function(d){
 					return d.rating/5;
-				})
-				// .transition()
-				// .duration(function(d,i){
-				// 	return (((5 -d.rating) +i)*500);
-				// })
-				// .style('opacity',1)
-				;
+				});
 			hexes
 				.on('mousemove',function(d,i){
-					//var dev_off = self.device === 'default' || self.filters.length === 0;
 					var x, y;
 					var o = d.rating/5;
 
 					var padL = self.device === 'tablet' ? padding.left : 0,
 						padT = self.device === 'tablet' ? padding.top : 0;
 
-					/*if(dev_off){
-						x = self.filters.length === 0 ? d.pos.y : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +d.idx_g*(hex_rad*8);
-						y = self.filters.length === 0 ? d.pos.x : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875));
-					} else{
-						x = self.filters.length === 0 ? d.pos.y : (-self.h*0.25) +((i%hex_row_height)*(hex_rad*1.75) +(Math.floor(i/hex_row_height)%2)*(hex_rad*0.875)) +padL;
-						y = self.filters.length === 0 ? d.pos.x : self.filters.length === 1 ? (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +padT : (d.idx*self.col_w -self.w/2 +self.w*0.125) +(Math.floor(i/hex_row_height)*(hex_rad*1.5)) +(d.idx_g*(hex_rad*8))/2 +padT;
-					}*/
-					x = d.pos.y;
-					y = d.pos.x;
+					x = self.filters.length === 0 ? d.pos.y : 0;
+					y = self.filters.length === 0 ? d.pos.x : 0;
 
 					x +=self.w/2;
 					y +=self.h/2;
 
 					hexTTG
 						.classed('hidden',false)
-						.attr('transform',function(){
-							//var str = dev_off ? 'translate(' +x +',' +y +')rotate(90)' : 'translate(' +x +',' +y +')'; 
-							var str = 'translate(' +x +',' +y +')rotate(90)'; 
-							return str;
-						});
-					hexTT
-						.style('fill-opacity',o);
+						.attr('transform',function(){ return 'translate(' +x +',' +y +')rotate(90)'; });
+					hexTT.style('fill-opacity',o);
+					
 					self.util_detail_update(d);
 				});
 			hexes.exit().remove();
@@ -871,9 +735,62 @@ var init = function(){
 			}
 		},
 
+		//determine filter state from interface selections
+		//this does not filter the data itself
+		filter:function(_elem,_item){
+
+			var btn = d3.select(_elem),
+				btn_id = btn.attr('id'),
+				btn_selected = btn.classed('selected');
+
+			if(self.filters.indexOf(btn_id) <0){
+				self.filters.push(btn_id);
+			} else{
+				self.filters = self.filters.filter(function(d){ return d !== btn_id; });
+			}
+			if(self.filters.length === 0){
+				self.util_filters_clear();
+			} else{
+				self.btn_filters_clear.classed('visible',true);
+
+				self.legend_bg.attr('d',self.path_legend_exp);
+				self.legend.classed('expanded',true);
+				self.legend_g.classed('show',true);
+
+				d3.select('#sampled').classed('visible',true);
+			}
+
+			//if button is just being selected, deactivate incompatible filter
+			if(btn_id !== 'gender' && !btn_selected){
+				if(btn_id === 'country'){
+					d3.select('.btn.filter#grade').classed('deactivated',true);
+				} else if(btn_id === 'grade'){
+					d3.select('.btn.filter#country').classed('deactivated',true);
+				}
+
+			//if button is being deselected, reactivate incompatible filter
+			} else if(btn_id !== 'gender' && btn_selected){
+				if(btn_id === 'country'){
+					d3.select('.btn.filter#grade').classed('deactivated',false);
+				} else if(btn_id === 'grade'){
+					d3.select('.btn.filter#country').classed('deactivated',false);
+				}
+			}
+
+			//class button as selected or not
+			btn.classed('selected',!btn_selected);
+			
+			self.mobile_ham.classed('xout',false);
+			self.generate();
+		},
+
 		/*	====================================================================== 
 			UTILITY FUNCTIONS
 			====================================================================== */
+
+		//resizing logic
+		resize:function(){
+		},
 
 		//mobile comments view
 		comments_show:function(){
@@ -926,10 +843,6 @@ var init = function(){
 			self.mobile_comments.html('&rarr; View <span class="b">comments</span>.');
 			self.mobile_comments_panel.style('display','none');
 			self.mobile_comments_panel_body.html('');
-		},
-
-		//resizing logic
-		resize:function(){
 		},
 
 		//HEXAGON CALCULATIONS
