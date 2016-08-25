@@ -30,7 +30,7 @@ var init = function(){
 
 		//holds any selected filters
 		filters:[],
-		filters_sub:[],
+		buckets_country:[],
 
 		buckets_age:[
 			'<18',
@@ -120,7 +120,7 @@ var init = function(){
 			});
 
 			//create countries dataset
-			self.util_get_top_countries();
+			//self.util_get_top_countries();
 
 			self.generate();
 		},
@@ -131,19 +131,23 @@ var init = function(){
 			} else{
 				d = {};
 
+				//if only one filter is selected
 				if(self.filters.length === 1){
 					f = self.filters[0];
 					f = f === 'grade' ? 'grade_bucket' : f;
+
+					//get buckets that correspond to filter
 					b = self[(f === 'grade_bucket' ? 'buckets_grade' : 'buckets_' +f)];
 
-					b.forEach(function(_b){
-						d[_b] = [];
-					});
+					//in data object, create new array for every bucket
+					b.forEach(function(_b){ d[_b] = []; });
 
+					//cycle through sampled dataset to add values to their accordant arrays
 					self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
-						if(d[_d[f]]){ 
-							_d.idx = d3.keys(d).indexOf(_d[f]);
-							d[_d[f]].push(_d); 
+						var hash = f === 'country' ? _d[f].split(' ').join('_').toLowerCase() : _d[f];
+						if(d[hash]){
+							_d.idx = d3.keys(d).indexOf(d[hash]);
+							d[hash].push(_d);
 						}
 					});
 
@@ -157,9 +161,13 @@ var init = function(){
 							return b.rating -a.rating; 
 						});
 					});
+
+				//if more than one filter is selected (must be gender + {something})
 				} else{
 					f = self.filters.filter(function(d){ return d !== 'gender'; })[0];
 					f = f === 'grade' ? 'grade_bucket' : f;
+
+					//get buckets that correspond to filter
 					b = self[(f === 'grade_bucket' ? 'buckets_grade' : 'buckets_' +f)];
 
 					b.forEach(function(_b){
@@ -169,15 +177,17 @@ var init = function(){
 					});
 
 					self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
-						if(d[_d[f]]){ 
+						var hash = f === 'country' ? _d[f].split(' ').join('_').toLowerCase() : _d[f];
+						if(d[hash]){ 
 							var arr_g = _d.gender === 'M' ? 0 : 1;
-							_d.idx = d3.keys(d).indexOf(_d[f]);
+							_d.idx = d3.keys(d).indexOf(hash);
 							_d.idx_g = arr_g;
-							d[_d[f]][arr_g].push(_d); 
+							d[hash][arr_g].push(_d); 
 						}
 					});
 
 					//convert back to array
+					//sorted primarily by rating and secondarily by age
 					d = d3.entries(d);
 					d.forEach(function(_d){ 
 						_d.value.forEach(function(__d){
@@ -748,10 +758,10 @@ var init = function(){
 			if(_item){
 				
 				item = d3.select(_item);
-				item_id = item.data()[0].code;
+				item_id = item.data()[0].name.split(' ').join('_').toLowerCase();
 					
 				//if dropdown option has not yet been accounted for, add to sub-filters array
-				if(self.filters_sub.length <5 && self.filters_sub.indexOf(item_id) <0){
+				if(self.buckets_country.length <5 && self.buckets_country.indexOf(item_id) <0){
 
 					//if top-level filter has not yet been accounted for, add to filters array
 					//deactivate incompatible filter if 'country' is selected
@@ -759,15 +769,15 @@ var init = function(){
 						self.filters.push(btn_id);
 						if(btn_id === 'country'){ d3.select('.btn.filter#grade').classed('deactivated',true); }
 					}
-					self.filters_sub.push(item_id);
+					self.buckets_country.push(item_id);
 					item.classed('selected',true);
 				} else{
-					self.filters_sub = self.filters_sub.filter(function(d){ return d !== item_id; });
+					self.buckets_country = self.buckets_country.filter(function(d){ return d !== item_id; });
 					item.classed('selected',false);
 
 					//if no more sub-filters, remove top-level filter from filters array
 					//reactivate incompatible filter if 'country' is deselected
-					if(self.filters_sub.length === 0){
+					if(self.buckets_country.length === 0){
 						self.filters = self.filters.filter(function(d){ return d !== btn_id; });
 						if(btn_id === 'country'){ d3.select('.btn.filter#grade').classed('deactivated',false); }
 					}
@@ -800,7 +810,7 @@ var init = function(){
 				//class button as selected or not
 				btn.classed('selected',!btn_selected);
 			}
-			if(self.filters.length === 0 && self.filters_sub.length === 0){
+			if(self.filters.length === 0 && self.buckets_country.length === 0){
 				self.util_filters_clear();
 			} else{
 				self.btn_filters_clear.classed('visible',true);
@@ -893,7 +903,7 @@ var init = function(){
 		util_filters_clear:function(){
 
 			self.filters = [];
-			self.filters_sub = [];
+			self.buckets_country = [];
 
 			self.btn_filters_clear.classed('visible',false);
 			self.btn_filters
@@ -1027,7 +1037,7 @@ var init = function(){
 
 		//data
 		util_get_top_countries:function(){
-			var arr_countries = {};
+			/*var arr_countries = {};
 			var data = self.data['dummy_sample_' +self.modes[self.mode]];
 			for(var i=0; i<data.length; i++){
 				if(!arr_countries[data[i].country]){
@@ -1044,7 +1054,7 @@ var init = function(){
 				if(arr_countries_sorted[i]){
 					self.buckets_country.push(arr_countries_sorted[i].key);
 				}
-			}
+			}*/
 		},
 
 		//updating lower right hover annotations
