@@ -127,8 +127,10 @@ var init = function(){
 			self.generate();
 		},
 		filterData:function(){
-			var d, f, b;
-				d = {};
+			var d, f, b, r;
+
+			r = 0;
+			d = {};
 
 			//if only one filter is selected
 			if(self.filters.length === 1){
@@ -152,7 +154,20 @@ var init = function(){
 
 				//convert back to array
 				d = d3.entries(d);
+
+				var length_tot = d3.sum(d,function(_d){ return _d.value.length; });
+
 				d.forEach(function(_d){ 
+
+					//calculate length in relation to total length for placement
+					var _r = _d.value.length/length_tot;
+
+					_d.ratio = _r;
+					_d.ratio_agg = r;
+
+					r +=_r;
+
+					//sort primarily by rating and secondarily by age
 					_d.value = _d.value.sort(function(a,b){ 
 						if(a.rating === b.rating){
 							return b.age_bucket -a.age_bucket;
@@ -186,9 +201,21 @@ var init = function(){
 				});
 
 				//convert back to array
-				//sorted primarily by rating and secondarily by age
 				d = d3.entries(d);
+
+				var length_tot = d3.sum(d,function(_d){ return (_d.value[0].length +_d.value[1].length); });
+
 				d.forEach(function(_d){ 
+
+					//calculate length in relation to total length for placement
+					var _r = (_d.value[0].length +_d.value[1].length)/length_tot;
+					
+					_d.ratio = _r;
+					_d.ratio_agg = r;
+
+					r +=_r;
+
+					//sort primarily by rating and secondarily by age
 					_d.value.forEach(function(__d){
 						__d = __d.sort(function(a,b){ 
 							if(a.rating === b.rating){
@@ -434,19 +461,22 @@ var init = function(){
 		//thanks for all the help, http://www.redblobgames.com/grids/hexagons/!
 		generate:function(){
 
+			//prepare data to be displayed
+			self.data_display = self.filters.length === 0 ? [self.data[self.modes[self.mode]]] : self.filterData();
+
 			//remove comments panel if needed
 			if(self.device !== 'mobile' || (self.device === 'mobile' && !self.comments_on)){ self.comments_hide(); }
 			
 			d3.select('body').attr('class',self.modes[self.mode]);
 
 			//class and style filter buttons
-			self.btn_filters.attr('class',function(){
+			/*self.btn_filters.attr('class',function(){
 				var elem = d3.select(this),
 					p_01 = elem.classed('dd') ? 'dd' : '',
 					p_02 = elem.classed('selected') ? 'selected' : '',
 					p_03 = elem.classed('deactivated') ? 'deactivated' : '';
 				return 'btn filter ' +self.modes[self.mode] +' ' +p_01 +' ' +p_02 +' ' +p_03;
-			});
+			});*/
 
 			//create dropdown for country filter
 			var countries_menu_items;
@@ -511,9 +541,6 @@ var init = function(){
 				.html(function(d,i){ return d; });
 			sel_ops_grade.exit().remove();
 
-			//prepare data to be displayed
-			self.data_display = self.filters.length === 0 ? [self.data[self.modes[self.mode]]] : self.filterData();
-
 			//HEX GRID CALCULATIONS
 			//thank you, https://en.wikipedia.org/wiki/Centered_hexagonal_number
 			var num_rings = self.calc_hex_rings(self.data[self.modes[self.mode]].length),
@@ -524,6 +551,15 @@ var init = function(){
 				hex_rad = hex_h/2,
 				hex_rad_hov = hex_rad*2.25,
 				hex_rad_legend = 8;
+
+			//for columns
+			var hex_pad = 30,
+				hex_pad_sub = 15,
+				hex_area_w = self.filters.length === 2 ? self.w*0.75 -((self.data_display.length -1)*hex_pad -(self.data_display.length*hex_pad_sub))
+					: self.filters.length === 1 ? self.w*0.75 -((self.data_display.length -1)*hex_pad)
+					: 0,
+				hex_area_h = self.h*0.45,
+				hex_area = hex_area_w*hex_area_h;
 
 			//INITIALIZE VARIABLES
 			//this is just used to neatly generate a hexagon path
@@ -587,7 +623,7 @@ var init = function(){
 				'top':30,
 				'right':0,
 				'bottom':0,
-				'left':90
+				'left':(self.w*0.25)/2
 			};
 
 			//UPDATE LEGEND
@@ -643,9 +679,10 @@ var init = function(){
 				.classed('hexG',true);
 			hexG
 				.attr('transform',function(d){
-					var noT = self.device === 'default' || self.device === 'mobile' || self.filters.length === 0,
-						x = noT ? self.w/2 : self.w/2 +padding.left,
-						y = noT ? self.h/2 : self.h/2 +padding.top;
+					//var noT = self.device === 'default' || self.device === 'mobile' || self.filters.length === 0,
+					var noT = self.filters.length === 0;
+						x = noT ? self.w/2 : padding.left,
+						y = noT ? self.h/2 : (self.h -hex_area_h)/1.75;
 					return 'translate(' +x +',' +y +')';
 				});
 			hexG
@@ -657,10 +694,30 @@ var init = function(){
 
 			//hexagon sub-containers
 			hexesG = hexG.selectAll('g.hexesG')
-				.data(function(d,i){ return d; });
+				.data(function(d){ return d; });
 			hexesG.enter().append('g')
 				.classed('hexesG',true);
+			hexesG
+				.attr('transform',function(d,i){
+					var x = d.ratio_agg ? (d.ratio_agg*hex_area_w) +(i*hex_pad) : 0,
+						y = 0;
+					return 'translate(' +x +',' +y +')';
+				})
 			hexesG.exit().remove();
+
+			var hr = hexesG.selectAll('rect.hr')
+				.data(function(d){ return [d]; });
+			hr.enter().append('rect')
+				.classed('hr',true);
+			hr
+				.attr('width',function(d){
+					return d.ratio ? hex_area_w*d.ratio : 0;
+				})
+				.attr('height',hex_area_h)
+				.attr('x',0)
+				.attr('y',0)
+				.style('fill','pink');
+			hr.exit().remove();
 
 			//hexagons
 			hexes = hexesG.selectAll('path.hex')
@@ -685,8 +742,8 @@ var init = function(){
 					var x, y;
 					var o = d.rating/5;
 
-					var padL = self.device === 'tablet' ? padding.left : 0,
-						padT = self.device === 'tablet' ? padding.top : 0;
+					// var padL = self.device === 'tablet' ? padding.left : 0,
+					// 	padT = self.device === 'tablet' ? padding.top : 0;
 
 					x = self.filters.length === 0 ? d.pos.y : 0;
 					y = self.filters.length === 0 ? d.pos.x : 0;
@@ -766,7 +823,7 @@ var init = function(){
 					if(self.filters.indexOf(btn_id) <0){
 						self.filters.push(btn_id);
 						btn.classed('selected',true);
-						
+
 						if(btn_id === 'country'){ d3.select('.btn.filter#grade').classed('deactivated',true); }
 					}
 					self.buckets_country.push(item_id);
