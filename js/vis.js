@@ -30,7 +30,9 @@ var init = function(){
 
 		//holds any selected filters
 		filters:[],
-		buckets_country:[],
+
+		//array(s) for unique values
+		unique_countries:[],
 
 		buckets_age:[
 			'<18',
@@ -119,8 +121,8 @@ var init = function(){
 				});
 			});
 
-			//create countries dataset
-			//self.util_get_top_countries();
+			//create unique countries dataset
+			self.util_get_unique_countries();
 
 			self.generate();
 		},
@@ -449,13 +451,13 @@ var init = function(){
 			//create dropdown for country filter
 			var countries_menu_items;
 			countries_menu_items = d3.select('.btn.filter#country .expand').selectAll('li.option')
-				.data(self.data.countries.sort(function(a,b){
-					return a.name <b.name ? -1 : a.name >b.name ? 1 : 0;
+				.data(self.unique_countries.sort(function(a,b){
+					return a <b ? -1 : a >b ? 1 : 0;
 				}));
 			countries_menu_items.enter().append('li')
 				.classed('option',true);
 			countries_menu_items
-				.html(function(d){ return d.name; });
+				.html(function(d){ return d; });
 			countries_menu_items
 				.on('click',function(d){
 					d3.event.stopPropagation();
@@ -754,8 +756,8 @@ var init = function(){
 			if(_item){
 				
 				item = d3.select(_item);
-				item_id = item.data()[0].name.split(' ').join('_').toLowerCase();
-					
+				item_id = item.data()[0].split(' ').join('_').toLowerCase();
+				
 				//if dropdown option has not yet been accounted for, add to sub-filters array
 				if(self.buckets_country.length <5 && self.buckets_country.indexOf(item_id) <0){
 
@@ -943,6 +945,7 @@ var init = function(){
 			var obj = {};
 
 			//gather values into new data object
+			obj.subject = self.modes[self.mode];
 			obj.gender = document.getElementById('input_female').checked ? 'F' : document.getElementById('input_male').checked ? 'M' : '';
 			obj.country = document.getElementById('input_country').value;
 			obj.age = document.getElementById('input_age').value;
@@ -1051,6 +1054,14 @@ var init = function(){
 					self.buckets_country.push(arr_countries_sorted[i].key);
 				}
 			}*/
+		},
+		util_get_unique_countries:function(){
+			var data = self.data['dummy_sample_' +self.modes[self.mode]];
+			data.forEach(function(d,i){
+				if(self.unique_countries.indexOf(d.country) <0){
+					self.unique_countries.push(d.country);
+				}
+			});
 		},
 
 		//updating lower right hover annotations
