@@ -765,6 +765,8 @@ var init = function(){
 					//deactivate incompatible filter if 'country' is selected
 					if(self.filters.indexOf(btn_id) <0){
 						self.filters.push(btn_id);
+						btn.classed('selected',true);
+						
 						if(btn_id === 'country'){ d3.select('.btn.filter#grade').classed('deactivated',true); }
 					}
 					self.buckets_country.push(item_id);
@@ -777,6 +779,8 @@ var init = function(){
 					//reactivate incompatible filter if 'country' is deselected
 					if(self.buckets_country.length === 0){
 						self.filters = self.filters.filter(function(d){ return d !== btn_id; });
+						btn.classed('selected',false);
+
 						if(btn_id === 'country'){ d3.select('.btn.filter#grade').classed('deactivated',false); }
 					}
 				}
