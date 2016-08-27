@@ -555,10 +555,17 @@ var init = function(){
 			//for columns
 			var hex_pad = 30,
 				hex_pad_sub = 15,
-				hex_area_w = self.filters.length === 2 ? self.w*0.75 -((self.data_display.length -1)*hex_pad -(self.data_display.length*hex_pad_sub))
+
+				hex_area_w = self.device === 'default' ?
+					( self.filters.length === 2 ? self.w*0.75 -((self.data_display.length -1)*hex_pad -(self.data_display.length*hex_pad_sub))
 					: self.filters.length === 1 ? self.w*0.75 -((self.data_display.length -1)*hex_pad)
-					: 0,
-				hex_area_h = self.h*0.45,
+					: 0)
+					: self.w*0.45,
+				hex_area_h = self.device === 'default' ?
+					self.h*0.45 :
+					( self.filters.length === 2 ? self.h*0.75 -((self.data_display.length -1)*hex_pad -(self.data_display.length*hex_pad_sub))
+					: self.filters.length === 1 ? self.h*0.75 -((self.data_display.length -1)*hex_pad)
+					: 0),
 				hex_area = hex_area_w*hex_area_h;
 
 			//INITIALIZE VARIABLES
@@ -620,7 +627,7 @@ var init = function(){
 				.range([2,hex_rad_legend]);
 
 			var padding = {
-				'top':30,
+				'top':(self.h*0.25)/2,
 				'right':0,
 				'bottom':0,
 				'left':(self.w*0.25)/2
@@ -680,9 +687,10 @@ var init = function(){
 			hexG
 				.attr('transform',function(d){
 					//var noT = self.device === 'default' || self.device === 'mobile' || self.filters.length === 0,
-					var noT = self.filters.length === 0;
-						x = noT ? self.w/2 : padding.left,
-						y = noT ? self.h/2 : (self.h -hex_area_h)/1.75;
+					var noT = self.filters.length === 0,
+						noD = self.device !== 'default',
+						x = noT ? self.w/2 : noD ? (self.w -hex_area_w)/1.75 : padding.left,
+						y = noT ? self.h/2 : noD ? padding.top : (self.h -hex_area_h)/1.75;
 					return 'translate(' +x +',' +y +')';
 				});
 			hexG
@@ -699,8 +707,9 @@ var init = function(){
 				.classed('hexesG',true);
 			hexesG
 				.attr('transform',function(d,i){
-					var x = d.ratio_agg ? (d.ratio_agg*hex_area_w) +(i*hex_pad) : 0,
-						y = 0;
+					var noD = self.device !== 'default';
+					var x = d.ratio_agg ? noD ? 0 : (d.ratio_agg*hex_area_w) +(i*hex_pad) : 0,
+						y = d.ratio_agg ? noD ? (d.ratio_agg*hex_area_h) +(i*hex_pad) : 0 : 0;
 					return 'translate(' +x +',' +y +')';
 				})
 			hexesG.exit().remove();
@@ -711,9 +720,13 @@ var init = function(){
 				.classed('hr',true);
 			hr
 				.attr('width',function(d){
-					return d.ratio ? hex_area_w*d.ratio : 0;
+					var noD = self.device !== 'default';
+					return d.ratio ? noD ? hex_area_w : hex_area_w*d.ratio : 0;
 				})
-				.attr('height',hex_area_h)
+				.attr('height',function(d){
+					var noD = self.device !== 'default';
+					return d.ratio ? noD ? hex_area_h*d.ratio : hex_area_h : 0;
+				})
 				.attr('x',0)
 				.attr('y',0)
 				.style('fill','pink');
