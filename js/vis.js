@@ -461,8 +461,10 @@ var init = function(){
 		//thanks for all the help, http://www.redblobgames.com/grids/hexagons/!
 		generate:function(){
 
+			var filters_off = self.filters.length === 0;
+
 			//prepare data to be displayed
-			self.data_display = self.filters.length === 0 ? [self.data[self.modes[self.mode]]] : self.filterData();
+			self.data_display = filters_off ? [self.data[self.modes[self.mode]]] : self.filterData();
 
 			//remove comments panel if needed
 			if(self.device !== 'mobile' || (self.device === 'mobile' && !self.comments_on)){ self.comments_hide(); }
@@ -505,7 +507,7 @@ var init = function(){
 
 			//update sample span to reflect sample data, if applicable
 			d3.select('#sampled .sample').text(function(){
-				return self.filters.length >0 ? 5 : 0;
+				return filters_off ? 0 : 5;
 			});
 
 			//update switch buttons to reflect current/opposite modes
@@ -542,16 +544,6 @@ var init = function(){
 			sel_ops_grade.exit().remove();
 
 			//HEX GRID CALCULATIONS
-			//thank you, https://en.wikipedia.org/wiki/Centered_hexagonal_number
-			var num_rings = self.calc_hex_rings(self.data[self.modes[self.mode]].length),
-
-				//calculate radius for hexagon group based on height of screen and number of rings to be drawn
-				hex_h = Math.floor(self.h/(num_rings*(self.device === 'mobile' ? 0.75 : 2))),
-
-				hex_rad = hex_h/2,
-				hex_rad_hov = hex_rad*2.25,
-				hex_rad_legend = 8;
-
 			//for columns
 			var hex_pad = 30,
 				hex_pad_sub = 15,
@@ -568,6 +560,24 @@ var init = function(){
 					: 0),
 				hex_area = hex_area_w*hex_area_h;
 
+			//thank you, https://en.wikipedia.org/wiki/Centered_hexagonal_number
+			var num_rings = self.calc_hex_rings(self.data[self.modes[self.mode]].length),
+
+				//calculate radius for hexagon group based on height of screen and number of rings to be drawn
+				hex_h = Math.floor(self.h/(num_rings*(self.device === 'mobile' ? 0.75 : 2))),
+				hex_w,
+
+				hex_rad = filters_off ? hex_h/2 : self.calc_hex_linear_radius(d3.sum(self.data_display,function(d){ return d.value.length; }),hex_area),
+				hex_rad_hov = hex_rad*2.25,
+				hex_rad_legend = 8;
+
+			hex_h = (Math.sqrt(3)/2)*(2*hex_rad);
+			hex_w = hex_rad*2;
+
+			var	hex_row_h = Math.floor( hex_area_h/hex_h ),
+				hex_col_w = Math.floor( hex_area_w/hex_w )
+				;
+ 
 			//INITIALIZE VARIABLES
 			//this is just used to neatly generate a hexagon path
 			var hexbin = d3.hexbin();
@@ -687,10 +697,9 @@ var init = function(){
 			hexG
 				.attr('transform',function(d){
 					//var noT = self.device === 'default' || self.device === 'mobile' || self.filters.length === 0,
-					var noT = self.filters.length === 0,
-						noD = self.device !== 'default',
-						x = noT ? self.w/2 : noD ? (self.w -hex_area_w)/1.75 : padding.left,
-						y = noT ? self.h/2 : noD ? padding.top : (self.h -hex_area_h)/1.75;
+					var noD = self.device !== 'default',
+						x = filters_off ? self.w/2 : noD ? (self.w -hex_area_w)/1.75 : padding.left,
+						y = filters_off ? self.h/2 : noD ? padding.top : (self.h -hex_area_h)/1.75;
 					return 'translate(' +x +',' +y +')';
 				});
 			hexG
@@ -739,11 +748,12 @@ var init = function(){
 				.classed('hex',true);
 			hexes
 				.attr('d',function(d){
-					return self.filters.length === 0 ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age_bucket));
+					return filters_off ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age_bucket));
 				})
 				.attr('transform',function(d,i){
-					var x = self.filters.length === 0 ? d.pos.y : 0,
-						y = self.filters.length === 0 ? d.pos.x : 0;
+					var noD = self.device !== 'default';
+					var x = filters_off ? d.pos.y : noD ? (i%hex_col_w)*hex_w : 0,
+						y = filters_off ? d.pos.x : noD ? 0 : (i%hex_row_h)*hex_h;
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})
 				.style('stroke',self.colors[self.mode])
@@ -758,8 +768,8 @@ var init = function(){
 					// var padL = self.device === 'tablet' ? padding.left : 0,
 					// 	padT = self.device === 'tablet' ? padding.top : 0;
 
-					x = self.filters.length === 0 ? d.pos.y : 0;
-					y = self.filters.length === 0 ? d.pos.x : 0;
+					x = filters_off ? d.pos.y : 0;
+					y = filters_off ? d.pos.x : 0;
 
 					x +=self.w/2;
 					y +=self.h/2;
@@ -969,6 +979,10 @@ var init = function(){
 				num_hexes = 1 +6*((0.5*num_rings)*(num_rings -1));
 			}
 			return num_rings -1;
+		},
+		calc_hex_linear_radius:function(_count,_area){
+			var hex_area = _area/_count;
+			return Math.floor(Math.sqrt(((hex_area/6)*4)/Math.sqrt(3)));
 		},
 
 		//interface
