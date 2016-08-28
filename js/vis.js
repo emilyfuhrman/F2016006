@@ -714,6 +714,7 @@ var init = function(){
 			hexes.enter().append('path')
 				.classed('hex',true);
 			hexes
+				// .style('opacity',0)
 				.attr('d',function(d){
 					return filters_off ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age_bucket));
 				})
@@ -725,7 +726,15 @@ var init = function(){
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})
 				.style('stroke',self.colors[self.mode])
-				.style('fill-opacity',function(d){ return d.rating/5; });
+				.style('fill-opacity',function(d){ return d.rating/5; })
+				// .transition()
+				// .duration(90)
+				// .delay(function(d,i){
+				// 	//return filters_off ? 60 +d.pos.y*1.5 : 0;
+				// 	return i*0.4;
+				// })
+				// .style('opacity',1)
+				;
 			hexes
 				.on('mousemove',function(d,i){
 					var x, y;
