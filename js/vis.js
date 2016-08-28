@@ -694,7 +694,7 @@ var init = function(){
 			hexG
 				.attr('transform',function(d){
 					//var noT = self.device === 'default' || self.device === 'mobile' || self.filters.length === 0,
-					var x = filters_off ? self.w/2 : device_off ? padding.left : (self.w -hex_area_w)/1.75,
+					var x = filters_off ? self.w/2 : device_off ? padding.left : (self.w -hex_area_w)/1.75 -30,
 						y = filters_off ? self.h/2 : device_off ? (self.h -hex_area_h)/1.75 : padding.top;
 					return 'translate(' +x +',' +y +')';
 				});
@@ -788,8 +788,8 @@ var init = function(){
 			hexesLabels.enter().append('text')
 				.classed('hexLabel',true);
 			hexesLabels
-				.attr('x',function(d){ return d.ratio ? device_off ? hex_area_w*d.ratio/2 : hex_area_w : 0; })
-				.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +30 : hex_area_h*d.ratio : 0; })
+				.attr('x',function(d){ return d.ratio ? device_off ? hex_area_w*d.ratio/2 : hex_area_w +60 : 0; })
+				.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +30 : hex_area_h*d.ratio/2 : 0; })
 				.text(function(d){ 
 					var t = self.filters.length === 1 ? (d.value.length >0 ? d.key : '') : '';
 					if(self.filters[0] === 'gender'){
