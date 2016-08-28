@@ -499,7 +499,7 @@ var init = function(){
 			countries_menu_items.exit().remove();
 
 			//update all mode spans to reflect current mode
-			d3.select('#title .mode').text(util_toTitleCase(self.modes[self.mode]));
+			d3.select('#title .mode').text(self.util_toTitleCase(self.modes[self.mode]));
 			d3.selectAll('#form .mode').text(self.modes[self.mode]);
 
 			d3.selectAll('.mobile.solid').style('background-color',function(){
@@ -546,8 +546,8 @@ var init = function(){
 
 			//HEX GRID CALCULATIONS
 			//for columns
-			var hex_pad = 30,
-				hex_pad_sub = 15,
+			var hex_pad = 60,
+				hex_pad_sub = self.filters.length === 2 ? 15 : 0,
 
 				hex_area_w = self.device === 'default' ?
 					( self.filters.length === 2 ? self.w*0.75 -((self.data_display.length -1)*hex_pad -(self.data_display.length*hex_pad_sub))
@@ -587,7 +587,8 @@ var init = function(){
 				hexTT;
 			var hexG,
 				hexesG,
-				hexes;
+				hexes,
+				hexesLabels;
 			var legend_hexes,
 				legend_hexes_txt,
 				legend_hexes_arr;
@@ -602,11 +603,6 @@ var init = function(){
 				obj.y = s * 3/2 * _cube.z;
 
 				return obj;
-			}
-
-			//thank you, http://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
-			function util_toTitleCase(_str){
-			    return _str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 			}
 
 			//generate cube coordinates for data points
@@ -756,9 +752,7 @@ var init = function(){
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})
 				.style('stroke',self.colors[self.mode])
-				.style('fill-opacity',function(d){
-					return d.rating/5;
-				});
+				.style('fill-opacity',function(d){ return d.rating/5; });
 			hexes
 				.on('mousemove',function(d,i){
 					var x, y;
@@ -770,8 +764,8 @@ var init = function(){
 						x_trans = filters_off ? self.w/2 : device_off ? padding.left : (self.w -hex_area_w)/1.75,
 						y_trans = filters_off ? self.h/2 : device_off ? (self.h -hex_area_h)/1.75 : padding.top,
 
-						x_trans_micro = filters_off ? 0 : device_off ? (p.ratio_agg*hex_area_w) +(d.idx*hex_pad) : 0,
-						y_trans_micro = filters_off ? 0 : device_off ? 0 : (p.ratio_agg*hex_area_h) +(d.idx*hex_pad);
+						x_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? (p.ratio_agg*hex_area_w) +(d.idx*hex_pad) : 0,
+						y_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? 0 : (p.ratio_agg*hex_area_h) +(d.idx*hex_pad);
 
 					x = filters_off ? d.pos.y : col_num*(hex_w*0.75);
 					y = filters_off ? d.pos.x : row_num*(hex_h) +((col_num%2)*(hex_h/2));
@@ -788,6 +782,24 @@ var init = function(){
 				});
 			hexes.exit().remove();
 
+			//labels under groups
+			hexesLabels = hexesG.selectAll('text.hexLabel')
+				.data(function(d){ return !filters_off ? [d] : false; });
+			hexesLabels.enter().append('text')
+				.classed('hexLabel',true);
+			hexesLabels
+				.attr('x',function(d){ return d.ratio ? device_off ? hex_area_w*d.ratio/2 : hex_area_w : 0; })
+				.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +30 : hex_area_h*d.ratio : 0; })
+				.text(function(d){ 
+					var t = self.filters.length === 1 ? (d.value.length >0 ? d.key : '') : '';
+					if(self.filters[0] === 'gender'){
+						t = self.util_resolve_gender(t);
+					}
+					t = self.util_toTitleCase(t);
+					return t; 
+				});
+			hexesLabels.exit().remove();
+
 			//create tooltip group
 			hexTTG = self.svg.selectAll('g.hexTTG')
 				.data([self.data_display]);
@@ -802,8 +814,7 @@ var init = function(){
 				.classed('hexTTback',true);
 			hexTTback
 				.attr('d',hexbin.hexagon(hex_rad_hov))
-				.style('fill',self.colors[self.mode])
-				;
+				.style('fill',self.colors[self.mode]);
 			hexTTback.exit().remove();
 			hexTT = hexTTG.selectAll('path.hexTT')
 				.data(function(d){ return [d]; });
@@ -1221,6 +1232,12 @@ var init = function(){
 				group = self.buckets_grade[3];
 			}
 			return group;
+		},
+
+		//misc. operations
+		//thank you, http://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
+		util_toTitleCase:function(_str){
+		    return _str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 		}
 	}
 }

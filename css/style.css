@@ -717,20 +717,20 @@ input.second {
 	text-anchor:middle;
 	}
 
-.hexesGT {
-	text-anchor:start;
-	font-size:0.8rem;
-	}
-.hexesGGT {
-	font-size:0.6rem;
-	}
-
 .hex {
 	fill:white;
 	stroke:white;
 	stroke-width:0.5;
 	stroke-opacity:1;
 	cursor:pointer;
+	}
+
+.hexLabel {
+	fill:white;
+	fill-opacity:1;
+	font-size:0.9rem;
+	letter-spacing:0.025rem;
+	text-anchor:middle;
 	}
 
 /*	FLUIDITY
@@ -835,10 +835,6 @@ input.second {
 	#legend {
 		display:none;
 		}
-
-	.hexesGT {
-		text-anchor:end;
-		}
 	}
 
 @media (min-width:768px) { 
@@ -941,10 +937,6 @@ input.second {
 
 	#legend {
 		display:block;
-		}
-
-	.hexesGT {
-		text-anchor:end;
 		}
 	}
 
@@ -1049,9 +1041,5 @@ input.second {
 
 	#legend {
 		display:block;
-		}
-
-	.hexesGT {
-		text-anchor:start;
 		}
 	}
