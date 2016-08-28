@@ -660,22 +660,55 @@ var init = function(){
 			legend_hexes_txt.exit().remove();
 
 			//UPDATE HEXAGONS
-			//hexagon container
+			//hexagon coordinates container
+			var hex_coords = { x:self.w/2, y:self.h/2 };
+
+			//set up drag behavior on mobile for hexagon group
+			//thank you, https://bl.ocks.org/mbostock/9669633
+			var drag = d3.behavior.drag()
+			    .origin(function(d) { return hex_coords; })
+			    .on("dragstart", dragstarted)
+			    .on("drag", dragged)
+			    .on("dragend", dragended);
+
+			function dragstarted() {
+			}
+
+			function dragged(e) {
+				if(self.device === 'mobile' && filters_off){
+					hexTTG.classed('hidden',true);
+					self.util_detail_clear();
+					
+					hex_coords.x = d3.event.x;
+					hex_coords.y = d3.event.y;
+
+					d3.select(this).attr('transform', function(d) { return "translate(" + hex_coords.x + ',' + hex_coords.y + ')'; });
+				}
+
+			}
+
+			function dragended() {
+			}
+
 			hexG = self.svg.selectAll('g.hexG')
 				.data([self.data_display]);
 			hexG.enter().append('g')
 				.classed('hexG',true);
 			hexG
 				.attr('transform',function(d){
-					var x = filters_off ? self.w/2 : device_off ? padding.left : (self.w -hex_area_w)/3,
-						y = filters_off ? self.h/2 : device_off ? (self.h -hex_area_h)/1.75 : padding.top;
+					var x = filters_off ? hex_coords.x : device_off ? padding.left : (self.w -hex_area_w)/3,
+						y = filters_off ? hex_coords.y : device_off ? (self.h -hex_area_h)/1.75 : padding.top;
 					return 'translate(' +x +',' +y +')';
-				});
+				})
+				.call(drag);
 			hexG
 				.on('mouseout',function(d){
 					hexTTG.classed('hidden',true);
 					self.util_detail_clear();
-				});
+				})
+				//.on('touchstart',function(d){ d3.event.preventDefault(); })
+				//.on('touchmove',function(d){ d3.event.preventDefault(); })
+				;
 			hexG.exit().remove();
 
 			//hexagon sub-containers
@@ -688,7 +721,7 @@ var init = function(){
 					var x = d.ratio_agg ? device_off ? (d.ratio_agg*hex_area_w) +(i*hex_pad) +(i*hex_pad_sub) : 0 : 0,
 						y = d.ratio_agg ? device_off ? 0 : (d.ratio_agg*hex_area_h) +(i*hex_pad) +(i*hex_pad_sub) : 0;
 					return 'translate(' +x +',' +y +')';
-				})
+				});
 			hexesG.exit().remove();
 
 			//panels for position testing -- keep these around for now
@@ -743,8 +776,8 @@ var init = function(){
 						col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
 					var p = self.data_display[d.idx],
 
-						x_trans = filters_off ? self.w/2 : device_off ? padding.left : (self.w -hex_area_w)/3,
-						y_trans = filters_off ? self.h/2 : device_off ? (self.h -hex_area_h)/1.75 : padding.top,
+						x_trans = filters_off ? hex_coords.x : device_off ? padding.left : (self.w -hex_area_w)/3,
+						y_trans = filters_off ? hex_coords.y : device_off ? (self.h -hex_area_h)/1.75 : padding.top,
 
 						x_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? (p.ratio_agg*hex_area_w) +(d.idx*hex_pad) +(d.idx*hex_pad_sub) : 0,
 						y_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? 0 : (p.ratio_agg*hex_area_h) +(d.idx*hex_pad) +(d.idx*hex_pad_sub);
@@ -956,7 +989,7 @@ var init = function(){
 						});
 					});
 				} else{
-					data = self.data_display;
+					data = self.data_display[0];
 				}
 				return data;
 			}
@@ -1260,56 +1293,3 @@ window.onresize = function(){
 		self.generate();
 	}
 }
-
-/*	==============================================================================
-	MOBILE GESTURE DETECTION
-	============================================================================== */
-
-document.addEventListener('touchstart', handleTouchStart, false);        
-document.addEventListener('touchmove', handleTouchMove, false);
-
-var xDown = null;                                                        
-var yDown = null;                                                        
-
-function handleTouchStart(evt) {                                         
-    xDown = evt.touches[0].clientX;                                      
-    yDown = evt.touches[0].clientY;                                      
-};                                                
-
-function handleTouchMove(evt) {
-    if ( ! xDown || ! yDown ) {
-        return;
-    }
-
-    var xUp = evt.touches[0].clientX;                                    
-    var yUp = evt.touches[0].clientY;
-
-    var xDiff = xDown - xUp;
-    var yDiff = yDown - yUp;
-
-    /*most significant*/
-    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {
-        if ( xDiff > 0 ) {
-            /* left swipe */ 
-        } else {
-            /* right swipe */
-        }   
-    } else {
-        if ( yDiff > 0 ) {
-            /* up swipe */ 
-        } else { 
-            /* down swipe */
-        }                                                                 
-    }
-
-    self.svg.transform(function(d){
-    	var x = xDiff,
-    		y = yDiff;
-    	return 'translate(' +x +',' +y +')';
-    });
-
-
-    /* reset values */
-    xDown = null;
-    yDown = null;                                             
-};
