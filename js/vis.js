@@ -608,7 +608,7 @@ var init = function(){
 				.range([2,hex_rad_legend]);
 
 			var padding = {
-				'top':self.device === 'mobile' ? (self.h*0.175) : 130,
+				'top':self.h*0.175,
 				'right':0,
 				'bottom':0,
 				'left':(self.w*0.25)/2
