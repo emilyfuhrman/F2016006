@@ -401,8 +401,8 @@ var init = function(){
 
 			//grab mobile hamburger menu, add click handler
 			self.mobile_ham = d3.select('#hamburger').on('click',function(){
-				var o = self.menu.style('display');
-				if(o === 'none'){
+				var display_style = self.menu.style('display');
+				if(display_style === 'none'){
 					self.menu.style('display','block');
 					self.mobile_ham.classed('xout',true);
 				} else{
@@ -932,10 +932,6 @@ var init = function(){
 			UTILITY FUNCTIONS
 			====================================================================== */
 
-		//resizing logic
-		resize:function(){
-		},
-
 		//mobile comments view
 		comments_show:function(){
 			self.comments_on = true;
@@ -1260,6 +1256,60 @@ window.onresize = function(){
 
 		//console.log(self.device +'->' +device);
 		self.setup();
+		self.mobile_ham.classed('xout',false);
 		self.generate();
 	}
 }
+
+/*	==============================================================================
+	MOBILE GESTURE DETECTION
+	============================================================================== */
+
+document.addEventListener('touchstart', handleTouchStart, false);        
+document.addEventListener('touchmove', handleTouchMove, false);
+
+var xDown = null;                                                        
+var yDown = null;                                                        
+
+function handleTouchStart(evt) {                                         
+    xDown = evt.touches[0].clientX;                                      
+    yDown = evt.touches[0].clientY;                                      
+};                                                
+
+function handleTouchMove(evt) {
+    if ( ! xDown || ! yDown ) {
+        return;
+    }
+
+    var xUp = evt.touches[0].clientX;                                    
+    var yUp = evt.touches[0].clientY;
+
+    var xDiff = xDown - xUp;
+    var yDiff = yDown - yUp;
+
+    /*most significant*/
+    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {
+        if ( xDiff > 0 ) {
+            /* left swipe */ 
+        } else {
+            /* right swipe */
+        }   
+    } else {
+        if ( yDiff > 0 ) {
+            /* up swipe */ 
+        } else { 
+            /* down swipe */
+        }                                                                 
+    }
+
+    self.svg.transform(function(d){
+    	var x = xDiff,
+    		y = yDiff;
+    	return 'translate(' +x +',' +y +')';
+    });
+
+
+    /* reset values */
+    xDown = null;
+    yDown = null;                                             
+};
