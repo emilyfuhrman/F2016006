@@ -461,7 +461,8 @@ var init = function(){
 		//thanks for all the help, http://www.redblobgames.com/grids/hexagons/!
 		generate:function(){
 
-			var filters_off = self.filters.length === 0;
+			var filters_off = self.filters.length === 0,
+				device_off  = self.device === 'default';
 
 			//prepare data to be displayed
 			self.data_display = filters_off ? [self.data[self.modes[self.mode]]] : self.filterData();
@@ -575,7 +576,7 @@ var init = function(){
 			hex_w = hex_rad*2;
 
 			var	hex_row_h = Math.floor( hex_area_h/hex_h ),
-				hex_col_w = Math.floor( hex_area_w/hex_w )
+				hex_col_w = Math.floor( hex_area_w/(hex_w*0.75) )
 				;
  
 			//INITIALIZE VARIABLES
@@ -697,9 +698,8 @@ var init = function(){
 			hexG
 				.attr('transform',function(d){
 					//var noT = self.device === 'default' || self.device === 'mobile' || self.filters.length === 0,
-					var noD = self.device !== 'default',
-						x = filters_off ? self.w/2 : noD ? (self.w -hex_area_w)/1.75 : padding.left,
-						y = filters_off ? self.h/2 : noD ? padding.top : (self.h -hex_area_h)/1.75;
+					var x = filters_off ? self.w/2 : device_off ? padding.left : (self.w -hex_area_w)/1.75,
+						y = filters_off ? self.h/2 : device_off ? (self.h -hex_area_h)/1.75 : padding.top;
 					return 'translate(' +x +',' +y +')';
 				});
 			hexG
@@ -716,30 +716,28 @@ var init = function(){
 				.classed('hexesG',true);
 			hexesG
 				.attr('transform',function(d,i){
-					var noD = self.device !== 'default';
-					var x = d.ratio_agg ? noD ? 0 : (d.ratio_agg*hex_area_w) +(i*hex_pad) : 0,
-						y = d.ratio_agg ? noD ? (d.ratio_agg*hex_area_h) +(i*hex_pad) : 0 : 0;
+					var x = d.ratio_agg ? device_off ? (d.ratio_agg*hex_area_w) +(i*hex_pad) : 0 : 0,
+						y = d.ratio_agg ? device_off ? 0 : (d.ratio_agg*hex_area_h) +(i*hex_pad) : 0;
 					return 'translate(' +x +',' +y +')';
 				})
 			hexesG.exit().remove();
 
-			var hr = hexesG.selectAll('rect.hr')
+			//panels for position testing -- keep these around for now
+			/*var hr = hexesG.selectAll('rect.hr')
 				.data(function(d){ return [d]; });
 			hr.enter().append('rect')
 				.classed('hr',true);
 			hr
 				.attr('width',function(d){
-					var noD = self.device !== 'default';
-					return d.ratio ? noD ? hex_area_w : hex_area_w*d.ratio : 0;
+					return d.ratio ? device_off ? hex_area_w*d.ratio : hex_area_w : 0;
 				})
 				.attr('height',function(d){
-					var noD = self.device !== 'default';
-					return d.ratio ? noD ? hex_area_h*d.ratio : hex_area_h : 0;
+					return d.ratio ? device_off ? hex_area_h : hex_area_h*d.ratio : 0;
 				})
 				.attr('x',0)
 				.attr('y',0)
 				.style('fill','pink');
-			hr.exit().remove();
+			hr.exit().remove();*/
 
 			//hexagons
 			hexes = hexesG.selectAll('path.hex')
@@ -751,9 +749,10 @@ var init = function(){
 					return filters_off ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age_bucket));
 				})
 				.attr('transform',function(d,i){
-					var noD = self.device !== 'default';
-					var x = filters_off ? d.pos.y : noD ? (i%hex_col_w)*hex_w : 0,
-						y = filters_off ? d.pos.x : noD ? 0 : (i%hex_row_h)*hex_h;
+					var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
+						col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
+					var x = filters_off ? d.pos.y : col_num*(hex_w*0.75),
+						y = filters_off ? d.pos.x : row_num*(hex_h) +((col_num%2)*(hex_h/2));
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})
 				.style('stroke',self.colors[self.mode])
@@ -764,9 +763,6 @@ var init = function(){
 				.on('mousemove',function(d,i){
 					var x, y;
 					var o = d.rating/5;
-
-					// var padL = self.device === 'tablet' ? padding.left : 0,
-					// 	padT = self.device === 'tablet' ? padding.top : 0;
 
 					x = filters_off ? d.pos.y : 0;
 					y = filters_off ? d.pos.x : 0;
