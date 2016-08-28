@@ -147,7 +147,7 @@ var init = function(){
 				self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
 					var hash = f === 'country' ? _d[f].split(' ').join('_').toLowerCase() : _d[f];
 					if(d[hash]){
-						_d.idx = d3.keys(d).indexOf(d[hash]);
+						_d.idx = d3.keys(d).indexOf(hash);
 						d[hash].push(_d);
 					}
 				});
@@ -763,12 +763,21 @@ var init = function(){
 				.on('mousemove',function(d,i){
 					var x, y;
 					var o = d.rating/5;
+					var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
+						col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
+					var p = self.data_display[d.idx],
 
-					x = filters_off ? d.pos.y : 0;
-					y = filters_off ? d.pos.x : 0;
+						x_trans = filters_off ? self.w/2 : device_off ? padding.left : (self.w -hex_area_w)/1.75,
+						y_trans = filters_off ? self.h/2 : device_off ? (self.h -hex_area_h)/1.75 : padding.top,
 
-					x +=self.w/2;
-					y +=self.h/2;
+						x_trans_micro = filters_off ? 0 : device_off ? (p.ratio_agg*hex_area_w) +(d.idx*hex_pad) : 0,
+						y_trans_micro = filters_off ? 0 : device_off ? 0 : (p.ratio_agg*hex_area_h) +(d.idx*hex_pad);
+
+					x = filters_off ? d.pos.y : col_num*(hex_w*0.75);
+					y = filters_off ? d.pos.x : row_num*(hex_h) +((col_num%2)*(hex_h/2));
+
+					x +=(x_trans +x_trans_micro);
+					y +=(y_trans +y_trans_micro);
 
 					hexTTG
 						.classed('hidden',false)
