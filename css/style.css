@@ -848,11 +848,12 @@ input.second {
 
 	#menu .btn.filter .expand {
 		left:-2px;
-		top:78px;
+		top:80px;
+		max-height:150px;
 		width:100%;
 		width:calc(100% + 4px);
 		border:2px solid white;
-		border-top:none;
+		border-top:2px solid white;
 		}
 
 	.math #menu .btn.filter .expand {
@@ -976,6 +977,7 @@ input.second {
 	#menu .btn.filter .expand {
 		left:-1px;
 		top:29px;
+		max-height:180px;
 		width:135px;
 		border:1px solid white;
 		border-top:none;
@@ -1103,6 +1105,7 @@ input.second {
 	#menu .btn.filter .expand {
 		left:-1px;
 		top:29px;
+		max-height:180px;
 		width:135px;
 		border:1px solid white;
 		border-top:none;
