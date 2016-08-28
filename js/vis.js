@@ -1017,6 +1017,7 @@ var init = function(){
 			});
 
 			d3.select('#sampled').classed('visible',false);
+			self.mobile_ham.classed('xout',false);
 		},
 
 		//forms

@@ -118,10 +118,10 @@ div {
 	height:auto;
 	}
 .math #menu {
-	background:#295ccc;
+	background:rgba(41,92,204,0.8);
 	}
 .science #menu {
-	background:#67a400;
+	background:rgba(103,164,0,0.8);
 	}
 
 #menu .btn {
@@ -463,22 +463,31 @@ div {
 	}
 
 .nav_mobile #hamburger {
+	background-image:url(../assets/hamburger.svg);
+	background-repeat:no-repeat;
+	background-position: 2px 5px;
+	background-size:28px 22px;
 	z-index:50;
 	position:fixed;
-	background:white;
-	width:42px;
-	height:42px;
-	right:30px;
-	top:30px;
-	border:2px solid black;
+	width:32px;
+	height:32px;
+	right:15px;
+	top:15px;
+	border-radius:2px;
 	-webkit-box-sizing:border-box;
     -moz-box-sizing:border-box;
     -ms-box-sizing:border-box;
 	box-sizing:border-box;
 	cursor:pointer;
 	}
+.math .nav_mobile #hamburger {
+	background-color:#295ccc;
+	}
+.science .nav_mobile #hamburger {
+	background-color:#67a400;
+	}
 .nav_mobile #hamburger.xout {
-	background:black;
+	background-image:url(../assets/hamburger_xout.svg);
 	}
 
 .nav_mobile .btn {
