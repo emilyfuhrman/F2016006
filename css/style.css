@@ -848,7 +848,7 @@ input.second {
 
 	#menu .btn.filter .expand {
 		left:-2px;
-		top:80px;
+		top:58px;
 		max-height:150px;
 		width:100%;
 		width:calc(100% + 4px);
@@ -869,7 +869,7 @@ input.second {
 
 	#menu .btn.clear {
 		display:none;
-		font-size:1rem;
+		font-size:0.4rem;
 		left:15px;
 		top:auto;
 		bottom:30px;
