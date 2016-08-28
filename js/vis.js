@@ -152,30 +152,6 @@ var init = function(){
 					}
 				});
 
-				//convert back to array
-				d = d3.entries(d);
-
-				var length_tot = d3.sum(d,function(_d){ return _d.value.length; });
-
-				d.forEach(function(_d){ 
-
-					//calculate length in relation to total length for placement
-					var _r = _d.value.length/length_tot;
-
-					_d.ratio = _r;
-					_d.ratio_agg = r;
-
-					r +=_r;
-
-					//sort primarily by rating and secondarily by age
-					_d.value = _d.value.sort(function(a,b){ 
-						if(a.rating === b.rating){
-							return b.age_bucket -a.age_bucket;
-						}
-						return b.rating -a.rating; 
-					});
-				});
-
 			//if more than one filter is selected (must be gender + {something})
 			} else{
 				f = self.filters.filter(function(d){ return d !== 'gender'; })[0];
@@ -185,47 +161,42 @@ var init = function(){
 				b = self[(f === 'grade_bucket' ? 'buckets_grade' : 'buckets_' +f)];
 
 				b.forEach(function(_b){
-					d[_b] = [];
-					d[_b].push([]); //array -- M
-					d[_b].push([]); //array -- F
+					d[_b +'_M'] = [];
+					d[_b +'_F'] = [];
 				});
 
 				self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
 					var hash = f === 'country' ? _d[f].split(' ').join('_').toLowerCase() : _d[f];
-					if(d[hash]){ 
-						var arr_g = _d.gender === 'M' ? 0 : 1;
-						_d.idx = d3.keys(d).indexOf(hash);
-						_d.idx_g = arr_g;
-						d[hash][arr_g].push(_d); 
+					if(d[hash +'_' +_d.gender]){
+						_d.idx = d3.keys(d).indexOf(hash +'_' +_d.gender);
+						d[hash +'_' +_d.gender].push(_d); 
 					}
 				});
-
-				//convert back to array
-				d = d3.entries(d);
-
-				var length_tot = d3.sum(d,function(_d){ return (_d.value[0].length +_d.value[1].length); });
-
-				d.forEach(function(_d){ 
-
-					//calculate length in relation to total length for placement
-					var _r = (_d.value[0].length +_d.value[1].length)/length_tot;
-					
-					_d.ratio = _r;
-					_d.ratio_agg = r;
-
-					r +=_r;
-
-					//sort primarily by rating and secondarily by age
-					_d.value.forEach(function(__d){
-						__d = __d.sort(function(a,b){ 
-							if(a.rating === b.rating){
-								return b.age_bucket -a.age_bucket;
-							}
-							return b.rating -a.rating; 
-						});
-					});
-				});
 			}
+
+			//convert back to array
+			d = d3.entries(d);
+
+			var length_tot = d3.sum(d,function(_d){ return _d.value.length; });
+
+			d.forEach(function(_d,_i){ 
+
+				//calculate length in relation to total length for placement
+				var _r = _d.value.length/length_tot;
+
+				_d.ratio = _r;
+				_d.ratio_agg = r;
+
+				r +=_r;
+
+				//sort primarily by rating and secondarily by age
+				_d.value = _d.value.sort(function(a,b){ 
+					if(a.rating === b.rating){
+						return b.age_bucket -a.age_bucket;
+					}
+					return b.rating -a.rating; 
+				});
+			});
 			return d;
 		},
 
@@ -546,18 +517,20 @@ var init = function(){
 
 			//HEX GRID CALCULATIONS
 			//for columns
-			var hex_pad = 60,
-				hex_pad_sub = self.filters.length === 2 ? 15 : 0,
+			var hex_display_length = filters_off ? self.data_display.length : self.data_display.filter(function(d){ return d.value.length >0; }).length,
+
+				hex_pad = device_off ? 60 : 30,
+				hex_pad_sub = self.filters.length === 2 ? (device_off ? 15 : 6) : 0,
 
 				hex_area_w = self.device === 'default' ?
-					( self.filters.length === 2 ? self.w*0.75 -((self.data_display.length -1)*hex_pad -(self.data_display.length*hex_pad_sub))
-					: self.filters.length === 1 ? self.w*0.75 -((self.data_display.length -1)*hex_pad)
+					( self.filters.length === 2 ? self.w*0.75 -((hex_display_length -1)*hex_pad +(hex_display_length*hex_pad_sub))
+					: self.filters.length === 1 ? self.w*0.75 -((hex_display_length -1)*hex_pad)
 					: 0)
 					: self.w*0.45,
 				hex_area_h = self.device === 'default' ?
 					self.h*0.45 :
-					( self.filters.length === 2 ? self.h*0.75 -((self.data_display.length -1)*hex_pad -(self.data_display.length*hex_pad_sub))
-					: self.filters.length === 1 ? self.h*0.75 -((self.data_display.length -1)*hex_pad)
+					( self.filters.length === 2 ? self.h*0.65 -((hex_display_length -1)*hex_pad -(hex_display_length*hex_pad_sub))
+					: self.filters.length === 1 ? self.h*0.65 -((hex_display_length -1)*hex_pad)
 					: 0),
 				hex_area = hex_area_w*hex_area_h;
 
@@ -588,7 +561,8 @@ var init = function(){
 			var hexG,
 				hexesG,
 				hexes,
-				hexesLabels;
+				hexesLabels,
+				hexesLabels_;
 			var legend_hexes,
 				legend_hexes_txt,
 				legend_hexes_arr;
@@ -693,8 +667,7 @@ var init = function(){
 				.classed('hexG',true);
 			hexG
 				.attr('transform',function(d){
-					//var noT = self.device === 'default' || self.device === 'mobile' || self.filters.length === 0,
-					var x = filters_off ? self.w/2 : device_off ? padding.left : (self.w -hex_area_w)/1.75 -30,
+					var x = filters_off ? self.w/2 : device_off ? padding.left : (self.w -hex_area_w)/3,
 						y = filters_off ? self.h/2 : device_off ? (self.h -hex_area_h)/1.75 : padding.top;
 					return 'translate(' +x +',' +y +')';
 				});
@@ -712,8 +685,8 @@ var init = function(){
 				.classed('hexesG',true);
 			hexesG
 				.attr('transform',function(d,i){
-					var x = d.ratio_agg ? device_off ? (d.ratio_agg*hex_area_w) +(i*hex_pad) : 0 : 0,
-						y = d.ratio_agg ? device_off ? 0 : (d.ratio_agg*hex_area_h) +(i*hex_pad) : 0;
+					var x = d.ratio_agg ? device_off ? (d.ratio_agg*hex_area_w) +(i*hex_pad) +(i*hex_pad_sub) : 0 : 0,
+						y = d.ratio_agg ? device_off ? 0 : (d.ratio_agg*hex_area_h) +(i*hex_pad) +(i*hex_pad_sub) : 0;
 					return 'translate(' +x +',' +y +')';
 				})
 			hexesG.exit().remove();
@@ -737,7 +710,7 @@ var init = function(){
 
 			//hexagons
 			hexes = hexesG.selectAll('path.hex')
-				.data(function(d){ return d.value || d; });
+				.data(function(d){ return filters_off ? d : d.value; });
 			hexes.enter().append('path')
 				.classed('hex',true);
 			hexes
@@ -761,11 +734,11 @@ var init = function(){
 						col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
 					var p = self.data_display[d.idx],
 
-						x_trans = filters_off ? self.w/2 : device_off ? padding.left : (self.w -hex_area_w)/1.75,
+						x_trans = filters_off ? self.w/2 : device_off ? padding.left : (self.w -hex_area_w)/3,
 						y_trans = filters_off ? self.h/2 : device_off ? (self.h -hex_area_h)/1.75 : padding.top,
 
-						x_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? (p.ratio_agg*hex_area_w) +(d.idx*hex_pad) : 0,
-						y_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? 0 : (p.ratio_agg*hex_area_h) +(d.idx*hex_pad);
+						x_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? (p.ratio_agg*hex_area_w) +(d.idx*hex_pad) +(d.idx*hex_pad_sub) : 0,
+						y_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? 0 : (p.ratio_agg*hex_area_h) +(d.idx*hex_pad) +(d.idx*hex_pad_sub);
 
 					x = filters_off ? d.pos.y : col_num*(hex_w*0.75);
 					y = filters_off ? d.pos.x : row_num*(hex_h) +((col_num%2)*(hex_h/2));
@@ -788,17 +761,39 @@ var init = function(){
 			hexesLabels.enter().append('text')
 				.classed('hexLabel',true);
 			hexesLabels
-				.attr('x',function(d){ return d.ratio ? device_off ? hex_area_w*d.ratio/2 : hex_area_w +60 : 0; })
-				.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +30 : hex_area_h*d.ratio/2 : 0; })
+				.classed('sub',function(){ return self.filters.length === 2; })
+				.attr('x',function(d){ return d.ratio ? device_off ? 0 : hex_area_w +30 : 0; })
+				.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +30 : 0 : 0; })
 				.text(function(d){ 
-					var t = self.filters.length === 1 ? (d.value.length >0 ? d.key : '') : '';
-					if(self.filters[0] === 'gender'){
-						t = self.util_resolve_gender(t);
+					var t;
+					if(self.filters.length === 1){
+						t = d.value.length >0 ? d.key : '';
+						t = self.filters[0] === 'gender' ? self.util_resolve_gender(t) : t;
+					} else if(self.filters.length === 2){
+						t = self.util_toTitleCase(d.key.split('_')[1]);
+					} else{
+						t = '';
 					}
-					t = self.util_toTitleCase(t);
-					return t; 
-				});
+					return self.util_toTitleCase(t); 
+				})
+				.style('text-anchor',function(){ return device_off ? 'start' : 'start'; })
+				;
 			hexesLabels.exit().remove();
+
+			//labels for when double-filters are showing
+			hexesLabels_ = hexesG.selectAll('text.hexLabel_')
+				.data(function(d){ return self.filters.length === 2 ? [d] : false; });
+			hexesLabels_.enter().append('text')
+				.classed('hexLabel_',true);
+			hexesLabels_
+				.attr('x',function(d){ return d.ratio ? device_off ? 0 : hex_area_w +60 : 0; })
+				.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +60 : 0 : 0; })
+				.text(function(d,i){
+					var split = d.key.split('_');
+					return split[1] === 'M' ? self.util_toTitleCase(split[0]) : ''; 
+				})
+				.style('text-anchor',function(){ return device_off ? 'start' : 'start'; });
+			hexesLabels_.exit().remove();
 
 			//create tooltip group
 			hexTTG = self.svg.selectAll('g.hexTTG')

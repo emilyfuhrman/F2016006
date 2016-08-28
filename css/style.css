@@ -706,6 +706,7 @@ input.second {
 	opacity:0;
 	}
 .hexTTG .hexTTback {
+	fill-opacity:1;
 	}
 .hexTTG .hexTT {
 	fill:white;
@@ -725,12 +726,15 @@ input.second {
 	cursor:pointer;
 	}
 
-.hexLabel {
+.hexLabel,
+.hexLabel_ {
 	fill:white;
 	fill-opacity:1;
 	font-size:0.9rem;
 	letter-spacing:0.025rem;
-	text-anchor:middle;
+	}
+.hexLabel.sub {
+	font-size:0.725rem;
 	}
 
 /*	FLUIDITY
@@ -835,6 +839,14 @@ input.second {
 	#legend {
 		display:none;
 		}
+
+	.hexLabel,
+	.hexLabel_ {
+		font-size:0.725rem;
+		}
+	.hexLabel.sub {
+		font-size:0.65rem;
+		}
 	}
 
 @media (min-width:768px) { 
@@ -937,6 +949,14 @@ input.second {
 
 	#legend {
 		display:block;
+		}
+
+	.hexLabel,
+	.hexLabel_ {
+		font-size:0.9rem;
+		}
+	.hexLabel.sub {
+		font-size:0.725rem;
 		}
 	}
 
@@ -1041,5 +1061,13 @@ input.second {
 
 	#legend {
 		display:block;
+		}
+
+	.hexLabel,
+	.hexLabel_ {
+		font-size:0.9rem;
+		}
+	.hexLabel.sub {
+		font-size:0.725rem;
 		}
 	}
