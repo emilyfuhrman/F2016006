@@ -564,9 +564,16 @@ div {
 	----------------------------- */
 
 textarea,
+textarea:focus,
 select,
-input {
+select:focus,
+input,
+input:focus {
 	outline:none;
+	}
+select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
 	}
 
 .form {
@@ -582,14 +589,23 @@ input {
 	}
 
 .form select {
-	background:transparent;
-	width:120px;
-	border:none;
+	background-image:url(../assets/dd_arrow.svg);
+	background-color:transparent;
+	background-repeat:no-repeat;
+	background-position:147px 1px;
+	width:172px;
+	border:none !important;
 	cursor:pointer;
+	-webkit-appearance:none;
+	-moz-appearance:none;
 	}
 .form .input.select {
 	background:white;
 	border:1px solid black;
+	}
+.form select option {
+	border:none;
+	box-shadow:none;
 	}
 
 .form button {
@@ -605,7 +621,7 @@ input {
 
 .form textarea {
 	height:100%;
-	padding-left:6px;
+	padding:3px 0 3px 6px;
 	border:1px solid black;
 	resize:none;
 	}
