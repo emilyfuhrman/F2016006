@@ -763,8 +763,8 @@ var init = function(){
 				// .transition()
 				// .duration(90)
 				// .delay(function(d,i){
-				// 	//return filters_off ? 60 +d.pos.y*1.5 : 0;
-				// 	return i*0.4;
+				// 	var dist = filters_off ? 0.35*i : i;
+				// 	return dist;
 				// })
 				// .style('opacity',1)
 				;
@@ -795,7 +795,10 @@ var init = function(){
 					
 					self.util_detail_update(d);
 				});
-			hexes.exit().remove();
+			hexes
+				// .style('opacity',0)
+				.exit()
+				.remove();
 
 			//labels under groups
 			hexesLabels = hexesG.selectAll('text.hexLabel')
