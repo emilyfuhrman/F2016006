@@ -356,7 +356,7 @@ div {
 	margin:6px 9px 0 0;
 	padding-left:30px;
 	}
-#legend.show #legend_tab{
+#legend.show #legend_tab {
 	background-position:12px -16px;
 	}
 
@@ -383,9 +383,6 @@ div {
 	}
 
 .legend_g {
-	display:none;
-	}
-.legend_g.show {
 	display:block;
 	}
 
@@ -407,7 +404,7 @@ div {
 	stroke-opacity:1;
 	}
 #legend .legend_hex_txt {
-	font-size:0.45rem;
+	font-size:0.55rem;
 	text-anchor:middle;
 	fill:white;
 	stroke:none;

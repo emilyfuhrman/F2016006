@@ -67,7 +67,6 @@ var init = function(){
 		hex_sideLength:15,
 
 		path_legend:"M0,130.9V34.7c0-6.4,0-11.6,0-11.5c0,0,0-5.2,0-11.5S5.2,0,11.6,0 h76.3c6.4,0,11.6,5.2,11.6,11.5c0,0.2,0,16.3,0,16.5c0.3,6.1,5.4,11,11.6,11h53c6.4,0,11.6,5.2,11.6,11.6v80.3",
-		path_legend_exp:"M0,130.9V34.7c0-6.4,0-11.6,0-11.5c0,0,0-5.2,0-11.5S5.2,0,11.6,0H88 c6.4,0,11.6,5.2,11.6,11.5c0,0.2,0,16.3,0,16.5c0.3,6.1,5.4,11,11.6,11h233.8c6.4,0,11.6,5.2,11.6,11.6v80.2",
 
 		//mobile comments visible?
 		comments_on:false,
@@ -317,21 +316,16 @@ var init = function(){
 			self.legend_bg.enter().append('path')
 				.classed('legend_bg',true);
 			self.legend_bg
-				.attr('d',function(){
-					return self.filters.length === 0 ? self.path_legend : self.path_legend_exp;
-				})
+				.attr('d',function(){ return self.path_legend; })
 				.attr('transform','translate(1,1)');
 			self.legend_bg.exit().remove();
 
 			//legend hexagon groups
 			self.legend_g = self.legend_body.selectAll('g.legend_g')
-				.data([[6,7],[1,2,3,4,5]]);
+				.data([[1,2]]);
 			self.legend_g.enter().append('g')
 				.classed('legend_g',true);
 			self.legend_g
-				.classed('show',function(d,i){
-					return i === 0;
-				})
 				.attr('transform',function(d,i){
 					var x = i*180 +24,
 						y = 69;
@@ -345,13 +339,9 @@ var init = function(){
 			legend_g_txt.enter().append('text')
 				.classed('legend_g_txt',true);
 			legend_g_txt
-				.attr('x',function(d){
-					return d.length === 2 ? -9 : -5;
-				})
+				.attr('x',-9)
 				.attr('y',48)
-				.text(function(d){
-					return d.length === 2 ? 'Hexagon shading: rating' : 'Hexagon size: age';
-				});
+				.text('Hexagon shading: rating');
 			legend_g_txt.exit().remove();
 
 			//legend hexagon group dividers
@@ -360,9 +350,7 @@ var init = function(){
 			legend_g_line.enter().append('line')
 				.classed('legend_g_line',true);
 			legend_g_line
-				.attr('x1',function(d){
-					return d.length === 2 ? -9 : -5;
-				})
+				.attr('x1',-9)
 				.attr('y1',33)
 				.attr('x2',139)
 				.attr('y2',33);
@@ -585,13 +573,6 @@ var init = function(){
 				d.pos = util_cubeToPix(cube_coords[i]);
 			});
 
-			var scale_age = d3.scale.linear()
-				.domain([0,self.buckets_age.length -1])
-				.range([2,hex_rad]);
-			var scale_age_legend = d3.scale.linear()
-				.domain([0,self.buckets_age.length -1])
-				.range([2,hex_rad_legend]);
-
 			var padding = {
 				'top':self.h*0.175,
 				'right':0,
@@ -605,16 +586,14 @@ var init = function(){
 			legend_hexes.enter().append('path')
 				.classed('legend_hex',true);
 			legend_hexes
-				.attr('d',function(d,i){
-					return d >5 ? hexbin.hexagon(hex_rad_legend) : hexbin.hexagon(scale_age_legend(d));
-				})
+				.attr('d',function(d,i){ return hexbin.hexagon(hex_rad_legend); })
 				.attr('transform',function(d,i){
-					var x = d >5 ? i*120 : i*30,
+					var x = i*120,
 						y = 9;
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})
 				.style('fill-opacity',function(d,i){
-					return d >5 ? ((d-6)*5)/5 : 1;
+					return i === 0 ? 0.2 : 1;
 				});
 			legend_hexes.exit().remove();
 			legend_hexes_txt = self.legend_g.selectAll('text.legend_hex_txt')
@@ -623,24 +602,24 @@ var init = function(){
 				.classed('legend_hex_txt',true);
 			legend_hexes_txt
 				.attr('transform',function(d,i){
-					var x = d >5 ? i*120 : i*30,
-						y = -6;
+					var x = i*120 +3,
+						y = -9;
 					return 'translate(' +x +',' +y +')';
 				})
 				.text(function(d,i){
-					return d >5 ? (d === 6 ? '1' : '5') : self.buckets_age[d-1]; 
+					return i === 0 ? 'Hate' : 'Love'; 
 				});
 			legend_hexes_txt.exit().remove();
 			legend_hexes_arr = self.legend_g.selectAll('line.legend_hex_arr')
-				.data(function(d,i){ return d.length === 2 ? d : false; });
+				.data(function(d,i){ return d; });
 			legend_hexes_arr.enter().append('line')
 				.classed('legend_hex_arr',true);
 			legend_hexes_arr
 				.attr('marker-end','url(#arrow)')
-				.attr('x1',6)
-				.attr('y1',-9)
-				.attr('x2',111)
-				.attr('y2',-9)
+				.attr('x1',20)
+				.attr('y1',-12)
+				.attr('x2',105)
+				.attr('y2',-12)
 				;
 			legend_hexes_txt.exit().remove();
 
@@ -733,9 +712,7 @@ var init = function(){
 				.classed('hex',true);
 			hexes
 				// .style('opacity',0)
-				.attr('d',function(d){
-					return filters_off ? hexbin.hexagon(hex_rad) : hexbin.hexagon(scale_age(d.age_bucket));
-				})
+				.attr('d',function(d){ return hexbin.hexagon(hex_rad); })
 				.attr('transform',function(d,i){
 					var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
 						col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
@@ -937,9 +914,6 @@ var init = function(){
 				self.util_filters_clear();
 			} else{
 				self.btn_filters_clear.classed('visible',true);
-
-				self.legend_bg.attr('d',self.path_legend_exp);
-				self.legend.classed('expanded',true);
 				self.legend_g.classed('show',true);
 			}
 			
@@ -1034,8 +1008,6 @@ var init = function(){
 			//deselect all dropdown menu selections
 			d3.selectAll('li.option').classed('selected',false);
 
-			self.legend_bg.attr('d',self.path_legend);
-			self.legend.classed('expanded',false);
 			self.legend_g.classed('show',function(d,i){
 				return i === 0;
 			});
