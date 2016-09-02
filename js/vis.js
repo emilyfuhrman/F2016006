@@ -82,7 +82,7 @@ var init = function(){
 		],
 
 		getData:function(_callback){
-			var datasets = ['math','science','dummy_sample_math','dummy_sample_science','countries'];
+			var datasets = ['math','science','countries'];
 			datasets.forEach(function(d){
 				d3.csv('data/' +d +'.csv',function(e,_d){
 					self.data[d] = _d;
@@ -109,16 +109,6 @@ var init = function(){
 				self.data[d].sort(function(a,b){
 					return d3.descending(a.rating,b.rating);
 				});
-				self.data['dummy_sample_' +d].forEach(function(_d){
-					_d.rating = +_d.rating;
-					_d.age = +_d.age;
-
-					_d.age_bucket = self.util_resolve_age(_d.age);
-					_d.grade_bucket = self.util_resolve_grade(_d.grade);
-				});
-				self.data['dummy_sample_' +d].sort(function(a,b){
-					return d3.descending(a.rating,b.rating);
-				});
 			});
 
 			//create unique countries dataset
@@ -143,8 +133,8 @@ var init = function(){
 				//in data object, create new array for every bucket
 				b.forEach(function(_b){ d[_b] = []; });
 
-				//cycle through sampled dataset to add values to their accordant arrays
-				self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
+				//cycle through data to add values to their accordant arrays
+				self.data[self.modes[self.mode]].forEach(function(_d){
 					var hash = f === 'country' ? _d[f].split(' ').join('_').toLowerCase() : _d[f];
 					if(d[hash]){
 						_d.idx = d3.keys(d).indexOf(hash);
@@ -165,7 +155,7 @@ var init = function(){
 					d[_b +'_F'] = [];
 				});
 
-				self.data['dummy_sample_' +self.modes[self.mode]].forEach(function(_d){
+				self.data[self.modes[self.mode]].forEach(function(_d){
 					var hash = f === 'country' ? _d[f].split(' ').join('_').toLowerCase() : _d[f];
 					if(d[hash +'_' +_d.gender]){
 						_d.idx = d3.keys(d).indexOf(hash +'_' +_d.gender);
@@ -475,11 +465,6 @@ var init = function(){
 
 			d3.selectAll('.mobile.solid').style('background-color',function(){
 				return d3.select(this).classed('mobile') ? self.colors_legend[self.mode] : 'transparent';
-			});
-
-			//update sample span to reflect sample data, if applicable
-			d3.select('#sampled .sample').text(function(){
-				return filters_off ? 0 : 5;
 			});
 
 			//update switch buttons to reflect current/opposite modes
@@ -956,8 +941,6 @@ var init = function(){
 				self.legend_bg.attr('d',self.path_legend_exp);
 				self.legend.classed('expanded',true);
 				self.legend_g.classed('show',true);
-
-				d3.select('#sampled').classed('visible',true);
 			}
 			
 			self.mobile_ham.classed('xout',false);
@@ -1057,7 +1040,6 @@ var init = function(){
 				return i === 0;
 			});
 
-			d3.select('#sampled').classed('visible',false);
 			self.mobile_ham.classed('xout',false);
 		},
 
@@ -1197,7 +1179,7 @@ var init = function(){
 			}*/
 		},
 		util_get_unique_countries:function(){
-			var data = self.data['dummy_sample_' +self.modes[self.mode]];
+			var data = self.data[self.modes[self.mode]];
 			data.forEach(function(d,i){
 				if(self.unique_countries.indexOf(d.country) <0){
 					self.unique_countries.push(d.country);
