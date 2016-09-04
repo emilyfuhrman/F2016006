@@ -816,7 +816,7 @@ var init = function(){
 					return self.device !== 'mobile' ? 'block' : 'none';
 				});
 			self.anno.style('background',function(){
-				return self.device === 'mobile' ? self.mode === 0 ? 'rgba(41, 92, 204, 0.75)' : 'rgba(103,164,0,0.75)' : 'transparent';
+				return self.device === 'mobile' ? self.mode === 0 ? 'rgba(82, 132, 157, 0.75)' : 'rgba(123, 158, 126, 0.75)' : 'transparent';
 			});
 
 			//if on, refresh comments panel
