@@ -72,12 +72,12 @@ var init = function(){
 		comments_on:false,
 
 		colors:[
-			'#4a78cf',
-			'#85B800'
+			'#6698b1',
+			'#8fb292'
 		],
 		colors_legend:[
-			'#295ccc',
-			'#67a400'
+			'#52849d',
+			'#7b9e7e'
 		],
 
 		getData:function(_callback){
@@ -287,12 +287,21 @@ var init = function(){
 				self.util_form_show();
 			});
 
+			//initialize hexbin
+			self.hexbin = d3.hexbin();
+
 		/*	---------------------------------------------------------------------- 
 			LEGEND
 			---------------------------------------------------------------------- */
 
-			var legend_g_txt,
+			var legend_body,
+				legend_bg;
+			var legend_g,
+				legend_g_txt,
 				legend_g_line;
+			var legend_hexes,
+				legend_hexes_txt,
+				legend_hexes_arr;
 
 			//grab legend, add interaction
 			self.legend = d3.select('.nav#legend')
@@ -304,37 +313,37 @@ var init = function(){
 				});
 			
 			//legend SVG container
-			self.legend_body = d3.select('#legend_body').selectAll('svg.legend')
+			legend_body = d3.select('#legend_body').selectAll('svg.legend')
 				.data([self]);
-			self.legend_body.enter().append('svg')
+			legend_body.enter().append('svg')
 				.classed('legend',true);
-			self.legend_body.exit().remove();
+			legend_body.exit().remove();
 
 			//legend background path
-			self.legend_bg = self.legend_body.selectAll('path.legend_bg')
+			legend_bg = legend_body.selectAll('path.legend_bg')
 				.data([self]);
-			self.legend_bg.enter().append('path')
+			legend_bg.enter().append('path')
 				.classed('legend_bg',true);
-			self.legend_bg
+			legend_bg
 				.attr('d',function(){ return self.path_legend; })
 				.attr('transform','translate(1,1)');
-			self.legend_bg.exit().remove();
+			legend_bg.exit().remove();
 
 			//legend hexagon groups
-			self.legend_g = self.legend_body.selectAll('g.legend_g')
+			legend_g = legend_body.selectAll('g.legend_g')
 				.data([[1,2]]);
-			self.legend_g.enter().append('g')
+			legend_g.enter().append('g')
 				.classed('legend_g',true);
-			self.legend_g
+			legend_g
 				.attr('transform',function(d,i){
-					var x = i*180 +24,
+					var x = 24,
 						y = 69;
 					return 'translate(' +x +',' +y +')';
 				});
-			self.legend_g.exit().remove();
+			legend_g.exit().remove();
 
 			//legend hexagon group captions
-			legend_g_txt = self.legend_g.selectAll('text.legend_g_txt')
+			legend_g_txt = legend_g.selectAll('text.legend_g_txt')
 				.data(function(d){ return [d]; });
 			legend_g_txt.enter().append('text')
 				.classed('legend_g_txt',true);
@@ -345,7 +354,7 @@ var init = function(){
 			legend_g_txt.exit().remove();
 
 			//legend hexagon group dividers
-			legend_g_line = self.legend_g.selectAll('line.legend_g_line')
+			legend_g_line = legend_g.selectAll('line.legend_g_line')
 				.data(function(d){ return [d]; });
 			legend_g_line.enter().append('line')
 				.classed('legend_g_line',true);
@@ -355,6 +364,44 @@ var init = function(){
 				.attr('x2',139)
 				.attr('y2',33);
 			legend_g_line.exit().remove();
+
+			//legend specifics
+			legend_hexes = legend_g.selectAll('path.legend_hex')
+				.data(function(d,i){ return d; });
+			legend_hexes.enter().append('path')
+				.classed('legend_hex',true);
+			legend_hexes
+				.attr('d',function(d,i){ return self.hexbin.hexagon(8); })
+				.attr('transform',function(d,i){
+					var x = i*120,
+						y = 9;
+					return 'translate(' +x +',' +y +')rotate(90)';
+				})
+				.style('fill-opacity',function(d,i){ return i === 0 ? 0.2 : 1; });
+			legend_hexes.exit().remove();
+			legend_hexes_txt = legend_g.selectAll('text.legend_hex_txt')
+				.data(function(d,i){ return d; });
+			legend_hexes_txt.enter().append('text')
+				.classed('legend_hex_txt',true);
+			legend_hexes_txt
+				.attr('transform',function(d,i){
+					var x = i*120 +1,
+						y = -9;
+					return 'translate(' +x +',' +y +')';
+				})
+				.text(function(d,i){ return i === 0 ? 'Hate' : 'Love'; });
+			legend_hexes_txt.exit().remove();
+			legend_hexes_arr = legend_g.selectAll('line.legend_hex_arr')
+				.data(function(d,i){ return d; });
+			legend_hexes_arr.enter().append('line')
+				.classed('legend_hex_arr',true);
+			legend_hexes_arr
+				.attr('marker-end','url(#arrow)')
+				.attr('x1',20)
+				.attr('y1',-12)
+				.attr('x2',102)
+				.attr('y2',-12);
+			legend_hexes_txt.exit().remove();
 
 		/*	---------------------------------------------------------------------- 
 			FILTERS
@@ -366,11 +413,6 @@ var init = function(){
 
 				//check to make sure it's not a dropdown 
 				if(!d3.select(this).classed('dd')){ self.filter(this); }
-			});
-			self.btn_filters_clear = d3.select('#clear').on('click',function(){
-				d3.event.stopPropagation();
-				self.util_filters_clear();
-				self.generate();
 			});
 
 		/*	---------------------------------------------------------------------- 
@@ -420,15 +462,6 @@ var init = function(){
 			if(self.device !== 'mobile' || (self.device === 'mobile' && !self.comments_on)){ self.comments_hide(); }
 			
 			d3.select('body').attr('class',self.modes[self.mode]);
-
-			//class and style filter buttons
-			/*self.btn_filters.attr('class',function(){
-				var elem = d3.select(this),
-					p_01 = elem.classed('dd') ? 'dd' : '',
-					p_02 = elem.classed('selected') ? 'selected' : '',
-					p_03 = elem.classed('deactivated') ? 'deactivated' : '';
-				return 'btn filter ' +self.modes[self.mode] +' ' +p_01 +' ' +p_02 +' ' +p_03;
-			});*/
 
 			//create dropdown for country filter
 			var countries_menu_items;
@@ -515,8 +548,7 @@ var init = function(){
 				hex_w,
 
 				hex_rad = filters_off ? hex_h/2 : self.calc_hex_linear_radius(d3.sum(self.data_display,function(d){ return d.value.length; }),hex_area),
-				hex_rad_hov = hex_rad*2.25,
-				hex_rad_legend = 8;
+				hex_rad_hov = hex_rad*2.25;
 
 			hex_h = (Math.sqrt(3)/2)*(2*hex_rad);
 			hex_w = hex_rad*2;
@@ -527,7 +559,6 @@ var init = function(){
  
 			//INITIALIZE VARIABLES
 			//this is just used to neatly generate a hexagon path
-			var hexbin = d3.hexbin();
 			var hexTTG,
 				hexTTback,
 				hexTT;
@@ -536,9 +567,6 @@ var init = function(){
 				hexes,
 				hexesLabels,
 				hexesLabels_;
-			var legend_hexes,
-				legend_hexes_txt,
-				legend_hexes_arr;
 
 			//INITIALIZE FUNCTIONS
 			//convert cube coordinates to pixel coordinates
@@ -579,49 +607,6 @@ var init = function(){
 				'bottom':0,
 				'left':(self.w*0.25)/2
 			};
-
-			//UPDATE LEGEND
-			legend_hexes = self.legend_g.selectAll('path.legend_hex')
-				.data(function(d,i){ return d; });
-			legend_hexes.enter().append('path')
-				.classed('legend_hex',true);
-			legend_hexes
-				.attr('d',function(d,i){ return hexbin.hexagon(hex_rad_legend); })
-				.attr('transform',function(d,i){
-					var x = i*120,
-						y = 9;
-					return 'translate(' +x +',' +y +')rotate(90)';
-				})
-				.style('fill-opacity',function(d,i){
-					return i === 0 ? 0.2 : 1;
-				});
-			legend_hexes.exit().remove();
-			legend_hexes_txt = self.legend_g.selectAll('text.legend_hex_txt')
-				.data(function(d,i){ return d; });
-			legend_hexes_txt.enter().append('text')
-				.classed('legend_hex_txt',true);
-			legend_hexes_txt
-				.attr('transform',function(d,i){
-					var x = i*120 +3,
-						y = -9;
-					return 'translate(' +x +',' +y +')';
-				})
-				.text(function(d,i){
-					return i === 0 ? 'Hate' : 'Love'; 
-				});
-			legend_hexes_txt.exit().remove();
-			legend_hexes_arr = self.legend_g.selectAll('line.legend_hex_arr')
-				.data(function(d,i){ return d; });
-			legend_hexes_arr.enter().append('line')
-				.classed('legend_hex_arr',true);
-			legend_hexes_arr
-				.attr('marker-end','url(#arrow)')
-				.attr('x1',20)
-				.attr('y1',-12)
-				.attr('x2',105)
-				.attr('y2',-12)
-				;
-			legend_hexes_txt.exit().remove();
 
 			//UPDATE HEXAGONS
 			//hexagon coordinates container
@@ -712,7 +697,7 @@ var init = function(){
 				.classed('hex',true);
 			hexes
 				// .style('opacity',0)
-				.attr('d',function(d){ return hexbin.hexagon(hex_rad); })
+				.attr('d',function(d){ return self.hexbin.hexagon(hex_rad); })
 				.attr('transform',function(d,i){
 					var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
 						col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
@@ -815,7 +800,7 @@ var init = function(){
 			hexTTback.enter().append('path')
 				.classed('hexTTback',true);
 			hexTTback
-				.attr('d',hexbin.hexagon(hex_rad_hov))
+				.attr('d',self.hexbin.hexagon(hex_rad_hov))
 				.style('fill',self.colors[self.mode]);
 			hexTTback.exit().remove();
 			hexTT = hexTTG.selectAll('path.hexTT')
@@ -823,7 +808,7 @@ var init = function(){
 			hexTT.enter().append('path')
 				.classed('hexTT',true);
 			hexTT
-				.attr('d',hexbin.hexagon(hex_rad_hov))
+				.attr('d',self.hexbin.hexagon(hex_rad_hov))
 				.style('stroke',self.colors[self.mode]);
 			hexTT.exit().remove();
 
@@ -912,9 +897,6 @@ var init = function(){
 			}
 			if(self.filters.length === 0 && self.buckets_country.length === 0){
 				self.util_filters_clear();
-			} else{
-				self.btn_filters_clear.classed('visible',true);
-				self.legend_g.classed('show',true);
 			}
 			
 			self.mobile_ham.classed('xout',false);
@@ -1000,17 +982,12 @@ var init = function(){
 			self.filters = [];
 			self.buckets_country = [];
 
-			self.btn_filters_clear.classed('visible',false);
 			self.btn_filters
 				.classed('selected',false)
 				.classed('deactivated',false);
 
 			//deselect all dropdown menu selections
 			d3.selectAll('li.option').classed('selected',false);
-
-			self.legend_g.classed('show',function(d,i){
-				return i === 0;
-			});
 
 			self.mobile_ham.classed('xout',false);
 		},

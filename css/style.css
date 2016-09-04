@@ -9,13 +9,13 @@
 
 /*	PALETTE
 
-	M 	#4a78cf
-	S 	#85B800
+	M 	#6698b1
+	S 	#8fb292
 	
 	Legend ==>
 
-	M 	#295ccc
-	S	#67a400
+	M 	#52849d
+	S	#7b9e7e
 
 	*/
 
@@ -39,10 +39,10 @@ svg {
 	shape-rendering:geometricPrecision;
 	}
 .math svg {
-	background:#4a78cf;
+	background:#6698b1;
 	}
 .science svg {
-	background:#85B800;
+	background:#8fb292;
 	}
 
 div {
@@ -171,11 +171,11 @@ div {
 	}
 .math #menu .btn.filter.selected {
 	background-image:url(../assets/icon_filter_math.svg);
-	color:#295ccc;
+	color:#52849d;
 	}
 .science #menu .btn.filter.selected {
 	background-image:url(../assets/icon_filter_science.svg);
-	color:#67a400;
+	color:#7b9e7e;
 	}
 #menu .btn.filter.deactivated {
 	opacity:0.5;
@@ -222,10 +222,10 @@ div {
 	}
 
 .math #menu .btn.filter .expand {
-	background:#4a78cf;
+	background:#6698b1;
 	}
 .science #menu .btn.filter .expand {
-	background:#85B800;
+	background:#8fb292;
 	}
 
 #menu .btn.filter:hover .expand {
@@ -251,11 +251,11 @@ div {
 	}*/
 .math #menu .btn.filter .expand li.option:hover,
 .math #menu .btn.filter .expand li.option.selected {
-	color:#295ccc;
+	color:#52849d;
 	}
 .science #menu .btn.filter .expand li.option:hover,
 .science #menu .btn.filter .expand li.option.selected {
-	color:#67a400;
+	color:#7b9e7e;
 	}
 
 #menu .btn.filter#gender {
@@ -371,10 +371,10 @@ div {
 	}
 
 .math #legend #legend_body {
-	fill:#295ccc;
+	fill:#52849d;
 	}
 .science #legend #legend_body {
-	fill:#67a400;
+	fill:#7b9e7e;
 	}
 
 .legend_bknd {
@@ -479,10 +479,10 @@ div {
 	cursor:pointer;
 	}
 .math .nav_mobile #hamburger {
-	background-color:#295ccc;
+	background-color:#52849d;
 	}
 .science .nav_mobile #hamburger {
-	background-color:#67a400;
+	background-color:#7b9e7e;
 	}
 .nav_mobile #hamburger.xout {
 	background-image:url(../assets/hamburger_xout.svg);
@@ -542,10 +542,10 @@ div {
 	box-sizing:border-box;
 	}
 .math .nav_mobile#comments_panel .panel .comment_block {
-	color:#295ccc;
+	color:#52849d;
 	}
 .science .nav_mobile#comments_panel .panel .comment_block {
-	color:#67a400;
+	color:#7b9e7e;
 	}
 
 .nav_mobile#comments_panel .panel .comment_block span {
@@ -981,10 +981,10 @@ input.second {
 		}
 
 	.math #menu .btn.filter .expand {
-		background:#4a78cf;
+		background:#6698b1;
 		}
 	.science #menu .btn.filter .expand {
-		background:#85B800;
+		background:#8fb292;
 		}
 
 	#menu .btn#add {
@@ -1109,10 +1109,10 @@ input.second {
 		}
 
 	.math #menu .btn.filter .expand {
-		background:#4a78cf;
+		background:#6698b1;
 		}
 	.science #menu .btn.filter .expand {
-		background:#85B800;
+		background:#8fb292;
 		}
 
 	#menu .btn#add {
