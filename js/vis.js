@@ -490,7 +490,7 @@ var init = function(){
 
 			//update switch buttons to reflect current/opposite modes
 			d3.selectAll('.mode_cur').text(self.modes[self.mode]);
-			d3.selectAll('.mode_opp').text(self.modes[1 -self.mode]);
+			d3.selectAll('.mode_opp').text(self.util_toTitleCase(self.modes[1 -self.mode]));
 
 			//update form options
 			var sel_ops_country,
