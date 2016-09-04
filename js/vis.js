@@ -496,7 +496,7 @@ var init = function(){
 			var sel_ops_country,
 				sel_ops_rating,
 				sel_ops_grade;
-			var data_rating = d3.entries(self.buckets_rating).map(function(d){ return d.key +'=' +d.value; });
+			var data_rating = d3.entries(self.buckets_rating).map(function(d){ return d.value; });
 			sel_ops_country = d3.select('.input.select #input_country').selectAll('option.sel_ops_country')
 				.data(self.data.countries.sort(function(a,b){
 					return a.name <b.name ? -1 : a.name >b.name ? 1 : 0;
