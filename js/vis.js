@@ -760,7 +760,7 @@ var init = function(){
 					if(self.filters.length === 1){
 						t = d.value.length >0 ? d.key : '';
 						t = self.filters[0] === 'gender' ? self.util_resolve_gender(t) : t;
-					} else if(self.filters.length === 2){debugger;
+					} else if(self.filters.length === 2){
 						t = self.util_toTitleCase(d.key.split('_')[1]);
 					} else{
 						t = '';
