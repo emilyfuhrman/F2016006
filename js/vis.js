@@ -554,8 +554,7 @@ var init = function(){
 			hex_w = hex_rad*2;
 
 			var	hex_row_h = Math.floor( hex_area_h/hex_h ),
-				hex_col_w = Math.floor( hex_area_w/(hex_w*0.75) )
-				;
+				hex_col_w = Math.floor( hex_area_w/(hex_w*0.75) );
  
 			//INITIALIZE VARIABLES
 			//this is just used to neatly generate a hexagon path
@@ -761,12 +760,12 @@ var init = function(){
 					if(self.filters.length === 1){
 						t = d.value.length >0 ? d.key : '';
 						t = self.filters[0] === 'gender' ? self.util_resolve_gender(t) : t;
-					} else if(self.filters.length === 2){
+					} else if(self.filters.length === 2){debugger;
 						t = self.util_toTitleCase(d.key.split('_')[1]);
 					} else{
 						t = '';
 					}
-					return self.util_toTitleCase(t); 
+					return d.value.length === 0 ? '' : self.util_toTitleCase(t); 
 				})
 				.style('text-anchor',function(){ return device_off ? 'start' : 'start'; })
 				;
@@ -782,7 +781,7 @@ var init = function(){
 				.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +60 : 0 : 0; })
 				.text(function(d,i){
 					var split = d.key.split('_');
-					return split[1] === 'M' ? self.util_toTitleCase(split[0]) : ''; 
+					return d.value.length === 0 ? '' : (split[1] === 'M' ? self.util_toTitleCase(split[0]) : ''); 
 				})
 				.style('text-anchor',function(){ return device_off ? 'start' : 'start'; });
 			hexesLabels_.exit().remove();
