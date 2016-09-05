@@ -753,7 +753,7 @@ var init = function(){
 				.classed('hexLabel',true);
 			hexesLabels
 				.classed('sub',function(){ return self.filters.length === 2; })
-				.attr('x',function(d){ return d.ratio ? device_off ? 0 : hex_area_w +30 : 0; })
+				.attr('x',function(d){ return d.ratio ? device_off ? (self.filters.length <2 ? 0 : 0) : hex_area_w +30 : 0; })
 				.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +30 : 0 : 0; })
 				.text(function(d){ 
 					var t;
@@ -767,7 +767,7 @@ var init = function(){
 					}
 					return d.value.length === 0 ? '' : self.util_toTitleCase(t); 
 				})
-				.style('text-anchor',function(){ return device_off ? 'start' : 'start'; });
+				.style('text-anchor',function(){ return device_off ? (self.filters.length <2 ? 'start' : 'middle') : 'start'; });
 				;
 			hexesLabels.exit().remove();
 
@@ -778,7 +778,7 @@ var init = function(){
 				.classed('hexLabel_',true);
 			hexesLabels_
 				.attr('x',function(d){ 
-					return d.ratio ? device_off ? d.ratio_agg +(hex_area_w*d.ratio) +hex_pad_sub : hex_area_w +60 : 0; 
+					return d.ratio ? device_off ? d.ratio_agg +(hex_area_w*d.ratio) +hex_pad_sub/2 : hex_area_w +60 : 0; 
 				})
 				.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +60 : 0 : 0; })
 				.text(function(d,i){
