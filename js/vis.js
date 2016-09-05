@@ -767,7 +767,7 @@ var init = function(){
 					}
 					return d.value.length === 0 ? '' : self.util_toTitleCase(t); 
 				})
-				.style('text-anchor',function(){ return device_off ? 'start' : 'start'; })
+				.style('text-anchor',function(){ return device_off ? 'start' : 'start'; });
 				;
 			hexesLabels.exit().remove();
 
@@ -777,13 +777,15 @@ var init = function(){
 			hexesLabels_.enter().append('text')
 				.classed('hexLabel_',true);
 			hexesLabels_
-				.attr('x',function(d){ return d.ratio ? device_off ? 0 : hex_area_w +60 : 0; })
+				.attr('x',function(d){ 
+					return d.ratio ? device_off ? d.ratio_agg +(hex_area_w*d.ratio) +hex_pad_sub : hex_area_w +60 : 0; 
+				})
 				.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +60 : 0 : 0; })
 				.text(function(d,i){
 					var split = d.key.split('_');
 					return d.value.length === 0 ? '' : (split[1] === 'M' ? self.util_toTitleCase(split[0]) : ''); 
 				})
-				.style('text-anchor',function(){ return device_off ? 'start' : 'start'; });
+				.style('text-anchor',function(){ return device_off ? (self.filters.length <2 ? 'start' : 'middle' ) : 'start'; });
 			hexesLabels_.exit().remove();
 
 			//create tooltip group
