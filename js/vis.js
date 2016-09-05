@@ -553,6 +553,9 @@ var init = function(){
 			hex_h = (Math.sqrt(3)/2)*(2*hex_rad);
 			hex_w = hex_rad*2;
 
+			//adjust hex group padding
+			hex_pad_sub = hex_pad_sub <hex_rad*2 ? hex_rad*2 : hex_pad_sub;
+
 			var	hex_row_h = Math.floor( hex_area_h/hex_h ),
 				hex_col_w = Math.floor( hex_area_w/(hex_w*0.75) );
  
