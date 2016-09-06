@@ -239,7 +239,6 @@ var init = function(){
 			self.menu = d3.select('#menu');
 			self.anno = d3.select('#anno');
 			self.anno_comment = d3.select('#comment');
-			self.anno_tweet = d3.select('#anno #detail #twitter');
 			self.anno_userDetail = d3.select('#anno #detail #user').html(function(){
 				return self.device === 'default'? 'Hover over a hexagon for detail.' : self.device === 'tablet' ? 'Tap a hexagon for detail.' : 'Swipe to explore!';
 			});
@@ -645,6 +644,9 @@ var init = function(){
 			function dragended() {
 			}
 
+			//store tooltip height
+			var tt_h = self.anno.node().getBoundingClientRect().height;
+
 			hexG = self.svg.selectAll('g.hexG')
 				.data([self.data_display]);
 			hexG.enter().append('g')
@@ -745,6 +747,26 @@ var init = function(){
 						.classed('hidden',false)
 						.attr('transform',function(){ return 'translate(' +x +',' +y +')rotate(90)'; });
 					hexTT.style('fill-opacity',o);
+
+					if(self.device !== 'mobile'){
+
+						//get screen coordinates of tooltip
+						var coords = hexTTG.node().getBoundingClientRect();
+						var tt_pad = hex_rad_hov*2,
+							tt_w = 300,
+							tt_h_new = self.anno.node().getBoundingClientRect().height,
+							tt_x = coords.left +tt_pad,
+							tt_y = coords.top +tt_pad;
+
+						tt_h = tt_h_new !== 0 ? tt_h_new : tt_h;
+
+						tt_x = tt_x +tt_w >self.w ? tt_x -tt_w -tt_pad : tt_x;
+						tt_y = tt_y >self.h/2 ? tt_y -tt_h -tt_pad : tt_y;
+
+						self.anno
+							.style('left',tt_x +'px')
+							.style('top',tt_y +'px');
+					}
 					
 					self.util_detail_update(d);
 				});
@@ -776,7 +798,6 @@ var init = function(){
 					return d.value.length === 0 ? '' : self.util_toTitleCase(t); 
 				})
 				.style('text-anchor',function(){ return device_off ? (self.filters.length <2 ? 'start' : 'middle') : 'start'; });
-				;
 			hexesLabels.exit().remove();
 
 			//labels for when double-filters are showing
@@ -826,7 +847,7 @@ var init = function(){
 					return self.device !== 'mobile' ? 'block' : 'none';
 				});
 			self.anno.style('background',function(){
-				return self.device === 'mobile' ? self.mode === 0 ? 'rgba(82, 132, 157, 0.75)' : 'rgba(123, 158, 126, 0.75)' : 'transparent';
+				return self.mode === 0 ? 'rgba(82, 132, 157, 0.75)' : 'rgba(123, 158, 126, 0.75)';
 			});
 
 			//if on, refresh comments panel
@@ -1153,6 +1174,7 @@ var init = function(){
 		util_detail_update:function(_d){
 			var str_comment,
 				str_userDetail;
+
 			if(self.device ==='mobile'){
 				str_comment = '';
 				str_userDetail = 'Rating: ' +_d.rating +'/5<br/><br/>' + '<span class="comment">&ldquo;' +_d.comment +'&rdquo;</span>';
@@ -1160,6 +1182,7 @@ var init = function(){
 				str_comment = '&ldquo;' +_d.comment +'&rdquo;';
 				str_userDetail = 'Grade ' +_d.grade +' rating: ' +_d.rating +'/5 &#124; ' +self.util_resolve_gender(_d.gender) +', ' +_d.age +', ' +_d.country;
 			}
+			self.anno.style('display','block');
 			self.anno_comment.html(str_comment);
 			self.anno_userDetail.html(str_userDetail);
 		},
@@ -1167,7 +1190,7 @@ var init = function(){
 			var str_userDetail = self.device === 'default'? 'Hover over a hexagon for detail.' : self.device === 'tablet' ? 'Tap a hexagon for detail.' : 'Swipe to explore!';
 			self.anno_comment.html('');
 			self.anno_userDetail.html(str_userDetail);
-			self.anno_tweet.html('');
+			self.anno.style('display',function(){ return self.device === 'mobile' ? 'block' : 'none' });
 		},
 
 		//resolving values to buckets
@@ -1237,6 +1260,7 @@ window.onresize = function(){
 		//console.log(self.device +'->' +device);
 		self.setup();
 		self.mobile_ham.classed('xout',false);
+		self.util_detail_clear();
 		self.generate();
 	}
 }

@@ -297,15 +297,13 @@ div {
 	}
 
 #anno {
-	background:transparent;
-	/*width:500px;*/
-	min-width:250px;
-	width:auto;
+	z-index:1000;
+	display:none;
+	position:absolute;
+	width:300px;
 	font-size:0.725rem;
 	line-height:0.85rem;
-	right:15px;
-	bottom:24px;
-	padding:0;
+	padding:30px;
 	pointer-events:none;
 	-webkit-box-sizing:border-box;
     -moz-box-sizing:border-box;
@@ -315,22 +313,20 @@ div {
 
 #anno #comment,
 #anno .comment {
-	position:absolute;
+	position:relative;
+	float:left;
 	font-family:'Georgia', serif;
-	bottom:24px;
-	padding-top:30px;
-	padding-bottom:15px;
+	padding:15px;
 	}
 
 #anno #detail {
+	float:left;
 	width:100%;
-	padding-top:4px;
-	padding-bottom:0;
-	border-top:1px solid white;
+	padding:0;
 	}
 
 #anno #detail #user {
-	padding-right:30px;
+	padding:0 15px 15px;
 	}
 
 #arrows {
@@ -782,19 +778,26 @@ input.second {
 		}
 
 	#anno {
+		display:block;
+		position:fixed;
 		width:100%;
 		font-size:0.725rem;
+		top:auto !important;
 		right:0;
-		bottom:0;
+		bottom:0 !important;
+		left:0 !important;
 		padding:15px;
 		}
 	#anno #comment,
 	#anno .comment {
 		position:static;
+		padding:0;
 		}
 	#anno #detail {
-		padding-bottom:15px;
-		border-top:none;
+		padding-bottom:0;
+		}
+	#anno #detail #user {
+		padding:15px 15px 15px;
 		}
 
 	#sampled,
@@ -908,20 +911,24 @@ input.second {
 		}
 
 	#anno {
+		display:none;
+		position:absolute;
 		background:transparent;
-		width:auto;
+		width:300px;
 		font-size:0.725rem;
-		right:15px;
-		bottom:24px;
+		bottom:auto;
 		padding:0;
 		}
 	#anno #comment,
 	#anno .comment {
-		position:absolute;
+		position:relative;
+		padding:15px;
 		}
 	#anno #detail {
 		padding-bottom:0;
-		border-top:1px solid white;
+		}
+	#anno #detail #user {
+		padding:0 15px 15px;
 		}
 
 	#sampled {
@@ -1035,21 +1042,24 @@ input.second {
 		}
 
 	#anno {
+		display:none;
+		position:absolute;
 		background:transparent;
-		/*width:500px;*/
-		width:auto;
+		width:300px;
 		font-size:0.725rem;
-		right:15px;
-		bottom:24px;
+		bottom:auto;
 		padding:0;
 		}
 	#anno #comment,
 	#anno .comment {
-		position:absolute;
+		position:relative;
+		padding:15px;
 		}
 	#anno #detail {
 		padding-bottom:0;
-		border-top:1px solid white;
+		}
+	#anno #detail #user {
+		padding:0 15px 15px;
 		}
 
 	#sampled {
