@@ -71,22 +71,33 @@ div {
 	letter-spacing:0.025rem;
 	}
 
-#logo {
+.nav.link {
 	opacity:1;
 	background:transparent;
-	background:url(../assets/logo.svg) no-repeat 45px 30px;
-	background-size:45px 45px;
 	display:block;
-	width:90px;
+	width:45px;
 	height:90px;
 	top:0;
-	right:15px;
 	}
-#logo:hover {
-	opacity:0.6;	
-	}
-#logo a {
+.nav.link:hover {	
+	opacity:0.6;
 	cursor:pointer;
+	}
+
+#logo {
+	background:url(../assets/logo.svg) no-repeat 0 30px;
+	background-size:45px 45px;
+	right:117px;
+	}
+#cir_twitter {
+	background:url(../assets/icon_circle_twitter.svg) no-repeat 0 30px;
+	background-size:45px 45px;
+	right:66px;
+	}
+#cir_fb {
+	background:url(../assets/icon_circle_fb.svg) no-repeat 0 30px;
+	background-size:45px 45px;
+	right:15px;
 	}
 
 #logo_tweet {
@@ -791,7 +802,7 @@ input.second {
 		display:none;
 		}
 	#title,
-	#logo,
+	.nav.link,
 	#logo_tweet {
 		display:none;
 		}
@@ -921,7 +932,7 @@ input.second {
 		}
 
 	#title,
-	#logo,
+	.nav.link,
 	#logo_tweet {
 		display:block;
 		}
@@ -1049,7 +1060,7 @@ input.second {
 		}
 
 	#title,
-	#logo,
+	.nav.link,
 	#logo_tweet {
 		display:block;
 		}
