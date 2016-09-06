@@ -764,11 +764,12 @@ var init = function(){
 				.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +30 : 0 : 0; })
 				.text(function(d){ 
 					var t;
+					var split = d.key.split('_');
 					if(self.filters.length === 1){
-						t = d.value.length >0 ? d.key.split('_').join(' ') : '';
+						t = d.value.length >0 ? split.join(' ') : '';
 						t = self.filters[0] === 'gender' ? self.util_resolve_gender(t) : t;
 					} else if(self.filters.length === 2){
-						t = self.util_toTitleCase(d.key.substring(0,d.key.length -2).split('_').join(' '));
+						t = self.util_toTitleCase(split[split.length -1]);
 					} else{
 						t = '';
 					}
