@@ -765,10 +765,10 @@ var init = function(){
 				.text(function(d){ 
 					var t;
 					if(self.filters.length === 1){
-						t = d.value.length >0 ? d.key : '';
+						t = d.value.length >0 ? d.key.split('_').join(' ') : '';
 						t = self.filters[0] === 'gender' ? self.util_resolve_gender(t) : t;
 					} else if(self.filters.length === 2){
-						t = self.util_toTitleCase(d.key.split('_')[1]);
+						t = self.util_toTitleCase(d.key.substring(0,d.key.length -2).split('_').join(' '));
 					} else{
 						t = '';
 					}
@@ -790,7 +790,7 @@ var init = function(){
 				.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +60 : 0 : 0; })
 				.text(function(d,i){
 					var split = d.key.split('_');
-					return d.value.length === 0 ? '' : (split[1] === 'M' ? self.util_toTitleCase(split[0]) : ''); 
+					return d.value.length === 0 ? '' : (split[split.length -1] === 'M' ? self.util_toTitleCase(d.key.substring(0,d.key.length -2).split('_').join(' ')) : ''); 
 				})
 				.style('text-anchor',function(){ return device_off ? (self.filters.length <2 ? 'start' : 'middle' ) : 'start'; });
 			hexesLabels_.exit().remove();
