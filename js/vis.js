@@ -412,7 +412,11 @@ var init = function(){
 				d3.event.stopPropagation();
 
 				//check to make sure it's not a dropdown 
-				if(!d3.select(this).classed('dd')){ self.filter(this); }
+				if(!d3.select(this).classed('dd')){ 
+					self.filter(this); 
+				} else if(d3.select(this).classed('selected')){
+					self.filter(this);
+				}
 			});
 
 		/*	---------------------------------------------------------------------- 
@@ -497,6 +501,7 @@ var init = function(){
 				sel_ops_rating,
 				sel_ops_grade;
 			var data_rating = d3.entries(self.buckets_rating).map(function(d){ return d.value; });
+
 			sel_ops_country = d3.select('.input.select #input_country').selectAll('option.sel_ops_country')
 				.data(self.data.countries.sort(function(a,b){
 					return a.name <b.name ? -1 : a.name >b.name ? 1 : 0;
@@ -553,14 +558,13 @@ var init = function(){
 			hex_h = (Math.sqrt(3)/2)*(2*hex_rad);
 			hex_w = hex_rad*2;
 
-			//adjust hex group padding
+			//adjust hex group padding, in case it's smaller than the size of a hexagon
 			hex_pad_sub = hex_pad_sub <hex_rad*2 ? hex_rad*2 : hex_pad_sub;
 
 			var	hex_row_h = Math.floor( hex_area_h/hex_h ),
 				hex_col_w = Math.floor( hex_area_w/(hex_w*0.75) );
  
 			//INITIALIZE VARIABLES
-			//this is just used to neatly generate a hexagon path
 			var hexTTG,
 				hexTTback,
 				hexTT;
@@ -877,6 +881,10 @@ var init = function(){
 					self.filters.push(btn_id);
 				} else{
 					self.filters = self.filters.filter(function(d){ return d !== btn_id; });
+					if(btn_id === 'country'){
+						self.buckets_country = [];
+						d3.selectAll('#country .option').classed('selected',false);
+					}
 				}
 
 				//if button is just being selected, deactivate incompatible filter
