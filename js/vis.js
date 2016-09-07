@@ -29,6 +29,7 @@ var init = function(){
 		],
 
 		freeze:false,
+		form_visible:false,
 
 		//holds any selected filters
 		filters:[],
@@ -741,7 +742,7 @@ var init = function(){
 				})
 				.on('mousemove',function(d,i){
 
-					if(!self.freeze){
+					if(!self.freeze && !self.form_visible){
 						var x, y;
 						var o = d.rating/5;
 						var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
@@ -1049,6 +1050,7 @@ var init = function(){
 			self.form_tweet.style('left',window.innerWidth/2 -250 +'px');
 		},
 		util_form_clear:function(){
+			document.getElementById('input_name').value = '';
 			document.getElementById('input_female').checked = false;
 			document.getElementById('input_male').checked = false;
 			document.getElementById('input_country').selectedIndex = 0;
@@ -1058,10 +1060,12 @@ var init = function(){
 			document.getElementById('input_experience').value = '';
 		},
 		util_form_hide:function(){
+			self.form_visible = false;
 			self.form.classed('hidden',true);
 			self.form_tweet.classed('hidden',true);
 		},
 		util_form_show:function(){
+			self.form_visible = true;
 			self.form.classed('hidden',false);
 		},
 		util_form_submit:function(){
@@ -1069,11 +1073,12 @@ var init = function(){
 
 			//gather values into new data object
 			obj.subject = self.modes[self.mode];
+			obj.name = document.getElementById('input_name').value;
 			obj.gender = document.getElementById('input_female').checked ? 'F' : document.getElementById('input_male').checked ? 'M' : '';
 			obj.country = document.getElementById('input_country').value;
 			obj.age = document.getElementById('input_age').value;
 			obj.grade = document.getElementById('input_grade').value;
-			obj.rating = document.getElementById('input_rating').value;
+			obj.rating = self.util_resolve_rating_to_number(document.getElementById('input_rating').value);
 			obj.experience = document.getElementById('input_experience').value;
 
 			//make sure none are blank
@@ -1106,7 +1111,7 @@ var init = function(){
 				char_limit = 140;
 
 			//turn to integer
-			_obj.rating = +_obj.rating.split('=')[0];
+			_obj.rating = +_obj.rating;
 			
 			//compose rating portion
 			if(_obj.rating === 1){
@@ -1150,6 +1155,7 @@ var init = function(){
 
 			self.util_form_clear_tweet();
 			self.form_tweet.classed('hidden',true);
+			self.form_visible = false;
 		},	
 		util_encode_tweet:function(_text){
 			var self = this;
@@ -1253,6 +1259,21 @@ var init = function(){
 				group = self.buckets_grade[3];
 			}
 			return group;
+		},
+		util_resolve_rating_to_number:function(_n){
+			var n;
+			if(_n === 'HATE'){
+				n = 1;
+			} else if(_n === 'DISLIKE'){
+				n = 2;
+			} else if(_n === 'OK'){
+				n = 3;
+			} else if(_n === 'LIKE'){
+				n = 4;
+			} else if(_n === 'LOVE'){
+				n = 5;
+			}
+			return n;
 		},
 
 		//misc. operations

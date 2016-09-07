@@ -600,6 +600,8 @@ select:-moz-focusring {
 	background-repeat:no-repeat;
 	background-position:147px 1px;
 	width:172px;
+	left:294px;
+	padding-left:6px;
 	border:none !important;
 	cursor:pointer;
 	-webkit-appearance:none;
@@ -704,7 +706,7 @@ input.second {
 .form .input {
 	position:absolute;
 	line-height:1rem;
-	margin-top:-0.6rem;
+	margin-top:-0.2rem;
 	left:300px;
 	}
 
