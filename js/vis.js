@@ -69,8 +69,6 @@ var init = function(){
 		hex_file_h:30,
 		hex_sideLength:15,
 
-		path_legend:"M0,130.9V34.7c0-6.4,0-11.6,0-11.5c0,0,0-5.2,0-11.5S5.2,0,11.6,0 h76.3c6.4,0,11.6,5.2,11.6,11.5c0,0.2,0,16.3,0,16.5c0.3,6.1,5.4,11,11.6,11h53c6.4,0,11.6,5.2,11.6,11.6v80.3",
-
 		//mobile comments visible?
 		comments_on:false,
 
@@ -219,6 +217,7 @@ var init = function(){
 				.on('click',function(){
 					if(self.freeze){ self.freeze = false; }
 					self.util_form_hide();
+					self.legend.classed('show',false);
 				});
 			self.svg.exit().remove();
 
@@ -307,29 +306,29 @@ var init = function(){
 				legend_hexes_arr;
 
 			//grab legend, add interaction
-			self.legend = d3.select('.nav#legend')
-				.on('mousemove',function(){
-					self.legend.classed('show',true);
-				})
-				.on('mouseout',function(){
-					self.legend.classed('show',false);
+			self.legend = d3.selectAll('.btn.legend')
+				.on('click',function(){
+					var show = d3.select(this).classed('show');
+					d3.select(this).classed('show',!show);
 				});
 			
 			//legend SVG container
-			legend_body = d3.select('#legend_body').selectAll('svg.legend')
+			legend_body = d3.selectAll('.legend_body').selectAll('svg.legend')
 				.data([self]);
 			legend_body.enter().append('svg')
 				.classed('legend',true);
 			legend_body.exit().remove();
 
 			//legend background path
-			legend_bg = legend_body.selectAll('path.legend_bg')
+			legend_bg = legend_body.selectAll('rect.legend_bg')
 				.data([self]);
-			legend_bg.enter().append('path')
+			legend_bg.enter().append('rect')
 				.classed('legend_bg',true);
 			legend_bg
-				.attr('d',function(){ return self.path_legend; })
-				.attr('transform','translate(1,1)');
+				.attr('x',1)
+				.attr('y',1)
+				.attr('width',180)
+				.attr('height',90);
 			legend_bg.exit().remove();
 
 			//legend hexagon groups
@@ -340,7 +339,7 @@ var init = function(){
 			legend_g
 				.attr('transform',function(d,i){
 					var x = 24,
-						y = 69;
+						y = 30;
 					return 'translate(' +x +',' +y +')';
 				});
 			legend_g.exit().remove();
@@ -464,6 +463,9 @@ var init = function(){
 
 			//prepare data to be displayed
 			self.data_display = filters_off ? [self.data[self.modes[self.mode]]] : self.filterData();
+
+			//hide legend if needed
+			self.legend.classed('show',false);
 
 			//remove comments panel if needed
 			if(self.device !== 'mobile' || (self.device === 'mobile' && !self.comments_on)){ self.comments_hide(); }
@@ -666,6 +668,7 @@ var init = function(){
 				.on('click',function(){
 					d3.event.stopPropagation();
 					self.freeze = !self.freeze;
+					self.legend.classed('show',false);
 				})
 				.on('mouseout',function(d){
 					if(!self.freeze){
