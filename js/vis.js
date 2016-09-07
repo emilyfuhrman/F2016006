@@ -1187,7 +1187,7 @@ var init = function(){
 
 			if(self.device ==='mobile'){
 				str_comment = '';
-				str_userDetail = 'Rating: ' +_d.rating +'/5<br/><br/>' + '<span class="comment">&ldquo;' +_d.comment +'&rdquo;</span>';
+				str_userDetail = (_d.name ? _d.name : self.util_resolve_gender(_d.gender)) +', ' +_d.age +', from ' +_d.country +', has' +self.util_resolve_rating_to_sentence(_d.rating,true) +' since ' +self.util_resolve_grade(_d.grade).toLowerCase() + '<br/><br/><span class="comment">&ldquo;' +_d.comment +'&rdquo;</span>';
 			} else{
 				str_comment = '&ldquo;' +_d.comment +'&rdquo;';
 				str_userDetail = (_d.name ? _d.name : self.util_resolve_gender(_d.gender)) +', ' +_d.age +', from ' +_d.country +', has' +self.util_resolve_rating_to_sentence(_d.rating,true) +' since ' +self.util_resolve_grade(_d.grade).toLowerCase();
