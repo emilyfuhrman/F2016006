@@ -28,6 +28,8 @@ var init = function(){
 			'science'
 		],
 
+		freeze:false,
+
 		//holds any selected filters
 		filters:[],
 
@@ -214,6 +216,7 @@ var init = function(){
 				.attr('preserveAspectRatio','xMidYMid meet');
 			self.svg
 				.on('click',function(){
+					if(self.freeze){ self.freeze = false; }
 					self.util_form_hide();
 				});
 			self.svg.exit().remove();
@@ -659,9 +662,15 @@ var init = function(){
 				})
 				.call(drag);
 			hexG
+				.on('click',function(){
+					d3.event.stopPropagation();
+					self.freeze = !self.freeze;
+				})
 				.on('mouseout',function(d){
-					hexTTG.classed('hidden',true);
-					self.util_detail_clear();
+					if(!self.freeze){
+						hexTTG.classed('hidden',true);
+						self.util_detail_clear();
+					}
 				})
 				//.on('touchstart',function(d){ d3.event.preventDefault(); })
 				//.on('touchmove',function(d){ d3.event.preventDefault(); })
@@ -724,51 +733,59 @@ var init = function(){
 				// .style('opacity',1)
 				;
 			hexes
+				.on('mousedown',function(){
+					hexTT.style('stroke-width',6);
+				})
+				.on('mouseup',function(){
+					hexTT.style('stroke-width',3);
+				})
 				.on('mousemove',function(d,i){
-					var x, y;
-					var o = d.rating/5;
-					var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
-						col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
-					var p = self.data_display[d.idx],
 
-						x_trans = filters_off ? hex_coords.x : device_off ? padding.left : (self.w -hex_area_w)/3,
-						y_trans = filters_off ? hex_coords.y : device_off ? (self.h -hex_area_h)/1.75 : padding.top,
+					if(!self.freeze){
+						var x, y;
+						var o = d.rating/5;
+						var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
+							col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
+						var p = self.data_display[d.idx],
 
-						x_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? (p.ratio_agg*hex_area_w) +(d.idx*hex_pad) +(d.idx*hex_pad_sub) : 0,
-						y_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? 0 : (p.ratio_agg*hex_area_h) +(d.idx*hex_pad) +(d.idx*hex_pad_sub);
+							x_trans = filters_off ? hex_coords.x : device_off ? padding.left : (self.w -hex_area_w)/3,
+							y_trans = filters_off ? hex_coords.y : device_off ? (self.h -hex_area_h)/1.75 : padding.top,
 
-					x = filters_off ? d.pos.y : col_num*(hex_w*0.75);
-					y = filters_off ? d.pos.x : row_num*(hex_h) +((col_num%2)*(hex_h/2));
+							x_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? (p.ratio_agg*hex_area_w) +(d.idx*hex_pad) +(d.idx*hex_pad_sub) : 0,
+							y_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? 0 : (p.ratio_agg*hex_area_h) +(d.idx*hex_pad) +(d.idx*hex_pad_sub);
 
-					x +=(x_trans +x_trans_micro);
-					y +=(y_trans +y_trans_micro);
+						x = filters_off ? d.pos.y : col_num*(hex_w*0.75);
+						y = filters_off ? d.pos.x : row_num*(hex_h) +((col_num%2)*(hex_h/2));
 
-					hexTTG
-						.classed('hidden',false)
-						.attr('transform',function(){ return 'translate(' +x +',' +y +')rotate(90)'; });
-					hexTT.style('fill-opacity',o);
+						x +=(x_trans +x_trans_micro);
+						y +=(y_trans +y_trans_micro);
 
-					if(self.device !== 'mobile'){
+						hexTTG
+							.classed('hidden',false)
+							.attr('transform',function(){ return 'translate(' +x +',' +y +')rotate(90)'; });
+						hexTT.style('fill-opacity',o);
 
-						//get screen coordinates of tooltip
-						var coords = hexTTG.node().getBoundingClientRect();
-						var tt_pad = hex_rad_hov*2,
-							tt_w = 300,
-							tt_h_new = self.anno.node().getBoundingClientRect().height,
-							tt_x = coords.left +tt_pad,
-							tt_y = coords.top +tt_pad;
+						if(self.device !== 'mobile'){
 
-						tt_h = tt_h_new !== 0 ? tt_h_new : tt_h;
+							//get screen coordinates of tooltip
+							var coords = hexTTG.node().getBoundingClientRect();
+							var tt_pad = hex_rad_hov*2,
+								tt_w = 300,
+								tt_h_new = self.anno.node().getBoundingClientRect().height,
+								tt_x = coords.left +tt_pad,
+								tt_y = coords.top +tt_pad;
 
-						tt_x = tt_x +tt_w >self.w ? tt_x -tt_w -tt_pad : tt_x;
-						tt_y = tt_y >self.h/2 ? tt_y -tt_h -tt_pad : tt_y;
+							tt_h = tt_h_new !== 0 ? tt_h_new : tt_h;
 
-						self.anno
-							.style('left',tt_x +'px')
-							.style('top',tt_y +'px');
+							tt_x = tt_x +tt_w >self.w ? tt_x -tt_w -tt_pad : tt_x;
+							tt_y = tt_y >self.h/2 ? tt_y -tt_h -tt_pad : tt_y;
+
+							self.anno
+								.style('left',tt_x +'px')
+								.style('top',tt_y +'px');
+						}
+						self.util_detail_update(d);
 					}
-					
-					self.util_detail_update(d);
 				});
 			hexes
 				// .style('opacity',0)

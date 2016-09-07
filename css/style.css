@@ -120,6 +120,7 @@ div {
 	font-size:1.8rem;
 	left:15px;
 	top:24px;
+	pointer-events:none;
 	}
 
 #menu {
@@ -304,7 +305,7 @@ div {
 	font-size:0.725rem;
 	line-height:0.85rem;
 	padding:30px;
-	pointer-events:none;
+	/*pointer-events:none;*/
 	-webkit-box-sizing:border-box;
     -moz-box-sizing:border-box;
     -ms-box-sizing:border-box;
