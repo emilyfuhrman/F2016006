@@ -1112,21 +1112,8 @@ var init = function(){
 
 			//turn to integer
 			_obj.rating = +_obj.rating;
-			
-			//compose rating portion
-			if(_obj.rating === 1){
-				str_rating = 'HATE ' +self.modes[self.mode];
-			} else if(_obj.rating === 2){
-				str_rating = 'DISLIKE ' +self.modes[self.mode];
-			} else if(_obj.rating === 3){
-				str_rating = 'find ' +self.modes[self.mode] + ' OK';
-			} else if(_obj.rating === 4){
-				str_rating = 'LIKE ' +self.modes[self.mode];
-			} else if(_obj.rating === 5){
-				str_rating = 'LOVE ' +self.modes[self.mode];
-			}
 
-			str_begin = 'I ' +str_rating +' because "',
+			str_begin = 'I' +self.util_resolve_rating_to_sentence(_obj.rating) +' because "',
 			str_end = '..." Share your story at www.quantamagazine.org. #LoveHateSciMath';
 
 			//if needed, truncate experience blurb
@@ -1203,7 +1190,7 @@ var init = function(){
 				str_userDetail = 'Rating: ' +_d.rating +'/5<br/><br/>' + '<span class="comment">&ldquo;' +_d.comment +'&rdquo;</span>';
 			} else{
 				str_comment = '&ldquo;' +_d.comment +'&rdquo;';
-				str_userDetail = 'Grade ' +_d.grade +' rating: ' +_d.rating +'/5 &#124; ' +self.util_resolve_gender(_d.gender) +', ' +_d.age +', ' +_d.country;
+				str_userDetail = (_d.name ? _d.name : self.util_resolve_gender(_d.gender)) +', ' +_d.age +', from ' +_d.country +', has' +self.util_resolve_rating_to_sentence(_d.rating,true) +' since ' +self.util_resolve_grade(_d.grade).toLowerCase();
 			}
 			self.anno.style('display','block');
 			self.anno_comment.html(str_comment);
@@ -1261,19 +1248,24 @@ var init = function(){
 			return group;
 		},
 		util_resolve_rating_to_number:function(_n){
-			var n;
-			if(_n === 'HATE'){
-				n = 1;
-			} else if(_n === 'DISLIKE'){
-				n = 2;
-			} else if(_n === 'OK'){
-				n = 3;
-			} else if(_n === 'LIKE'){
-				n = 4;
-			} else if(_n === 'LOVE'){
-				n = 5;
+			return (d3.values(self.buckets_rating).indexOf(_n) +1);
+		},
+		util_resolve_rating_to_sentence:function(_n,_t){
+			var n = !isNaN(_n) ? _n : self.util_resolve_rating_to_number(_n),
+				tense_past = _t,
+				sentence_str;
+			if(n === 1){
+				sentence_str = (tense_past ? ' hated ' : ' HATE ') +self.modes[self.mode];
+			} else if(n === 2){
+				sentence_str = (tense_past ? ' disliked ' : ' DISLIKE ') +self.modes[self.mode];
+			} else if(n === 3){
+				sentence_str = tense_past ? ' been OK with ' +self.modes[self.mode] : ' find ' +self.modes[self.mode] +' OK ';
+			} else if(n === 4){
+				sentence_str = (tense_past ? ' liked ' : ' LIKE ') +self.modes[self.mode];
+			} else if(n === 5){
+				sentence_str = (tense_past ? ' loved ' : ' LOVE ') +self.modes[self.mode];
 			}
-			return n;
+			return sentence_str;
 		},
 
 		//misc. operations
