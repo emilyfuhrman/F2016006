@@ -1127,6 +1127,8 @@ var init = function(){
 		util_form_show:function(){
 			self.form_visible = true;
 			self.form.classed('hidden',false);
+			self.freeze = false;
+			self.anno.style('display','none');
 		},
 		util_form_submit:function(){
 			var obj = {};
