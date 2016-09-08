@@ -65,6 +65,8 @@ var init = function(){
 
 		m:false,
 
+		pressTimer:0,
+
 		hex_file_w:30,
 		hex_file_h:30,
 		hex_sideLength:15,
@@ -466,6 +468,12 @@ var init = function(){
 
 			//hide legend if needed
 			self.legend.classed('show',false);
+			
+			//reset tooltip functionality
+			self.anno.style('display',function(){
+				return self.device !== 'mobile' ? 'none' : 'block';
+			});
+			self.freeze = false;
 
 			//remove comments panel if needed
 			if(self.device !== 'mobile' || (self.device === 'mobile' && !self.comments_on)){ self.comments_hide(); }
@@ -485,7 +493,10 @@ var init = function(){
 			countries_menu_items
 				.on('click',function(d){
 					d3.event.stopPropagation();
-					self.filter(this.parentNode.parentNode,this);
+					if(d3.select(this).classed('selected') || self.buckets_country.length <5){
+						self.filter(this.parentNode.parentNode,this);
+						d3.select('#country_count').text(5 -self.buckets_country.length);
+					}
 				});
 			countries_menu_items.exit().remove();
 
@@ -650,6 +661,30 @@ var init = function(){
 			function dragended() {
 			}
 
+			//for mobile longpress text selection
+			//thank you, http://stackoverflow.com/questions/985272/selecting-text-in-an-element-akin-to-highlighting-with-your-mouse
+			function selectElementText(el, win) {
+			    win = win || window;
+			    var doc = win.document, sel, range;
+
+			    if (win.getSelection && doc.createRange) {
+			        sel = win.getSelection();
+			        range = doc.createRange();
+			        range.selectNodeContents(el);
+			        sel.removeAllRanges();
+			        sel.addRange(range);
+			    } else if (doc.body.createTextRange) {
+			        range = doc.body.createTextRange();
+			        range.setSelectionRange(0, 99999);
+			        range.moveToElementText(el);
+			        range.select();
+			        range.focus();
+			        // range.selectionStart=0;
+			        // range.selectionEnd=range.value.length;
+			    }
+			    //el.focus();
+			}
+
 			//store tooltip height
 			var tt_h = self.anno.node().getBoundingClientRect().height;
 
@@ -669,12 +704,29 @@ var init = function(){
 					d3.event.stopPropagation();
 					self.freeze = !self.freeze;
 					self.legend.classed('show',false);
+					return false;
+				})
+				.on('mousedown',function(){
+					if(hexTTG.classed('hidden',false)){
+						self.pressTimer = window.setTimeout(function(){
+	        				selectElementText(document.getElementById("user_comment"));
+	        				// var elem = document.getElementById("user_comment");
+	        				// elem.selectionStart=0;
+	        				// elem.selectionEnd=elem.innerHTML.length;
+						},1000);
+					}
+					return false;
+				})
+				.on('mouseup',function(){
+					clearTimeout(self.pressTimer);
+					return false;
 				})
 				.on('mouseout',function(d){
 					if(!self.freeze){
 						hexTTG.classed('hidden',true);
 						self.util_detail_clear();
 					}
+					return false;
 				})
 				//.on('touchstart',function(d){ d3.event.preventDefault(); })
 				//.on('touchmove',function(d){ d3.event.preventDefault(); })
@@ -717,7 +769,7 @@ var init = function(){
 			hexes.enter().append('path')
 				.classed('hex',true);
 			hexes
-				// .style('opacity',0)
+				.style('opacity',0)
 				.attr('d',function(d){ return self.hexbin.hexagon(hex_rad); })
 				.attr('transform',function(d,i){
 					var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
@@ -728,13 +780,13 @@ var init = function(){
 				})
 				.style('stroke',self.colors[self.mode])
 				.style('fill-opacity',function(d){ return d.rating/5; })
-				// .transition()
-				// .duration(90)
-				// .delay(function(d,i){
-				// 	var dist = filters_off ? 0.35*i : i;
-				// 	return dist;
-				// })
-				// .style('opacity',1)
+				.transition()
+				.duration(0)
+				.delay(function(d,i){
+					var factor = self.filters.length === 0 ? 3 : self.filters.length === 1 ? 1 : 0.5;
+					return Math.random()*i/factor +30;
+				})
+				.style('opacity',1)
 				;
 			hexes
 				.on('mousedown',function(){
@@ -792,7 +844,7 @@ var init = function(){
 					}
 				});
 			hexes
-				// .style('opacity',0)
+				.style('opacity',0)
 				.exit()
 				.remove();
 
@@ -927,6 +979,7 @@ var init = function(){
 					if(btn_id === 'country'){
 						self.buckets_country = [];
 						d3.selectAll('#country .option').classed('selected',false);
+						d3.select('#country_count').text(5);
 					}
 				}
 
@@ -1036,6 +1089,8 @@ var init = function(){
 
 			self.filters = [];
 			self.buckets_country = [];
+			
+			d3.select('#country_count').text(5);
 
 			self.btn_filters
 				.classed('selected',false)
@@ -1189,10 +1244,10 @@ var init = function(){
 				str_userDetail;
 
 			if(self.device ==='mobile'){
-				str_comment = '';
-				str_userDetail = (_d.name ? _d.name : self.util_resolve_gender(_d.gender)) +', ' +_d.age +', from ' +_d.country +', has' +self.util_resolve_rating_to_sentence(_d.rating,true) +' since ' +self.util_resolve_grade(_d.grade).toLowerCase() + '<br/><br/><span class="comment">&ldquo;' +_d.comment +'&rdquo;</span>';
+				str_comment = '<p></p>';
+				str_userDetail = (_d.name ? _d.name : self.util_resolve_gender(_d.gender)) +', ' +_d.age +', from ' +_d.country +', has' +self.util_resolve_rating_to_sentence(_d.rating,true) +' since ' +self.util_resolve_grade(_d.grade).toLowerCase() + '<br/><br/><span class="comment" id="user_comment"><p>&ldquo;' +_d.comment +'&rdquo;</p></span>';
 			} else{
-				str_comment = '&ldquo;' +_d.comment +'&rdquo;';
+				str_comment = '<p>&ldquo;' +_d.comment +'&rdquo;</p>';
 				str_userDetail = (_d.name ? _d.name : self.util_resolve_gender(_d.gender)) +', ' +_d.age +', from ' +_d.country +', has' +self.util_resolve_rating_to_sentence(_d.rating,true) +' since ' +self.util_resolve_grade(_d.grade).toLowerCase();
 			}
 			self.anno.style('display','block');
@@ -1201,7 +1256,7 @@ var init = function(){
 		},
 		util_detail_clear:function(){
 			var str_userDetail = self.device === 'default'? 'Hover over a hexagon for detail.' : self.device === 'tablet' ? 'Tap a hexagon for detail.' : 'Swipe to explore!';
-			self.anno_comment.html('');
+			self.anno_comment.html('<p></p>');
 			self.anno_userDetail.html(str_userDetail);
 			self.anno.style('display',function(){ return self.device === 'mobile' ? 'block' : 'none' });
 		},

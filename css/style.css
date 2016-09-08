@@ -52,6 +52,11 @@ div {
 	padding:0;
 	}
 
+p {
+	margin:0;
+	padding:0;
+	}
+
 .b {
 	font-weight:bold;
 	}
@@ -222,7 +227,7 @@ div {
 	list-style-type:none;
 	left:-1px;
 	top:29px;
-	padding:12px 0;
+	padding:45px 0 12px;
 	overflow-x:hidden;
 	overflow-y:scroll;
 	border:1px solid white;
@@ -231,6 +236,27 @@ div {
     -moz-box-sizing:border-box;
     -ms-box-sizing:border-box;
 	box-sizing:border-box;
+	}
+#menu .btn.filter .expand .counter {
+	position:fixed;
+	opacity:1;
+	color:white !important;
+	font-size:0.5rem;
+	font-style:italic;
+	margin-top:-45px;
+	padding:12px 24px 12px 12px;
+	text-transform:uppercase;
+	}
+#menu .btn.filter .expand .counter #country_count {
+	opacity:1;
+	}
+
+.math #menu .btn.filter .expand .counter {
+	background:#52849d;
+	}
+
+.science #menu .btn.filter .expand .counter {
+	background:#7b9e7e;
 	}
 
 .math #menu .btn.filter .expand {
@@ -303,7 +329,7 @@ div {
 	font-size:0.725rem;
 	line-height:0.85rem;
 	padding:30px;
-	/*pointer-events:none;*/
+	pointer-events:all;
 	-webkit-box-sizing:border-box;
     -moz-box-sizing:border-box;
     -ms-box-sizing:border-box;
@@ -343,14 +369,15 @@ div {
 	left:438px;
 	cursor:pointer;
 	}
-
+#legend .legend_body {
+	stroke-width:1;
+	}
 #legend .legend_body,
 #legend_mobile .legend_body {
 	display:none;
 	position:absolute;
 	fill:transparent;
 	stroke:white;
-	stroke-width:0;
 	margin-left:-30px;
 	margin-top:12px;
 	}
@@ -559,6 +586,7 @@ div {
 	}
 
 .nav_mobile #legend_mobile {
+	z-index:70;
 	top:93px;
 	padding-left:9px;
     padding-right:33px;
@@ -813,6 +841,7 @@ input.second {
 		bottom:0 !important;
 		left:0 !important;
 		padding:15px;
+		pointer-events:none;
 		}
 	#anno #comment,
 	#anno .comment {
@@ -872,15 +901,15 @@ input.second {
 
 	#menu .btn.filter#gender {
 		left:18px;
-		top:120px;
+		top:150px;
 		}
 	#menu .btn.filter#grade {
 		left:18px;
-		top:186px;
+		top:216px;
 		}
 	#menu .btn.filter#country {
 		left:18px;
-		top:252px;
+		top:282px;
 		}
 
 	#menu .btn.filter .expand {
@@ -898,6 +927,13 @@ input.second {
 		}
 	.science #menu .btn.filter .expand {
 		background:transparent;
+		}
+	
+	#menu .btn.filter .expand .counter {
+		width:100%;
+		width:calc(100% - 76px);
+		font-size:0.8rem;
+		text-transform:none;
 		}
 
 	#menu .btn#add {
@@ -945,6 +981,7 @@ input.second {
 		font-size:0.725rem;
 		bottom:auto;
 		padding:0;
+		pointer-events:all;
 		}
 	#anno #comment,
 	#anno .comment {
@@ -1031,6 +1068,12 @@ input.second {
 	.science #menu .btn.filter .expand {
 		background:#8fb292;
 		}
+	
+	#menu .btn.filter .expand .counter {
+		width:auto;
+		font-size:0.5rem;
+		text-transform:uppercase;
+		}
 
 	#menu .btn#add {
 		display:block;
@@ -1077,6 +1120,7 @@ input.second {
 		font-size:0.725rem;
 		bottom:auto;
 		padding:0;
+		pointer-events:all;
 		}
 	#anno #comment,
 	#anno .comment {
@@ -1162,6 +1206,12 @@ input.second {
 		}
 	.science #menu .btn.filter .expand {
 		background:#8fb292;
+		}
+	
+	#menu .btn.filter .expand .counter {
+		width:auto;
+		font-size:0.5rem;
+		text-transform:uppercase;
 		}
 
 	#menu .btn#add {
