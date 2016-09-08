@@ -288,6 +288,7 @@ p {
 	left:156px;
 	}
 #menu .btn.filter#country {
+	display:block;
 	left:297px;
 	}
 
@@ -892,6 +893,7 @@ input.second {
 		top:216px;
 		}
 	#menu .btn.filter#country {
+		display:none;
 		left:18px;
 		top:282px;
 		}
@@ -1032,6 +1034,7 @@ input.second {
 		top:126px;
 		}
 	#menu .btn.filter#country {
+		display:block;
 		left:15px;
 		top:162px;
 		}
@@ -1170,6 +1173,7 @@ input.second {
 		top:90px;
 		}
 	#menu .btn.filter#country {
+		display:block;
 		left:297px;
 		top:90px;
 		}
