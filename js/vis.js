@@ -473,6 +473,7 @@ var init = function(){
 			self.anno.style('display',function(){
 				return self.device !== 'mobile' ? 'none' : 'block';
 			});
+			d3.select('.hexTT').style('stroke-width',3);
 			self.freeze = false;
 
 			//remove comments panel if needed
@@ -710,9 +711,6 @@ var init = function(){
 					if(hexTTG.classed('hidden',false)){
 						self.pressTimer = window.setTimeout(function(){
 	        				selectElementText(document.getElementById("user_comment"));
-	        				// var elem = document.getElementById("user_comment");
-	        				// elem.selectionStart=0;
-	        				// elem.selectionEnd=elem.innerHTML.length;
 						},1000);
 					}
 					return false;
@@ -783,8 +781,12 @@ var init = function(){
 				.transition()
 				.duration(0)
 				.delay(function(d,i){
-					var factor = self.filters.length === 0 ? 3 : self.filters.length === 1 ? 1 : 0.5;
-					return Math.random()*i/factor +30;
+					if(self.device !== 'mobile'){
+						var factor = self.filters.length === 0 ? 3 : self.filters.length === 1 ? 1 : 0.5;
+						return Math.random()*i/factor +30;
+					} else{
+						return 0;
+					}
 				})
 				.style('opacity',1)
 				;
@@ -1244,10 +1246,10 @@ var init = function(){
 				str_userDetail;
 
 			if(self.device ==='mobile'){
-				str_comment = '<p></p>';
+				str_comment = '';
 				str_userDetail = (_d.name ? _d.name : self.util_resolve_gender(_d.gender)) +', ' +_d.age +', from ' +_d.country +', has' +self.util_resolve_rating_to_sentence(_d.rating,true) +' since ' +self.util_resolve_grade(_d.grade).toLowerCase() + '<br/><br/><span class="comment" id="user_comment"><p>&ldquo;' +_d.comment +'&rdquo;</p></span>';
 			} else{
-				str_comment = '<p>&ldquo;' +_d.comment +'&rdquo;</p>';
+				str_comment = '&ldquo;' +_d.comment +'&rdquo;';
 				str_userDetail = (_d.name ? _d.name : self.util_resolve_gender(_d.gender)) +', ' +_d.age +', from ' +_d.country +', has' +self.util_resolve_rating_to_sentence(_d.rating,true) +' since ' +self.util_resolve_grade(_d.grade).toLowerCase();
 			}
 			self.anno.style('display','block');
