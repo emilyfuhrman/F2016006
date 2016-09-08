@@ -10,12 +10,12 @@
 /*	PALETTE
 
 	M 	#6698b1
-	S 	#8fb292
+	S 	#9f518f
 	
 	Legend ==>
 
 	M 	#52849d
-	S	#7b9e7e
+	S	#8b3d7b
 
 	*/
 
@@ -42,7 +42,7 @@ svg {
 	background:#6698b1;
 	}
 .science svg {
-	background:#8fb292;
+	background:#9f518f;
 	}
 
 div {
@@ -123,7 +123,7 @@ p {
 	background:rgba(102, 152, 177, 0.8);
 	}
 .science #menu {
-	background:rgba(143, 178, 146, 0.8);
+	background:rgba(159, 81, 143, 0.8);
 	}
 
 #menu .btn {
@@ -177,7 +177,7 @@ p {
 	}
 .science #menu .btn.filter.selected {
 	background-image:url(../assets/icon_filter_science.svg);
-	color:#7b9e7e;
+	color:#8b3d7b;
 	}
 #menu .btn.filter.deactivated {
 	opacity:0.5;
@@ -241,14 +241,14 @@ p {
 	}
 
 .science #menu .btn.filter .expand .counter {
-	background:#7b9e7e;
+	background:#8b3d7b;
 	}
 
 .math #menu .btn.filter .expand {
 	background:#6698b1;
 	}
 .science #menu .btn.filter .expand {
-	background:#8fb292;
+	background:#9f518f;
 	}
 
 #menu .btn.filter:hover .expand {
@@ -278,7 +278,7 @@ p {
 	}
 .science #menu .btn.filter .expand li.option:hover,
 .science #menu .btn.filter .expand li.option.selected {
-	color:#7b9e7e;
+	color:#8b3d7b;
 	}
 
 #menu .btn.filter#gender {
@@ -385,7 +385,7 @@ p {
 	}
 .science #legend .legend_body,
 .science #legend_mobile .legend_body {
-	fill:#7b9e7e;
+	fill:#8b3d7b;
 	}
 
 .legend_bknd {
@@ -477,7 +477,7 @@ p {
 	background-repeat:no-repeat;
 	background-position: 2px 5px;
 	background-size:28px 22px;
-	z-index:50;
+	z-index:50000;
 	position:fixed;
 	width:32px;
 	height:32px;
@@ -494,7 +494,7 @@ p {
 	background-color:#52849d;
 	}
 .science .nav_mobile #hamburger {
-	background-color:#7b9e7e;
+	background-color:#8b3d7b;
 	}
 .nav_mobile #hamburger.xout {
 	background-image:url(../assets/hamburger_xout.svg);
@@ -557,7 +557,7 @@ p {
 	color:#52849d;
 	}
 .science .nav_mobile#comments_panel .panel .comment_block {
-	color:#7b9e7e;
+	color:#8b3d7b;
 	}
 
 .nav_mobile#comments_panel .panel .comment_block span {
@@ -1049,7 +1049,7 @@ input.second {
 		background:#6698b1;
 		}
 	.science #menu .btn.filter .expand {
-		background:#8fb292;
+		background:#9f518f;
 		}
 	
 	#menu .btn.filter .expand .counter {
@@ -1187,7 +1187,7 @@ input.second {
 		background:#6698b1;
 		}
 	.science #menu .btn.filter .expand {
-		background:#8fb292;
+		background:#9f518f;
 		}
 	
 	#menu .btn.filter .expand .counter {

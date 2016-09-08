@@ -76,11 +76,11 @@ var init = function(){
 
 		colors:[
 			'#6698b1',
-			'#8fb292'
+			'#9f518f'
 		],
 		colors_legend:[
 			'#52849d',
-			'#7b9e7e'
+			'#8b3d7b'
 		],
 
 		getData:function(_callback){
@@ -922,7 +922,7 @@ var init = function(){
 					return self.device !== 'mobile' ? 'block' : 'none';
 				});
 			self.anno.style('background',function(){
-				return self.mode === 0 ? 'rgba(82, 132, 157, 0.75)' : 'rgba(123, 158, 126, 0.75)';
+				return self.mode === 0 ? 'rgba(82, 132, 157, 0.75)' : 'rgba(139, 61, 123, 0.75)';
 			});
 
 			//if on, refresh comments panel
