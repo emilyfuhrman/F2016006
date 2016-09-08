@@ -56,11 +56,11 @@ var init = function(){
 			'College'
 		],
 		buckets_rating:{
-			'1':'LOVE',
-			'2':'LIKE',
+			'1':'HATE',
+			'2':'DISLIKE',
 			'3':'OK',
-			'4':'DISLIKE',
-			'5':'HATE'
+			'4':'LIKE',
+			'5':'LOVE'
 		},
 
 		m:false,
