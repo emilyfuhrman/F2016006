@@ -270,7 +270,7 @@ var init = function(){
 				d3.event.stopPropagation();
 				self.util_form_submit_tweet();
 			});
-			self.twit = d3.select('#logo_tweet').on('click',function(){
+			d3.select('#cir_twitter').on('click',function(){
         		d3.event.preventDefault();
 				d3.event.stopPropagation();
 				
