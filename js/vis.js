@@ -277,6 +277,13 @@ var init = function(){
 				var tweetString = "Why I #LoveHateSciMath: Share your story at http://quantamagazine.org via @QuantaMagazine";
 				self.util_form_submit_tweet(tweetString);
 			});
+			d3.select('#cir_fb').on('click',function(){
+				d3.event.preventDefault();
+				d3.event.stopPropagation();
+
+				var fbString = "Why I #LoveHateSciMath: Share your story.";
+				self.util_post_fb(fbString);
+			});
 
 			//grab navigation buttons, add click handlers
 			self.mode_switch = d3.selectAll('.btn.view.mode').on('click',function(){
@@ -708,7 +715,7 @@ var init = function(){
 					return false;
 				})
 				.on('mousedown',function(){
-					if(hexTTG.classed('hidden',false)){
+					if(self.device === 'mobile' && hexTTG.classed('hidden',false)){
 						self.pressTimer = window.setTimeout(function(){
 	        				selectElementText(document.getElementById("user_comment"));
 						},1000);
@@ -1210,6 +1217,14 @@ var init = function(){
 			var self = this;
 			var text = encodeURIComponent(_text).replace(/'/g,"%27").replace(/"/g,"%22");
 			return text;
+		},
+		util_post_fb:function(_text){
+			var caption = _text;
+		    FB.ui({
+			  method: 'feed',
+			  link: 'http://quantamagazine.org',
+			  caption: caption,
+			}, function(response){});
 		},
 
 		//data
