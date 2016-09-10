@@ -307,19 +307,12 @@ var init = function(){
 
 			var legend_body,
 				legend_bg;
-			var legend_g,
-				legend_g_txt,
-				legend_g_line;
+			var legend_g;
+				// legend_g_txt,
+				// legend_g_line;
 			var legend_hexes,
 				legend_hexes_txt,
 				legend_hexes_arr;
-
-			//grab legend, add interaction
-			self.legend = d3.selectAll('.btn.legend')
-				.on('click',function(){
-					var show = d3.select(this).classed('show');
-					d3.select(this).classed('show',!show);
-				});
 			
 			//legend SVG container
 			legend_body = d3.selectAll('.legend_body').selectAll('svg.legend')
@@ -334,10 +327,16 @@ var init = function(){
 			legend_bg.enter().append('rect')
 				.classed('legend_bg',true);
 			legend_bg
-				.attr('x',1)
-				.attr('y',1)
-				.attr('width',180)
-				.attr('height',90);
+				.attr('x',0)
+				.attr('y',0)
+				.attr('width',175)
+				.attr('height',63)
+				.style('fill-opacity',function(){
+					return self.device === 'mobile' ? 0.8 : 0;
+				})
+				.style('stroke-opacity',function(){
+					return self.device === 'mobile' ? 1 : 0;
+				});
 			legend_bg.exit().remove();
 
 			//legend hexagon groups
@@ -354,27 +353,27 @@ var init = function(){
 			legend_g.exit().remove();
 
 			//legend hexagon group captions
-			legend_g_txt = legend_g.selectAll('text.legend_g_txt')
-				.data(function(d){ return [d]; });
-			legend_g_txt.enter().append('text')
-				.classed('legend_g_txt',true);
-			legend_g_txt
-				.attr('x',-9)
-				.attr('y',48)
-				.text('Hexagon shading: rating');
-			legend_g_txt.exit().remove();
+			// legend_g_txt = legend_g.selectAll('text.legend_g_txt')
+			// 	.data(function(d){ return [d]; });
+			// legend_g_txt.enter().append('text')
+			// 	.classed('legend_g_txt',true);
+			// legend_g_txt
+			// 	.attr('x',-9)
+			// 	.attr('y',48)
+			// 	.text('Hexagon shading: rating');
+			// legend_g_txt.exit().remove();
 
 			//legend hexagon group dividers
-			legend_g_line = legend_g.selectAll('line.legend_g_line')
-				.data(function(d){ return [d]; });
-			legend_g_line.enter().append('line')
-				.classed('legend_g_line',true);
-			legend_g_line
-				.attr('x1',-9)
-				.attr('y1',33)
-				.attr('x2',139)
-				.attr('y2',33);
-			legend_g_line.exit().remove();
+			// legend_g_line = legend_g.selectAll('line.legend_g_line')
+			// 	.data(function(d){ return [d]; });
+			// legend_g_line.enter().append('line')
+			// 	.classed('legend_g_line',true);
+			// legend_g_line
+			// 	.attr('x1',-9)
+			// 	.attr('y1',33)
+			// 	.attr('x2',139)
+			// 	.attr('y2',33);
+			// legend_g_line.exit().remove();
 
 			//legend specifics
 			legend_hexes = legend_g.selectAll('path.legend_hex')
@@ -434,6 +433,13 @@ var init = function(){
 			MOBILE NAV
 			---------------------------------------------------------------------- */
 
+			//grab mobile legend, add interaction
+			self.legend = d3.selectAll('#legend_mobile')
+				.on('click',function(){
+					var show = d3.select(this).classed('show');
+					d3.select(this).classed('show',!show);
+				});
+
 			//grab mobile hamburger menu, add click handler
 			self.mobile_ham = d3.select('#hamburger').on('click',function(){
 				var display_style = self.menu.style('display');
@@ -472,9 +478,6 @@ var init = function(){
 
 			//prepare data to be displayed
 			self.data_display = filters_off ? [self.data[self.modes[self.mode]]] : self.filterData();
-
-			//hide legend if needed
-			self.legend.classed('show',false);
 			
 			//reset tooltip functionality
 			self.anno.style('display',function(){
@@ -482,6 +485,9 @@ var init = function(){
 			});
 			d3.select('.hexTT').style('stroke-width',3);
 			self.freeze = false;
+			
+			//hide legend if needed
+			self.legend.classed('show',false);
 
 			//remove comments panel if needed
 			if(self.device !== 'mobile' || (self.device === 'mobile' && !self.comments_on)){ self.comments_hide(); }

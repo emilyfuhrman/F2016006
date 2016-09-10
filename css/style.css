@@ -345,46 +345,47 @@ p {
 	top:50%;
 	}
 
-#legend {
-	z-index:100;
+#legend_body {
 	position:fixed;
 	display:block;
-	font-size:0.725rem;
-	letter-spacing:0.025rem;
-	width:81px !important;
-	left:438px;
-	cursor:pointer;
+	margin:0;
+	padding:0;
+	right:0;
+	top:170px;
 	}
-#legend .legend_body {
-	stroke-width:1;
+#legend_body svg {
+	background:transparent;
+	width:175px;
+	height:63px;
 	}
-#legend .legend_body,
+#legend_body text {
+	stroke:none;
+	fill:white;
+	font-size:0.55rem;
+	}
+#legend_body text.legend_hex_txt {
+	text-anchor:middle;
+	}
+
+
+.legend_body,
 #legend_mobile .legend_body {
 	display:none;
 	position:absolute;
-	fill:transparent;
 	stroke:white;
 	margin-left:-30px;
 	margin-top:12px;
 	}
-#legend.show .legend_body,
+.legend_body,
 #legend_mobile.show .legend_body {
 	display:block;
 	}
 
-#legend svg {
-	background:transparent;
-	}
-
-#legend .comp {
-	position:fixed;
-	}
-
-.math #legend .legend_body,
+.math .legend_body,
 .math #legend_mobile .legend_body {
 	fill:#52849d;
 	}
-.science #legend .legend_body,
+.science .legend_body,
 .science #legend_mobile .legend_body {
 	fill:#8b3d7b;
 	}
@@ -398,18 +399,18 @@ p {
 	display:block;
 	}
 
-.legend_g_txt {
+/*.legend_g_txt {
 	font-size:0.55rem;
 	stroke:none;
 	fill:white;
-	}
+	}*/
 
-.legend_g_line {
+/*.legend_g_line {
 	stroke:white;
 	stroke-width:1;
-	}
+	}*/
 
-#legend .legend_hex {
+#legend_body .legend_hex {
 	fill:white;
 	stroke:white;
 	stroke-width:0.5;
