@@ -303,6 +303,7 @@ p {
 	display:block;
 	background:url(../assets/icon_add.svg) no-repeat 8px 6px;
 	background-size:14px 14px;
+	width:120px;
 	right:15px;
 	top:125px;
 	}
@@ -621,6 +622,7 @@ select:-moz-focusring {
 	}
 
 .form {
+	z-index:10000;
 	display:block;
 	position:absolute;
 	background:white;
@@ -746,6 +748,7 @@ input.second {
 	line-height:1rem;
 	margin-top:-0.2rem;
 	left:300px;
+	right:auto;
 	}
 
 #form {
@@ -813,6 +816,15 @@ input.second {
 
 @media (max-width:768px) { 
 	/* smartphones, iPhone, portrait 480x320 phones */
+
+	.form {
+		width:100%;
+		}
+
+	.form .input {
+		left:auto;
+		right:30px;
+		}
 
 	.nav_mobile {
 		display:block;
@@ -924,7 +936,10 @@ input.second {
 		}
 
 	#menu .btn#add {
-		display:none;
+		width:100%;
+		width:calc(100% - 60px);
+		top:400px;
+		top:calc(100% - 120px);
 		}
 
 	#menu .btn.clear {
@@ -955,7 +970,16 @@ input.second {
 
 @media (min-width:768px) { 
 	/* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
-	
+
+	.form {
+		width:500px;
+		}
+
+	.form .input {
+		left:300px;
+		right:auto;
+		}
+
 	.nav_mobile {
 		display:none;
 		}
@@ -1063,7 +1087,8 @@ input.second {
 		}
 
 	#menu .btn#add {
-		display:block;
+		width:120px;
+		top:125px;
 		}
 
 	#menu .btn.clear {
@@ -1094,6 +1119,15 @@ input.second {
 
 @media (min-width:1024px) { 
 	/* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
+
+	.form {
+		width:500px;
+		}
+
+	.form .input {
+		left:300px;
+		right:auto;
+		}
 	
 	.nav_mobile {
 		display:none;
@@ -1202,7 +1236,8 @@ input.second {
 		}
 
 	#menu .btn#add {
-		display:block;
+		width:120px;
+		top:125px;
 		}
 
 	#menu .btn.clear {

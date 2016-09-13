@@ -219,7 +219,7 @@ var init = function(){
 				.on('click',function(){
 					if(self.freeze){ self.freeze = false; }
 					self.util_form_hide();
-					self.legend.classed('show',false);
+					self.legend_mobile.classed('show',false);
 				});
 			self.svg.exit().remove();
 
@@ -251,12 +251,16 @@ var init = function(){
 			//grab forms and inputs
 			self.form = d3.select('#form')
 				.classed('hidden',true)
-				.style('left',window.innerWidth/2 -250 +'px')
+				.style('left',function(){
+					return (self.device !== 'mobile' ? window.innerWidth/2 -250 : 0) +'px';
+				})
 				.style('top','150px')
 				;
 			self.form_tweet = d3.select('#form_tweet')
 				.classed('hidden',true)
-				.style('left',window.innerWidth/2 -250 +'px')
+				.style('left',function(){
+					return (self.device !== 'mobile' ? window.innerWidth/2 -250 : 0) +'px';
+				})
 				.style('top','150px');
 
 			//grab form buttons, add click handlers
@@ -434,7 +438,7 @@ var init = function(){
 			---------------------------------------------------------------------- */
 
 			//grab mobile legend, add interaction
-			self.legend = d3.selectAll('#legend_mobile')
+			self.legend_mobile = d3.selectAll('#legend_mobile')
 				.on('click',function(){
 					var show = d3.select(this).classed('show');
 					d3.select(this).classed('show',!show);
@@ -442,6 +446,8 @@ var init = function(){
 
 			//grab mobile hamburger menu, add click handler
 			self.mobile_ham = d3.select('#hamburger').on('click',function(){
+				d3.event.stopPropagation();
+
 				var display_style = self.menu.style('display');
 				if(display_style === 'none'){
 					self.menu.style('display','block');
@@ -450,6 +456,7 @@ var init = function(){
 					self.menu.style('display','none');
 					self.mobile_ham.classed('xout',false);
 				}
+				self.util_form_hide();
 			});
 
 			//grab mobile comments button, add click handler
@@ -487,7 +494,8 @@ var init = function(){
 			self.freeze = false;
 			
 			//hide legend if needed
-			self.legend.classed('show',false);
+			d3.select('#legend_body').style('display',function(){ return self.device !== 'mobile' ? 'block' : 'none' });
+			self.legend_mobile.classed('show',false);
 
 			//remove comments panel if needed
 			if(self.device !== 'mobile' || (self.device === 'mobile' && !self.comments_on)){ self.comments_hide(); }
@@ -717,7 +725,7 @@ var init = function(){
 				.on('click',function(){
 					d3.event.stopPropagation();
 					self.freeze = !self.freeze;
-					self.legend.classed('show',false);
+					self.legend_mobile.classed('show',false);
 					return false;
 				})
 				.on('mousedown',function(){
@@ -1119,8 +1127,12 @@ var init = function(){
 
 		//forms
 		util_form_center:function(){
-			self.form.style('left',window.innerWidth/2 -250 +'px');
-			self.form_tweet.style('left',window.innerWidth/2 -250 +'px');
+			self.form.style('left',function(){
+				return (self.device !== 'mobile' ? window.innerWidth/2 -250 : 0) +'px';
+			});
+			self.form_tweet.style('left',function(){
+				return (self.device !== 'mobile' ? window.innerWidth/2 -250 : 0) +'px';
+			});
 		},
 		util_form_clear:function(){
 			document.getElementById('input_name').value = '';
@@ -1141,7 +1153,9 @@ var init = function(){
 			self.form_visible = true;
 			self.form.classed('hidden',false);
 			self.freeze = false;
-			self.anno.style('display','none');
+			self.anno.style('display',function(){
+				return self.device !== 'mobile' ? 'none' : 'block';
+			});
 		},
 		util_form_submit:function(){
 			var obj = {};
