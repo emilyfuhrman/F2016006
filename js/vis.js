@@ -29,6 +29,8 @@ var init = function(){
 		],
 
 		freeze:false,
+		freeze_focus:null,
+
 		form_visible:false,
 
 		//holds any selected filters
@@ -300,6 +302,14 @@ var init = function(){
 				d3.event.stopPropagation();
 				self.util_form_hide();
 				self.util_form_show();
+			});
+
+			//grab hover tweet button, add click handler
+			d3.select('#hover_tweet').on('click',function(){
+				d3.event.stopPropagation();
+
+				var str = self.anno_comment + ' ' + self.anno_userDetail;
+				self.util_form_submit_tweet(self.util_encode_tweet(str));
 			});
 
 			//initialize hexbin
