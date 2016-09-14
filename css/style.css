@@ -316,7 +316,7 @@ p {
 	font-size:0.725rem;
 	line-height:0.85rem;
 	padding:30px;
-	pointer-events:all;
+	pointer-events:none;
 	-webkit-box-sizing:border-box;
     -moz-box-sizing:border-box;
     -ms-box-sizing:border-box;
@@ -343,7 +343,7 @@ p {
 
 #anno #hover_tweet {
 	float:left;
-	display:inline-block;
+	display:none;
 	background-image:url(../assets/icon_twitter.svg);
 	width:20px;
 	height:20px;
@@ -851,7 +851,7 @@ input.second {
 		bottom:0 !important;
 		left:0 !important;
 		padding:15px;
-		pointer-events:all;
+		pointer-events:none;
 		}
 	#anno #comment,
 	#anno .comment {
@@ -976,6 +976,10 @@ input.second {
 		}
 	.hexLabel.sub {
 		font-size:0.65rem;
+		}
+
+	#anno #hover_tweet {
+		margin:0 0 0 15px;
 		}
 	}
 
@@ -1126,6 +1130,10 @@ input.second {
 	.hexLabel.sub {
 		font-size:0.725rem;
 		}
+
+	#anno #hover_tweet {
+		margin:0 0 15px 15px;
+		}
 	}
 
 @media (min-width:1024px) { 
@@ -1274,5 +1282,9 @@ input.second {
 		}
 	.hexLabel.sub {
 		font-size:0.725rem;
+		}
+
+	#anno #hover_tweet {
+		margin:0 0 15px 15px;
 		}
 	}

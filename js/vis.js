@@ -308,8 +308,9 @@ var init = function(){
 			d3.select('#hover_tweet').on('click',function(){
 				d3.event.stopPropagation();
 
-				var str = self.anno_comment + ' ' + self.anno_userDetail;
-				self.util_form_submit_tweet(self.util_encode_tweet(str));
+				var str = self.device === 'mobile' ? self.anno_userDetail.html().split("<br>")[0] : self.anno_userDetail.html();
+				str +='. Share your story at http://quantamagazine.org.'
+				self.util_form_submit_tweet(str);
 			});
 
 			//initialize hexbin
@@ -735,6 +736,11 @@ var init = function(){
 				.on('click',function(){
 					d3.event.stopPropagation();
 					self.freeze = !self.freeze;
+					if(self.freeze){
+						self.anno.style('pointer-events','all');
+					} else{
+						self.anno.style('pointer-events','none');
+					}
 					self.legend_mobile.classed('show',false);
 					return false;
 				})
@@ -1302,12 +1308,14 @@ var init = function(){
 			self.anno.style('display','block');
 			self.anno_comment.html(str_comment);
 			self.anno_userDetail.html(str_userDetail);
+			d3.select('#hover_tweet').style('display','inline-block');
 		},
 		util_detail_clear:function(){
 			var str_userDetail = self.device === 'default'? 'Hover over a hexagon for detail.' : self.device === 'tablet' ? 'Tap a hexagon for detail.' : 'Swipe to explore!';
 			self.anno_comment.html('<p></p>');
 			self.anno_userDetail.html(str_userDetail);
 			self.anno.style('display',function(){ return self.device === 'mobile' ? 'block' : 'none' });
+			d3.select('#hover_tweet').style('display','none');
 		},
 
 		//resolving values to buckets
