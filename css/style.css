@@ -350,6 +350,7 @@ p {
 	margin:0 0 15px 15px;
 	padding:0;
 	cursor:pointer;
+	pointer-events:all;
 	}
 
 #arrows {
@@ -834,7 +835,7 @@ input.second {
 		}
 
 	.form .tag {
-		width:50%;
+		width:40%;
 		}
 
 	.form .input {
@@ -856,7 +857,7 @@ input.second {
 		bottom:0 !important;
 		left:0 !important;
 		padding:15px;
-		pointer-events:none;
+		pointer-events:all;
 		}
 	#anno #comment,
 	#anno .comment {
@@ -984,6 +985,7 @@ input.second {
 		}
 
 	#anno #hover_tweet {
+		display:none;
 		margin:0 0 0 15px;
 		}
 	}
@@ -1141,6 +1143,7 @@ input.second {
 		}
 
 	#anno #hover_tweet {
+		display:block;
 		margin:0 0 15px 15px;
 		}
 	}
@@ -1173,7 +1176,7 @@ input.second {
 		font-size:0.725rem;
 		bottom:auto;
 		padding:0;
-		pointer-events:all;
+		pointer-events:none;
 		}
 	#anno #comment,
 	#anno .comment {
@@ -1298,6 +1301,7 @@ input.second {
 		}
 
 	#anno #hover_tweet {
+		display:block;
 		margin:0 0 15px 15px;
 		}
 	}

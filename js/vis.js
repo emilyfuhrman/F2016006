@@ -813,30 +813,44 @@ var init = function(){
 				.data(function(d){ return filters_off ? d : d.value; });
 			hexes.enter().append('path')
 				.classed('hex',true);
-			hexes
-				.style('opacity',0)
-				.attr('d',function(d){ return self.hexbin.hexagon(hex_rad); })
-				.attr('transform',function(d,i){
-					var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
-						col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
-					var x = filters_off ? d.pos.y : col_num*(hex_w*0.75),
-						y = filters_off ? d.pos.x : row_num*(hex_h) +((col_num%2)*(hex_h/2));
-					return 'translate(' +x +',' +y +')rotate(90)';
-				})
-				.style('stroke',self.colors[self.mode])
-				.style('fill-opacity',function(d){ return d.rating/5; })
-				.transition()
-				.duration(0)
-				.delay(function(d,i){
-					if(self.device !== 'mobile'){
+
+			//conditional transition -- do not run on mobile
+			if(self.device !== 'mobile'){
+				hexes
+					.style('opacity',0)
+					.attr('d',function(d){ return self.hexbin.hexagon(hex_rad); })
+					.attr('transform',function(d,i){
+						var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
+							col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
+						var x = filters_off ? d.pos.y : col_num*(hex_w*0.75),
+							y = filters_off ? d.pos.x : row_num*(hex_h) +((col_num%2)*(hex_h/2));
+						return 'translate(' +x +',' +y +')rotate(90)';
+					})
+					.style('stroke',self.colors[self.mode])
+					.style('fill-opacity',function(d){ return d.rating/5; })
+					.transition()
+					.duration(0)
+					.delay(function(d,i){
 						var factor = self.filters.length === 0 ? 3 : self.filters.length === 1 ? 1 : 0.5;
 						return Math.random()*i/factor +30;
-					} else{
-						return 0;
-					}
-				})
-				.style('opacity',1)
-				;
+					})
+					.style('opacity',1);
+			} else{
+				hexes
+					.attr('d',function(d){ return self.hexbin.hexagon(hex_rad); })
+					.attr('transform',function(d,i){
+						var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
+							col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
+						var x = filters_off ? d.pos.y : col_num*(hex_w*0.75),
+							y = filters_off ? d.pos.x : row_num*(hex_h) +((col_num%2)*(hex_h/2));
+						return 'translate(' +x +',' +y +')rotate(90)';
+					})
+					.style('stroke',self.colors[self.mode])
+					.style('fill-opacity',function(d){ return d.rating/5; })
+					.style('opacity',1)
+					;
+			}
+			
 			hexes
 				.on('mousedown',function(){
 					hexTT.style('stroke-width',6);
@@ -895,10 +909,7 @@ var init = function(){
 						self.util_detail_update(d);
 					}
 				});
-			hexes
-				.style('opacity',0)
-				.exit()
-				.remove();
+			hexes.exit().remove();
 
 			//labels under groups
 			hexesLabels = hexesG.selectAll('text.hexLabel')
@@ -1362,7 +1373,7 @@ var init = function(){
 			self.anno.style('display','block');
 			self.anno_comment.html(str_comment);
 			self.anno_userDetail.html(str_userDetail);
-			d3.select('#hover_tweet').style('display','inline-block');
+			d3.select('#hover_tweet').style('display',function(){ self.device !== 'mobile' ? 'block' : 'none'; });
 		},
 		util_detail_clear:function(){
 			var str_userDetail = self.device === 'default'? 'Hover over a hexagon for detail.' : self.device === 'tablet' ? 'Tap a hexagon for detail.' : 'Swipe to explore!';
