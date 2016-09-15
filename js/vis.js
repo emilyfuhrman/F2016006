@@ -219,7 +219,11 @@ var init = function(){
 				.attr('preserveAspectRatio','xMidYMid meet');
 			self.svg
 				.on('click',function(){
-					if(self.freeze){ self.freeze = false; }
+					if(self.freeze){ 
+						self.freeze = false;
+						self.util_clearURL();
+						self.util_tt_hide();
+					}
 					self.util_form_hide();
 					self.legend_mobile.classed('show',false);
 				});
@@ -502,8 +506,17 @@ var init = function(){
 				return self.device !== 'mobile' ? 'none' : 'block';
 			});
 			d3.select('.hexTT').style('stroke-width',3);
-			self.freeze = false;
 			
+			//detect unique ID in URL
+			//freeze as needed
+			self.freeze = filters_off && window.location.hash.split('#').length >1;
+			self.freeze_focus = self.freeze ? self.data[self.modes[self.mode]].filter(function(d){ return d.ID === window.location.hash.split('#')[1]; })[0] : null;
+			if(!self.freeze){ self.util_clearURL(); }
+			if(!self.freeze_focus){ 
+				self.freeze = false; 
+				self.util_clearURL();
+			}
+
 			//hide legend if needed
 			d3.select('#legend_body').style('display',function(){ return self.device !== 'mobile' ? 'block' : 'none' });
 			self.legend_mobile.classed('show',false);
@@ -614,8 +627,7 @@ var init = function(){
 				hex_col_w = Math.floor( hex_area_w/(hex_w*0.75) );
  
 			//INITIALIZE VARIABLES
-			var hexTTG,
-				hexTTback,
+			var hexTTback,
 				hexTT;
 			var hexG,
 				hexesG,
@@ -680,8 +692,7 @@ var init = function(){
 
 			function dragged(e) {
 				if(self.device === 'mobile' && filters_off){
-					hexTTG.classed('hidden',true);
-					self.util_detail_clear();
+					self.util_tt_hide();
 					
 					hex_coords.x = d3.event.x;
 					hex_coords.y = d3.event.y;
@@ -738,14 +749,16 @@ var init = function(){
 					self.freeze = !self.freeze;
 					if(self.freeze){
 						self.anno.style('pointer-events','all');
+						self.util_setURL();
 					} else{
 						self.anno.style('pointer-events','none');
+						self.util_clearURL();
 					}
 					self.legend_mobile.classed('show',false);
 					return false;
 				})
 				.on('mousedown',function(){
-					if(self.device === 'mobile' && hexTTG.classed('hidden',false)){
+					if(self.device === 'mobile' && self.hexTTG.classed('hidden',false)){
 						self.pressTimer = window.setTimeout(function(){
 	        				selectElementText(document.getElementById("user_comment"));
 						},1000);
@@ -757,15 +770,9 @@ var init = function(){
 					return false;
 				})
 				.on('mouseout',function(d){
-					if(!self.freeze){
-						hexTTG.classed('hidden',true);
-						self.util_detail_clear();
-					}
+					if(!self.freeze){ self.util_tt_hide(); }
 					return false;
-				})
-				//.on('touchstart',function(d){ d3.event.preventDefault(); })
-				//.on('touchmove',function(d){ d3.event.preventDefault(); })
-				;
+				});
 			hexG.exit().remove();
 
 			//hexagon sub-containers
@@ -837,6 +844,9 @@ var init = function(){
 				.on('mousemove',function(d,i){
 
 					if(!self.freeze && !self.form_visible){
+
+						self.freeze_focus = d;
+
 						var x, y;
 						var o = d.rating/5;
 						var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
@@ -855,7 +865,7 @@ var init = function(){
 						x +=(x_trans +x_trans_micro);
 						y +=(y_trans +y_trans_micro);
 
-						hexTTG
+						self.hexTTG
 							.classed('hidden',false)
 							.attr('transform',function(){ return 'translate(' +x +',' +y +')rotate(90)'; });
 						hexTT.style('fill-opacity',o);
@@ -863,7 +873,7 @@ var init = function(){
 						if(self.device !== 'mobile'){
 
 							//get screen coordinates of tooltip
-							var coords = hexTTG.node().getBoundingClientRect();
+							var coords = self.hexTTG.node().getBoundingClientRect();
 							var tt_pad = hex_rad_hov*2,
 								tt_w = 300,
 								tt_h_new = self.anno.node().getBoundingClientRect().height,
@@ -930,14 +940,14 @@ var init = function(){
 			hexesLabels_.exit().remove();
 
 			//create tooltip group
-			hexTTG = self.svg.selectAll('g.hexTTG')
+			self.hexTTG = self.svg.selectAll('g.hexTTG')
 				.data([self.data_display]);
-			hexTTG.enter().append('g')
+			self.hexTTG.enter().append('g')
 				.classed('hexTTG',true);
-			hexTTG
+			self.hexTTG
 				.classed('hidden',true);
-			hexTTG.exit().remove();
-			hexTTback = hexTTG.selectAll('path.hexTTback')
+			self.hexTTG.exit().remove();
+			hexTTback = self.hexTTG.selectAll('path.hexTTback')
 				.data(function(d){ return [d]; });
 			hexTTback.enter().append('path')
 				.classed('hexTTback',true);
@@ -945,7 +955,7 @@ var init = function(){
 				.attr('d',self.hexbin.hexagon(hex_rad_hov))
 				.style('fill',self.colors[self.mode]);
 			hexTTback.exit().remove();
-			hexTT = hexTTG.selectAll('path.hexTT')
+			hexTT = self.hexTTG.selectAll('path.hexTT')
 				.data(function(d){ return [d]; });
 			hexTT.enter().append('path')
 				.classed('hexTT',true);
@@ -965,6 +975,55 @@ var init = function(){
 			//if on, refresh comments panel
 			if(self.comments_on){
 				self.comments_show();
+			}
+
+			//if frozen, set tooltip
+			if(self.freeze){
+
+				var x, y;
+				var o = self.freeze_focus.rating/5;
+				// var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
+				// 	col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
+				// var p = self.data_display[d.idx],
+
+				// 	x_trans = filters_off ? hex_coords.x : device_off ? padding.left : (self.w -hex_area_w)/3,
+				// 	y_trans = filters_off ? hex_coords.y : device_off ? (self.h -hex_area_h)/1.75 : padding.top,
+
+				// 	x_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? (p.ratio_agg*hex_area_w) +(d.idx*hex_pad) +(d.idx*hex_pad_sub) : 0,
+				// 	y_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? 0 : (p.ratio_agg*hex_area_h) +(d.idx*hex_pad) +(d.idx*hex_pad_sub);
+
+				x = self.freeze_focus.pos.y;
+				y = self.freeze_focus.pos.x;
+
+				x +=hex_coords.x;
+				y +=hex_coords.y;
+
+				self.hexTTG
+					.classed('hidden',false)
+					.attr('transform',function(){ return 'translate(' +x +',' +y +')rotate(90)'; });
+				hexTT.style('fill-opacity',o);
+
+				self.util_detail_update(self.freeze_focus);
+
+				if(self.device !== 'mobile'){
+
+					//get screen coordinates of tooltip
+					var coords = self.hexTTG.node().getBoundingClientRect();
+					var tt_pad = hex_rad_hov*2,
+						tt_w = 300,
+						tt_h_new = self.anno.node().getBoundingClientRect().height,
+						tt_x = coords.left +tt_pad,
+						tt_y = coords.top +tt_pad;
+
+					tt_h = tt_h_new !== 0 ? tt_h_new : tt_h;
+
+					tt_x = tt_x +tt_w >self.w ? tt_x -tt_w -tt_pad : tt_x;
+					tt_y = tt_y >self.h/2 ? tt_y -tt_h -tt_pad : tt_y;
+
+					self.anno
+						.style('left',tt_x +'px')
+						.style('top',tt_y +'px');
+				}
 			}
 		},
 
@@ -1168,7 +1227,10 @@ var init = function(){
 		util_form_show:function(){
 			self.form_visible = true;
 			self.form.classed('hidden',false);
+			
 			self.freeze = false;
+			self.util_clearURL();
+			
 			self.anno.style('display',function(){
 				return self.device !== 'mobile' ? 'none' : 'block';
 			});
@@ -1264,26 +1326,6 @@ var init = function(){
 		},
 
 		//data
-		util_get_top_countries:function(){
-			/*var arr_countries = {};
-			var data = self.data['dummy_sample_' +self.modes[self.mode]];
-			for(var i=0; i<data.length; i++){
-				if(!arr_countries[data[i].country]){
-					arr_countries[data[i].country] = 0;
-				}
-				arr_countries[data[i].country]++;
-			}
-			var arr_countries_sorted = d3.entries(arr_countries).sort(function(a,b){ return b.value -a.value; });
-
-			//clear out array
-			self.buckets_country = [];
-
-			for(var i=0; i<5; i++){
-				if(arr_countries_sorted[i]){
-					self.buckets_country.push(arr_countries_sorted[i].key);
-				}
-			}*/
-		},
 		util_get_unique_countries:function(){
 			var data = self.data[self.modes[self.mode]];
 			data.forEach(function(d,i){
@@ -1291,6 +1333,12 @@ var init = function(){
 					self.unique_countries.push(d.country);
 				}
 			});
+		},
+
+		//tooltip
+		util_tt_hide:function(){
+			self.hexTTG.classed('hidden',true);
+			self.util_detail_clear();
 		},
 
 		//updating lower right hover annotations
@@ -1387,6 +1435,14 @@ var init = function(){
 		//thank you, http://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
 		util_toTitleCase:function(_str){
 		    return _str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+		},
+
+		util_clearURL:function(){
+			history.pushState("", document.title, window.location.pathname + window.location.search);
+		},
+		util_setURL:function(){
+			var id = self.freeze_focus.ID;
+			if(self.filters.length === 0){ window.location.hash = id; }
 		}
 	}
 }
@@ -1398,6 +1454,10 @@ self.getData(self.processData);
 window.onresize = function(){
 
 	self.util_form_center();
+	
+	self.freeze = false;
+	self.util_tt_hide();
+	self.util_clearURL();
 
 	var device = self.util_resolve_device(window.innerWidth);
 	if(device !== self.device){
@@ -1409,3 +1469,6 @@ window.onresize = function(){
 		self.generate();
 	}
 }
+$(window).on('hashchange load',function(){
+    var id = parseInt(window.location.hash.replace("#", ""));
+});
