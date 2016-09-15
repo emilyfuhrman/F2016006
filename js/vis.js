@@ -260,14 +260,17 @@ var init = function(){
 				.style('left',function(){
 					return (self.device !== 'mobile' ? window.innerWidth/2 -250 : 0) +'px';
 				})
-				.style('top','150px')
-				;
+				.style('top',function(){
+					return (self.device !== 'mobile' ? 150 : 0) +'px';
+				});
 			self.form_tweet = d3.select('#form_tweet')
 				.classed('hidden',true)
 				.style('left',function(){
 					return (self.device !== 'mobile' ? window.innerWidth/2 -250 : 0) +'px';
 				})
-				.style('top','150px');
+				.style('top',function(){
+					return (self.device !== 'mobile' ? 150 : 0) +'px';
+				});
 
 			//grab form buttons, add click handlers
 			self.form_submit = d3.select('#form #submit').on('click',function(){
@@ -1248,6 +1251,9 @@ var init = function(){
 			obj.rating = self.util_resolve_rating_to_number(document.getElementById('input_rating').value);
 			obj.experience = document.getElementById('input_experience').value;
 
+			//**TODO assign unique ID
+			obj.ID = Math.round(Math.random()*30000);
+
 			//make sure none are blank
 			if(	obj.gender === ''
 				|| obj.country === ''
@@ -1281,7 +1287,7 @@ var init = function(){
 			_obj.rating = +_obj.rating;
 
 			str_begin = 'I' +self.util_resolve_rating_to_sentence(_obj.rating) +' because "',
-			str_end = '..." Share your story at www.quantamagazine.org. #LoveHateSciMath';
+			str_end = '..." Share your story at www.quantamagazine.org/#' +_obj.ID +'. #LoveHateSciMath';
 
 			//if needed, truncate experience blurb
 			var str_length = str_begin.length +_obj.experience.length +str_end.length;

@@ -752,6 +752,7 @@ input.second {
 	font-weight:bold;
 	letter-spacing:0.125em;
 	text-transform:uppercase;
+	width:auto;
 	}
 
 .form .input {
@@ -830,6 +831,10 @@ input.second {
 
 	.form {
 		width:100%;
+		}
+
+	.form .tag {
+		width:50%;
 		}
 
 	.form .input {
@@ -990,6 +995,10 @@ input.second {
 		width:500px;
 		}
 
+	.form .tag {
+		width:auto;
+		}
+
 	.form .input {
 		left:300px;
 		right:auto;
@@ -1141,6 +1150,10 @@ input.second {
 
 	.form {
 		width:500px;
+		}
+
+	.form .tag {
+		width:auto;
 		}
 
 	.form .input {
