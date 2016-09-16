@@ -28,6 +28,7 @@ var init = function(){
 			'science'
 		],
 
+		onload:true,
 		freeze:false,
 		freeze_focus:null,
 
@@ -500,6 +501,30 @@ var init = function(){
 
 			var filters_off = self.filters.length === 0,
 				device_off  = self.device === 'default';
+			
+			//detect unique ID in URL
+			//freeze as needed
+			self.freeze = self.onload && filters_off && window.location.hash.split('#').length >1;
+
+			if(self.onload && self.freeze){
+				self.modes.forEach(function(d){
+					var filtered = self.data[d].filter(function(_d){ return _d.ID === window.location.hash.split('#')[1]; });
+					if(filtered.length >0){
+						self.freeze_focus = filtered[0];
+						self.mode = self.modes.indexOf(d);
+					}
+				});
+			} else{
+				self.freeze_focus = null;
+			}
+
+			self.onload = false;
+
+			if(!self.freeze){ self.util_clearURL(); }
+			if(!self.freeze_focus){ 
+				self.freeze = false; 
+				self.util_clearURL();
+			}
 
 			//prepare data to be displayed
 			self.data_display = filters_off ? [self.data[self.modes[self.mode]]] : self.filterData();
@@ -509,16 +534,6 @@ var init = function(){
 				return self.device !== 'mobile' ? 'none' : 'block';
 			});
 			d3.select('.hexTT').style('stroke-width',3);
-			
-			//detect unique ID in URL
-			//freeze as needed
-			self.freeze = filters_off && window.location.hash.split('#').length >1;
-			self.freeze_focus = self.freeze ? self.data[self.modes[self.mode]].filter(function(d){ return d.ID === window.location.hash.split('#')[1]; })[0] : null;
-			if(!self.freeze){ self.util_clearURL(); }
-			if(!self.freeze_focus){ 
-				self.freeze = false; 
-				self.util_clearURL();
-			}
 
 			//hide legend if needed
 			d3.select('#legend_body').style('display',function(){ return self.device !== 'mobile' ? 'block' : 'none' });
