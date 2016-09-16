@@ -621,7 +621,7 @@ class generateVisualization{
 		//generate cube coordinates for data points
 		//thank you, http://stackoverflow.com/questions/2049196/generating-triangular-hexagonal-coordinates-xyz
 		var cube_coords = [];
-		for(var i=0; i<50; i++){
+		for(var i=0; i<100; i++){
 			for(var j=-i; j<=i; j++)
 			for(var k=-i; k<=i; k++)
 			for(var l=-i; l<=i; l++)
