@@ -317,7 +317,7 @@ var init = function(){
 				d3.event.stopPropagation();
 
 				var str = self.device === 'mobile' ? self.anno_userDetail.html().split("<br>")[0] : self.anno_userDetail.html();
-				str +='. Share your story at http://quantamagazine.org.'
+				str +='. Share your story at http://quantamagazine.org/#' +self.freeze_focus.ID +'. #LoveHateSciMath'
 				self.util_form_submit_tweet(str);
 			});
 
@@ -331,8 +331,6 @@ var init = function(){
 			var legend_body,
 				legend_bg;
 			var legend_g;
-				// legend_g_txt,
-				// legend_g_line;
 			var legend_hexes,
 				legend_hexes_txt,
 				legend_hexes_arr;
@@ -369,34 +367,11 @@ var init = function(){
 				.classed('legend_g',true);
 			legend_g
 				.attr('transform',function(d,i){
-					var x = 24,
+					var x = 20,
 						y = 30;
 					return 'translate(' +x +',' +y +')';
 				});
 			legend_g.exit().remove();
-
-			//legend hexagon group captions
-			// legend_g_txt = legend_g.selectAll('text.legend_g_txt')
-			// 	.data(function(d){ return [d]; });
-			// legend_g_txt.enter().append('text')
-			// 	.classed('legend_g_txt',true);
-			// legend_g_txt
-			// 	.attr('x',-9)
-			// 	.attr('y',48)
-			// 	.text('Hexagon shading: rating');
-			// legend_g_txt.exit().remove();
-
-			//legend hexagon group dividers
-			// legend_g_line = legend_g.selectAll('line.legend_g_line')
-			// 	.data(function(d){ return [d]; });
-			// legend_g_line.enter().append('line')
-			// 	.classed('legend_g_line',true);
-			// legend_g_line
-			// 	.attr('x1',-9)
-			// 	.attr('y1',33)
-			// 	.attr('x2',139)
-			// 	.attr('y2',33);
-			// legend_g_line.exit().remove();
 
 			//legend specifics
 			legend_hexes = legend_g.selectAll('path.legend_hex')
@@ -406,8 +381,8 @@ var init = function(){
 			legend_hexes
 				.attr('d',function(d,i){ return self.hexbin.hexagon(8); })
 				.attr('transform',function(d,i){
-					var x = i*120,
-						y = 9;
+					var x = i*110 +9,
+						y = 6;
 					return 'translate(' +x +',' +y +')rotate(90)';
 				})
 				.style('fill-opacity',function(d,i){ return i === 0 ? 0.2 : 1; });
@@ -418,7 +393,7 @@ var init = function(){
 				.classed('legend_hex_txt',true);
 			legend_hexes_txt
 				.attr('transform',function(d,i){
-					var x = i*120 +1,
+					var x = i*110 +9,
 						y = -9;
 					return 'translate(' +x +',' +y +')';
 				})
@@ -430,10 +405,10 @@ var init = function(){
 				.classed('legend_hex_arr',true);
 			legend_hexes_arr
 				.attr('marker-end','url(#arrow)')
-				.attr('x1',20)
-				.attr('y1',-12)
-				.attr('x2',102)
-				.attr('y2',-12);
+				.attr('x1',30)
+				.attr('y1',-14)
+				.attr('x2',96)
+				.attr('y2',-14);
 			legend_hexes_txt.exit().remove();
 
 		/*	---------------------------------------------------------------------- 

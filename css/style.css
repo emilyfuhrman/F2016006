@@ -374,7 +374,7 @@ p {
 #legend_body text {
 	stroke:none;
 	fill:white;
-	font-size:0.55rem;
+	font-size:0.725rem;
 	}
 #legend_body text.legend_hex_txt {
 	text-anchor:middle;
