@@ -95,7 +95,7 @@ class generateVisualization{
 	}
 
 	filterData(){
-		
+
 		var self = this;
 		var d, f, b, r;
 
@@ -292,8 +292,9 @@ class generateVisualization{
 		d3.select('#hover_tweet').on('click',function(){
 			d3.event.stopPropagation();
 
-			var str = self.device === 'mobile' ? self.anno_userDetail.html().split("<br>")[0] : self.anno_userDetail.html();
-			str +='. Share your story at http://quantamagazine.org/#' +self.freeze_focus.ID +'. #LoveHateSciMath'
+			//var str = self.device === 'mobile' ? self.anno_userDetail.html().split("<br>")[0] : self.anno_userDetail.html();
+			var str = '"' +self.freeze_focus.comment.substring(0,70);
+			str +='..." Share your story at http://quantamagazine.org/#' +self.freeze_focus.ID +'. #LoveHateSciMath'
 			self.util_form_submit_tweet(str);
 		});
 
