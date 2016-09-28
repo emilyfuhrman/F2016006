@@ -691,6 +691,10 @@ select:-moz-focusring {
 	padding-bottom:36px;
 	}
 
+.form textarea#input_name {
+	width:166px;
+	}
+
 input[type=radio]:not(old){
 	width:18px;
 	opacity:0;
