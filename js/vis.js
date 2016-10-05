@@ -264,14 +264,14 @@ class generateVisualization{
     		d3.event.preventDefault();
 			d3.event.stopPropagation();
 			
-			var tweetString = "Why I #LoveHateSciMath: Share your story at http://quantamagazine.org via @QuantaMagazine";
+			var tweetString = "Why I LOVE or HATE math/science: Share your story at http://quantamagazine.org via @QuantaMagazine #PencilsDown";
 			self.util_form_submit_tweet(tweetString);
 		});
 		d3.select('#cir_fb').on('click',function(){
 			d3.event.preventDefault();
 			d3.event.stopPropagation();
 
-			var fbString = "Why I #LoveHateSciMath: Share your story.";
+			var fbString = "Why I LOVE or HATE math/science: Share your story at http://quantamagazine.org via @QuantaMagazine #PencilsDown";
 			self.util_post_fb(fbString);
 		});
 
@@ -294,7 +294,7 @@ class generateVisualization{
 
 			//var str = self.device === 'mobile' ? self.anno_userDetail.html().split("<br>")[0] : self.anno_userDetail.html();
 			var str = '"' +self.freeze_focus.comment.substring(0,70);
-			str +='..." Share your story at http://quantamagazine.org/#' +self.freeze_focus.ID +'. #LoveHateSciMath'
+			str +='..." Share your story at http://quantamagazine.org/?code=' +self.freeze_focus.ID +'. #PencilsDown'
 			self.util_form_submit_tweet(str);
 		});
 
@@ -457,11 +457,12 @@ class generateVisualization{
 		
 		//detect unique ID in URL
 		//freeze as needed
-		self.freeze = self.onload && filters_off && window.location.hash.split('#').length >1;
+		var navcode = window.location.search.substr(1,window.location.search.length);
+		self.freeze = self.onload && filters_off && navcode.split('=').length >1;
 
 		if(self.onload && self.freeze){
 			self.modes.forEach(function(d){
-				var filtered = self.data[d].filter(function(_d){ return _d.ID === window.location.hash.split('#')[1]; });
+				var filtered = self.data[d].filter(function(_d){ return _d.ID === navcode.split('=')[1]; });
 				if(filtered.length >0){
 					self.freeze_focus = filtered[0];
 					self.mode = self.modes.indexOf(d);
@@ -1278,7 +1279,7 @@ class generateVisualization{
 		_obj.rating = +_obj.rating;
 
 		str_begin = 'I' +self.util_resolve_rating_to_sentence(_obj.rating) +' because "',
-		str_end = '..." Share your story at www.quantamagazine.org/#' +_obj.ID +'. #LoveHateSciMath';
+		str_end = '..." Share your story at www.quantamagazine.org/?code=' +_obj.ID +'. #PencilsDown';
 
 		//if needed, truncate experience blurb
 		var str_length = str_begin.length +_obj.experience.length +str_end.length;
@@ -1446,12 +1447,13 @@ class generateVisualization{
 	}
 
 	util_clearURL(){
-		history.pushState("", document.title, window.location.pathname + window.location.search);
+		window.history.pushState("", document.title, window.location.pathname);
 	}
 	util_setURL(){
 		var self = this;
-		var id = self.freeze_focus.ID;
-		if(self.filters.length === 0){ window.location.hash = id; }
+		var path = '?code=' +self.freeze_focus.ID;
+
+		if(self.filters.length === 0){ window.history.pushState("", document.title, path); }
 	}
 }
 
