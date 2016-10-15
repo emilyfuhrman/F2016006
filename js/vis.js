@@ -1281,7 +1281,7 @@ class generateVisualization{
 			self.form_alert.classed('hidden',false);
 			//self.form_tweet.classed('hidden',false);
 
-			var str = "Thank you! Your survey response will be available here once it has been approved: www.quantamagazine.org/?code=" +obj.iD;
+			var str = "Thank you! Your survey response will be available here once it has been approved: www.quantamagazine.org/?code=" +obj.ID;
 			//alert(str);
 			self.form_alert.select('#submit_message').html('<span>' +str +'</span>');
 		}
