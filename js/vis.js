@@ -248,6 +248,14 @@ class generateVisualization{
 			.style('top',function(){
 				return (self.device !== 'mobile' ? 150 : 0) +'px';
 			});
+		self.form_alert = d3.select('#form_alert')
+			.classed('hidden',true)
+			.style('left',function(){
+				return (self.device !== 'mobile' ? window.innerWidth/2 -250 : 0) +'px';
+			})
+			.style('top',function(){
+				return (self.device !== 'mobile' ? 150 : 0) +'px';
+			});		
 
 		//grab form buttons, add click handlers
 		self.form_submit = d3.select('#form #submit').on('click',function(){
@@ -259,6 +267,11 @@ class generateVisualization{
     		d3.event.preventDefault();
 			d3.event.stopPropagation();
 			self.util_form_submit_tweet();
+		});
+		d3.select('#okay').on('click',function(){
+    		d3.event.preventDefault();
+			d3.event.stopPropagation();
+			self.form_alert.classed('hidden',true);
 		});
 		d3.select('#cir_twitter').on('click',function(){
     		d3.event.preventDefault();
@@ -1199,6 +1212,9 @@ class generateVisualization{
 		self.form_tweet.style('left',function(){
 			return (self.device !== 'mobile' ? window.innerWidth/2 -250 : 0) +'px';
 		});
+		self.form_alert.style('left',function(){
+			return (self.device !== 'mobile' ? window.innerWidth/2 -250 : 0) +'px';
+		});
 	}
 	util_form_clear(){
 		document.getElementById('input_name').value = '';
@@ -1215,6 +1231,7 @@ class generateVisualization{
 		self.form_visible = false;
 		self.form.classed('hidden',true);
 		self.form_tweet.classed('hidden',true);
+		self.form_alert.classed('hidden',true);
 	}
 	util_form_show(){
 		var self = this;
@@ -1258,10 +1275,15 @@ class generateVisualization{
 			//**TODO submit object to database
 
 			self.util_form_clear();
-			self.util_form_compose_tweet(obj);
+			//self.util_form_compose_tweet(obj);
 
 			self.form.classed('hidden',true);
-			self.form_tweet.classed('hidden',false);
+			self.form_alert.classed('hidden',false);
+			//self.form_tweet.classed('hidden',false);
+
+			var str = "Thank you! Your survey response will be available here once it has been approved: www.quantamagazine.org/?code=" +obj.iD;
+			//alert(str);
+			self.form_alert.select('#submit_message').html('<span>' +str +'</span>');
 		}
 	}
 	util_form_compose_tweet(_obj){
@@ -1278,18 +1300,18 @@ class generateVisualization{
 		//turn to integer
 		_obj.rating = +_obj.rating;
 
-		str_begin = 'I' +self.util_resolve_rating_to_sentence(_obj.rating) +' because "',
-		str_end = '..." Share your story at www.quantamagazine.org/?code=' +_obj.ID +'. #PencilsDown';
+		// str_begin = 'I' +self.util_resolve_rating_to_sentence(_obj.rating) +' because "',
+		// str_end = '..." Share your story at www.quantamagazine.org/?code=' +_obj.ID +'. #PencilsDown';
 
 		//if needed, truncate experience blurb
-		var str_length = str_begin.length +_obj.experience.length +str_end.length;
-		if(str_length >char_limit){
-			str_mid = _obj.experience.substring(0,(_obj.experience.length -(str_length -char_limit) -1));
-		} else{
-			str_mid = _obj.experience;
-		}
+		// var str_length = str_begin.length +_obj.experience.length +str_end.length;
+		// if(str_length >char_limit){
+		// 	str_mid = _obj.experience.substring(0,(_obj.experience.length -(str_length -char_limit) -1));
+		// } else{
+		// 	str_mid = _obj.experience;
+		// }
 
-		str = str_begin +str_mid +str_end;
+		// str = str_begin +str_mid +str_end;
 		document.getElementById('tweet_body').value = str;
 	}
 	util_form_clear_tweet(){
@@ -1308,6 +1330,7 @@ class generateVisualization{
 
 		self.util_form_clear_tweet();
 		self.form_tweet.classed('hidden',true);
+		self.form_alert.classed('hidden',true);
 		self.form_visible = false;
 	}
 	util_encode_tweet(_text){

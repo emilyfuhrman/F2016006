@@ -731,6 +731,14 @@ input.second {
 	border-top:none;
 	}
 
+#form_alert .section {
+	border:none;
+	}
+#form_alert .section:first-child  {
+	padding-top:0;
+	padding-bottom:21px;
+	}
+
 .form .elem {
 	padding:30px 24px;
 	font-size:0.6rem;
