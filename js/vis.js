@@ -182,6 +182,8 @@ class generateVisualization{
 		self.w = self.device_dimensions[self.device].w;
 		self.h = self.device_dimensions[self.device].h;
 
+		self.mode = window.location.hash === '#science' ? 1 : 0;
+
 		//<svg id='map' viewBox='0 0 1436 782' preserveAspectRatio='xMidYMid meet'></svg>
 		self.svg = d3.select('#container').selectAll('svg.vis')
 			.data([self]);
@@ -293,6 +295,7 @@ class generateVisualization{
 			d3.event.stopPropagation();
 			self.util_filters_clear();
 			self.mode = 1 -self.mode;
+			window.location.hash = '#' +self.modes[self.mode];
 			self.generate();
 		});
 		self.add = d3.select('#menu .btn#add').on('click',function(){
@@ -1472,7 +1475,8 @@ class generateVisualization{
 	}
 
 	util_clearURL(){
-		window.history.pushState("", document.title, window.location.pathname);
+		var path = window.location.pathname +window.location.hash;
+		window.history.pushState("", document.title, path);
 	}
 	util_setURL(){
 		var self = this;
@@ -1505,5 +1509,5 @@ window.onresize = function(){
 	}
 }
 $(window).on('hashchange load',function(){
-    var id = parseInt(window.location.hash.replace("#", ""));
+    //var id = parseInt(window.location.hash.replace("#", ""));
 });
