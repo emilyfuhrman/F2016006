@@ -88,9 +88,7 @@ class generateVisualization{
 				return d3.descending(a.rating,b.rating);
 			});
 		});
-
-		//create unique countries dataset
-		self.util_get_unique_countries();
+		
 		self.generate();
 	}
 
@@ -495,6 +493,9 @@ class generateVisualization{
 			self.freeze = false; 
 			self.util_clearURL();
 		}
+
+		//generate unique countries dataset
+		self.util_get_unique_countries();
 
 		//prepare data to be displayed
 		self.data_display = filters_off ? [self.data[self.modes[self.mode]]] : self.filterData();
