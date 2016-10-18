@@ -25,8 +25,7 @@ class generateVisualization{
 		this.freeze_focus = null;
 		this.form_visible = false,
 
-		//array(s) for unique values
-		this.unique_countries = [];
+		this.unique_countries = {};
 
 		//buckets for each attribute
 		this.buckets_age = ['<18', '18-33', '34-49', '50-65', '>65'];
@@ -88,7 +87,11 @@ class generateVisualization{
 				return d3.descending(a.rating,b.rating);
 			});
 		});
-		
+
+
+		//generate unique countries datasets
+		self.util_get_unique_countries();
+
 		self.generate();
 	}
 
@@ -494,9 +497,6 @@ class generateVisualization{
 			self.util_clearURL();
 		}
 
-		//generate unique countries dataset
-		self.util_get_unique_countries();
-
 		//prepare data to be displayed
 		self.data_display = filters_off ? [self.data[self.modes[self.mode]]] : self.filterData();
 		
@@ -518,7 +518,7 @@ class generateVisualization{
 		//create dropdown for country filter
 		var countries_menu_items;
 		countries_menu_items = d3.select('.btn.filter#country .expand').selectAll('li.option')
-			.data(self.unique_countries.sort(function(a,b){
+			.data(self.unique_countries[self.modes[self.mode]].sort(function(a,b){
 				return a <b ? -1 : a >b ? 1 : 0;
 			}));
 		countries_menu_items.enter().append('li')
@@ -1184,7 +1184,9 @@ class generateVisualization{
 	}
 	calc_hex_linear_radius(_count,_area){
 		var self = this;
-		var hex_area = _area/_count;
+		var hex_bound = 75,
+			hex_count = _count <hex_bound ? hex_bound : _count,
+			hex_area = _area/hex_count;
 		return Math.floor(Math.sqrt(((hex_area/6)*4)/Math.sqrt(3)));
 	}
 
@@ -1357,12 +1359,16 @@ class generateVisualization{
 	//data
 	util_get_unique_countries(){
 		var self = this;
-		var data = self.data[self.modes[self.mode]];
-		data.forEach(function(d,i){
-			if(self.unique_countries.indexOf(d.country) <0){
-				self.unique_countries.push(d.country);
-			}
-		});
+
+		self.modes.forEach(function(d){
+			self.unique_countries[d] = [];
+			var data = self.data[d];
+			data.forEach(function(_d,i){
+				if(self.unique_countries[d].indexOf(_d.country) <0){
+					self.unique_countries[d].push(_d.country);
+				}
+			});
+		});		
 	}
 
 	//tooltip
