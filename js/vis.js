@@ -1284,7 +1284,7 @@ class generateVisualization{
 			self.form_alert.classed('hidden',false);
 			//self.form_tweet.classed('hidden',false);
 
-			var url = "www.quantamagazine.org/?code=" +obj.ID,
+			var url = "www.quantamagazine.org/20161020-science-math-education-survey/?code=" +obj.ID,
 				lnk = "<a href='http://" +url +"'>" +url +"</a>",
 				str = "Thank you! Your survey response will be available here once it has been approved: " +lnk;
 			//alert(str);
