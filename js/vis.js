@@ -279,16 +279,14 @@ class generateVisualization{
     		d3.event.preventDefault();
 			d3.event.stopPropagation();
 			
-			var tweetString = "Why I LOVE or HATE math/science: Share your story at https://www.quantamagazine.org/20161020-science-math-education-survey/
- via @QuantaMagazine #PencilsDown";
+			var tweetString = "Why I LOVE or HATE math/science: Share your story at https://www.quantamagazine.org/20161020-science-math-education-survey via @QuantaMagazine #PencilsDown";
 			self.util_form_submit_tweet(tweetString);
 		});
 		d3.select('#cir_fb').on('click',function(){
 			d3.event.preventDefault();
 			d3.event.stopPropagation();
 
-			var fbString = "Why I LOVE or HATE math/science: Share your story at https://www.quantamagazine.org/20161020-science-math-education-survey/
- via @QuantaMagazine #PencilsDown";
+			var fbString = "Why I LOVE or HATE math/science: Share your story at https://www.quantamagazine.org/20161020-science-math-education-survey via @QuantaMagazine #PencilsDown";
 			self.util_post_fb(fbString);
 		});
 
@@ -312,8 +310,7 @@ class generateVisualization{
 
 			//var str = self.device === 'mobile' ? self.anno_userDetail.html().split("<br>")[0] : self.anno_userDetail.html();
 			var str = '"' +self.freeze_focus.comment.substring(0,70);
-			str +='..." Share your story at https://www.quantamagazine.org/20161020-science-math-education-survey/
-/?code=' +self.freeze_focus.ID +'. #PencilsDown'
+			str +='..." Share your story at https://www.quantamagazine.org/20161020-science-math-education-survey/?code=' +self.freeze_focus.ID +'. #PencilsDown'
 			self.util_form_submit_tweet(str);
 		});
 
@@ -1351,8 +1348,7 @@ class generateVisualization{
 		var caption = _text;
 	    FB.ui({
 		  method: 'feed',
-		  link: 'https://www.quantamagazine.org/20161020-science-math-education-survey/
-',
+		  link: 'https://www.quantamagazine.org/20161020-science-math-education-survey',
 		  caption: caption,
 		}, function(response){});
 	}
