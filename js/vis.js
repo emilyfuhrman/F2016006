@@ -182,7 +182,7 @@ class generateVisualization{
 		self.w = self.device_dimensions[self.device].w;
 		self.h = self.device_dimensions[self.device].h;
 
-		self.mode = window.location.hash === '#science' ? 1 : 0;
+		self.mode = window.location.hash === '#science' ? 1 : window.location.hash === '#math' ? 0 : 0;
 
 		//<svg id='map' viewBox='0 0 1436 782' preserveAspectRatio='xMidYMid meet'></svg>
 		self.svg = d3.select('#container').selectAll('svg.vis')
