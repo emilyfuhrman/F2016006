@@ -59,13 +59,20 @@ class generateVisualization{
 		var self = this;
 		var datasets = ['math','science','countries'];
 		datasets.forEach(function(d){
-			d3.csv('data/' +d +'.csv',function(e,_d){
+			/*d3.csv('data/' +d +'.csv',function(e,_d){
 				self.data[d] = _d;
 				datasets = datasets.filter(function(__d){ return __d !== d; });
 				if(datasets.length === 0){
 					self.processData();
 				}
-			});
+			});*/
+			d3.json("/wp-content/plugins/education-interactive/edin-results.php?type="+d, function(error, _d) {
+		    	self.data[d] = _d;
+		    	datasets = datasets.filter(function(__d){ return __d !== d; });
+		    	if(datasets.length === 0){
+					self.processData();
+				}
+		    });
 		});
 	}
 
@@ -183,8 +190,6 @@ class generateVisualization{
 		self.w = self.device_dimensions[self.device].w;
 		self.h = self.device_dimensions[self.device].h;
 
-		self.mode = window.location.hash === '#science' ? 1 : window.location.hash === '#math' ? 0 : 0;
-
 		//<svg id='map' viewBox='0 0 1436 782' preserveAspectRatio='xMidYMid meet'></svg>
 		self.svg = d3.select('#container').selectAll('svg.vis')
 			.data([self]);
@@ -296,7 +301,8 @@ class generateVisualization{
 			d3.event.stopPropagation();
 			self.util_filters_clear();
 			self.mode = 1 -self.mode;
-			window.location.hash = '#' +self.modes[self.mode];
+			// window.location.hash = '#' +self.modes[self.mode];
+			self.util_setURL();
 			self.generate();
 		});
 		self.add = d3.select('#menu .btn#add').on('click',function(){
@@ -474,19 +480,28 @@ class generateVisualization{
 		
 		//detect unique ID in URL
 		//freeze as needed
-		var navcode = window.location.search.substr(1,window.location.search.length);
-		self.freeze = self.onload && filters_off && navcode.split('=').length >1;
-
-		if(self.onload && self.freeze){
-			self.modes.forEach(function(d){
-				var filtered = self.data[d].filter(function(_d){ return _d.ID === navcode.split('=')[1]; });
-				if(filtered.length >0){
-					self.freeze_focus = filtered[0];
-					self.mode = self.modes.indexOf(d);
+		var qstring = window.location.search.replace('?','').split('&');
+		if(qstring.length >0){
+			qstring.forEach(function(q){
+				var _q = q.split('=');
+				if(_q[0] === 'mode'){
+					self.mode = self.modes.indexOf(_q[1]);
+				}
+				if(_q[0] === 'code'){
+					self.freeze = self.onload && filters_off;
+					if(self.onload && self.freeze){
+						self.modes.forEach(function(d){
+							var filtered = self.data[d].filter(function(_d){ return _d.ID === _q[1]; });
+							if(filtered.length >0){
+								self.freeze_focus = filtered[0];
+								self.mode = self.modes.indexOf(d);
+							}
+						});
+					} else{
+						self.freeze_focus = null;
+					}
 				}
 			});
-		} else{
-			self.freeze_focus = null;
 		}
 
 		self.onload = false;
@@ -1184,7 +1199,7 @@ class generateVisualization{
 	}
 	calc_hex_linear_radius(_count,_area){
 		var self = this;
-		var hex_bound = 75,
+		var hex_bound = 50,
 			hex_count = _count <hex_bound ? hex_bound : _count,
 			hex_area = _area/hex_count;
 		return Math.floor(Math.sqrt(((hex_area/6)*4)/Math.sqrt(3)));
@@ -1391,6 +1406,7 @@ class generateVisualization{
 			str_comment = '&ldquo;' +_d.comment +'&rdquo;';
 			str_userDetail = (_d.name ? _d.name : self.util_resolve_gender(_d.gender)) +', ' +_d.age +', from ' +_d.country +', has' +self.util_resolve_rating_to_sentence(_d.rating,true) +' since ' +self.util_resolve_grade(_d.grade).toLowerCase();
 		}
+		str_comment = str_comment.replace(/\\/g, '');
 		self.anno.style('display','block');
 		self.anno_comment.html(str_comment);
 		self.anno_userDetail.html(str_userDetail);
@@ -1441,13 +1457,13 @@ class generateVisualization{
 		var self = this;
 		var g = +_n,
 			group;
-		if(g >0 && g <=5){
+		if((g >0 && g <=5) || (_n == 'Grades 1-5')){
 			group = self.buckets_grade[0];
-		} else if(g >5 && g <=8){
+		} else if((g >5 && g <=8) || (_n == 'Grades 6-8')){
 			group = self.buckets_grade[1];
-		} else if(g >8 && g <= 12){
+		} else if((g >8 && g <= 12) || (_n == 'Grades 9-12')){
 			group = self.buckets_grade[2];
-		} else{
+		} else {
 			group = self.buckets_grade[3];
 		}
 		return group;
@@ -1482,12 +1498,13 @@ class generateVisualization{
 	}
 
 	util_clearURL(){
-		var path = window.location.pathname +window.location.hash;
+		var self = this;
+		var path = window.location.pathname +'?mode=' +self.modes[self.mode];
 		window.history.pushState("", document.title, path);
 	}
 	util_setURL(){
 		var self = this;
-		var path = '?code=' +self.freeze_focus.ID;
+		var path = '?mode=' +self.modes[self.mode] +(self.freeze ? '&code=' +self.freeze_focus.ID : '');
 
 		if(self.filters.length === 0){ window.history.pushState("", document.title, path); }
 	}
