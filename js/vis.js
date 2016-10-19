@@ -973,7 +973,7 @@ class generateVisualization{
 				}
 				return d.value.length === 0 ? '' : self.util_toTitleCase(t); 
 			})
-			.style('text-anchor',function(){ return device_off ? (self.filters.length <2 ? 'start' : 'middle') : 'start'; });
+			.style('text-anchor',function(){ return device_off ? (self.filters.length <2 ? 'start' : 'start') : 'start'; });
 		hexesLabels.exit().remove();
 
 		//labels for when double-filters are showing
@@ -985,7 +985,9 @@ class generateVisualization{
 			.classed('hexLabel_',true);
 		hexesLabels_
 			.attr('x',function(d){ 
-				return d.ratio ? device_off ? d.ratio_agg +(hex_area_w*d.ratio) +hex_pad_sub/2 : hex_area_w +60 : 0; 
+				// return d.ratio ? device_off ? d.ratio_agg +(hex_area_w*d.ratio) +hex_pad_sub/2 : hex_area_w +60 : 0; 
+				// return d.ratio ? device_off ? (hex_area_w*d.ratio)/2 : hex_area_w : 0;
+				return d.ratio ? device_off ? (self.filters.length <2 ? 0 : 0) : hex_area_w +30 : 0; 
 			})
 			.attr('y',function(d){ 
 				// return d.ratio ? device_off ? hex_area_h +60 : 0 : 0; 
@@ -993,9 +995,9 @@ class generateVisualization{
 			})
 			.text(function(d,i){
 				var split = d.key.split('_');
-				return d.value.length === 0 ? '' : (split[split.length -1] === 'M' ? self.util_toTitleCase(d.key.substring(0,d.key.length -2).split('_').join(' ')) : ''); 
+				return split[split.length -1] === 'M' ? self.util_toTitleCase(d.key.substring(0,d.key.length -2).split('_').join(' ')) : ''; 
 			})
-			.style('text-anchor',function(){ return device_off ? (self.filters.length <2 ? 'start' : 'middle' ) : 'start'; });
+			.style('text-anchor',function(){ return device_off ? (self.filters.length <2 ? 'start' : 'start' ) : 'start'; });
 		hexesLabels_.exit().remove();
 
 		//create tooltip group
