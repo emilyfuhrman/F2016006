@@ -187,6 +187,7 @@ class generateVisualization{
 				d.sort(function(a,b){
 					return a.idx_tot -b.idx_tot;
 				});
+				d = d.filter(function(d){ return d.value.length >0; });
 				d.forEach(function(_d,_i){
 					_d.value.forEach(function(__d){
 						__d.idx_temp = _i;
@@ -995,7 +996,7 @@ class generateVisualization{
 			})
 			.text(function(d,i){
 				var split = d.key.split('_');
-				return split[split.length -1] === 'M' ? self.util_toTitleCase(d.key.substring(0,d.key.length -2).split('_').join(' ')) : ''; 
+				return (split[split.length -1] === 'M' || split[split.length -1] === 'F' && self.data_display.filter(function(_d){ return _d.key.split('_')[0] === split[0]; }).length <2) ? self.util_toTitleCase(d.key.substring(0,d.key.length -2).split('_').join(' ')) : ''; 
 			})
 			.style('text-anchor',function(){ return device_off ? (self.filters.length <2 ? 'start' : 'start' ) : 'start'; });
 		hexesLabels_.exit().remove();
