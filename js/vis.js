@@ -59,20 +59,20 @@ class generateVisualization{
 		var self = this;
 		var datasets = ['math','science','countries'];
 		datasets.forEach(function(d){
-			/*d3.csv('data/' +d +'.csv',function(e,_d){
+			d3.csv('data/' +d +'.csv',function(e,_d){
 				self.data[d] = _d;
 				datasets = datasets.filter(function(__d){ return __d !== d; });
 				if(datasets.length === 0){
 					self.processData();
 				}
-			});*/
-			d3.json("/wp-content/plugins/education-interactive/edin-results.php?type="+d, function(error, _d) {
-		    	self.data[d] = _d;
-		    	datasets = datasets.filter(function(__d){ return __d !== d; });
-		    	if(datasets.length === 0){
-					self.processData();
-				}
-		    });
+			});
+			// d3.json("/wp-content/plugins/education-interactive/edin-results.php?type="+d, function(error, _d) {
+		 //    	self.data[d] = _d;
+		 //    	datasets = datasets.filter(function(__d){ return __d !== d; });
+		 //    	if(datasets.length === 0){
+			// 		self.processData();
+			// 	}
+		 //    });
 		});
 	}
 
