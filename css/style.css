@@ -309,7 +309,7 @@ p {
 	}
 
 #anno {
-	z-index:1000;
+	z-index:1000000;
 	display:none;
 	position:absolute;
 	width:300px;
@@ -329,6 +329,7 @@ p {
 	float:left;
 	font-family:'Georgia', serif;
 	padding:15px;
+	padding-bottom:0;
 	}
 
 #anno #detail {
@@ -347,7 +348,7 @@ p {
 	background-image:url(../assets/icon_twitter.svg);
 	width:20px;
 	height:20px;
-	margin:0 0 15px 15px;
+	margin:15px;
 	padding:0;
 	cursor:pointer;
 	pointer-events:all;
@@ -998,7 +999,7 @@ input.second {
 
 	#anno #hover_tweet {
 		display:none;
-		margin:0 0 0 15px;
+		margin:15px;
 		}
 	}
 
@@ -1036,6 +1037,7 @@ input.second {
 	#anno .comment {
 		position:relative;
 		padding:15px;
+		padding-bottom:0;
 		}
 	#anno #detail {
 		padding-bottom:0;
@@ -1156,7 +1158,7 @@ input.second {
 
 	#anno #hover_tweet {
 		display:block;
-		margin:0 0 15px 15px;
+		margin:15px;
 		}
 	}
 
@@ -1194,6 +1196,7 @@ input.second {
 	#anno .comment {
 		position:relative;
 		padding:15px;
+		padding-bottom:0;
 		}
 	#anno #detail {
 		padding-bottom:0;
@@ -1314,6 +1317,6 @@ input.second {
 
 	#anno #hover_tweet {
 		display:block;
-		margin:0 0 15px 15px;
+		margin:15px;
 		}
 	}

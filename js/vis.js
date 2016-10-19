@@ -84,6 +84,7 @@ class generateVisualization{
 			self.data[d].forEach(function(_d){
 				_d.rating = +_d.rating;
 				_d.age = +_d.age;
+				_d.id = (_d.ID || _d.id);
 
 				_d.age_bucket = self.util_resolve_age(_d.age);
 				_d.grade_bucket = self.util_resolve_grade(_d.grade);
@@ -126,6 +127,7 @@ class generateVisualization{
 				var hash = f === 'country' ? _d[f].split(' ').join('_').toLowerCase() : _d[f];
 				if(d[hash]){
 					_d.idx = d3.keys(d).indexOf(hash);
+					_d.idx_temp = null;
 					d[hash].push(_d);
 				}
 			});
@@ -147,6 +149,7 @@ class generateVisualization{
 				var hash = f === 'country' ? _d[f].split(' ').join('_').toLowerCase() : _d[f];
 				if(d[hash +'_' +_d.gender]){
 					_d.idx = d3.keys(d).indexOf(hash +'_' +_d.gender);
+					_d.idx_temp = null;
 					d[hash +'_' +_d.gender].push(_d); 
 				}
 			});
@@ -157,6 +160,39 @@ class generateVisualization{
 
 		var length_tot = d3.sum(d,function(_d){ return _d.value.length; });
 
+		if(f === 'country'){
+			if(self.filters.length === 1){
+				d.sort(function(a,b){ return a.value.length -b.value.length; });
+				d.forEach(function(_d){
+					_d.value.forEach(function(__d){ 
+						var str = __d.country.split(' ').join('_').toLowerCase();
+						__d.idx_temp = d.indexOf(d.filter(function(k){ return k.key === str; })[0]);
+					});
+				});
+			} else if(self.filters.length === 2){
+				var holder = {};
+				b.forEach(function(_b){
+					holder[_b] = 0;
+				});
+				d.forEach(function(_d){
+					holder[_d.key.split('_')[0]] +=_d.value.length;
+				});
+				holder = d3.entries(holder);
+				holder.sort(function(a,b){ return a.value -b.value; });
+				d.forEach(function(_d){
+					var idx_tot = holder.indexOf(holder.filter(function(k){ return k.key === _d.key.split('_')[0]; })[0]);
+					_d.idx_tot = idx_tot;
+				});
+				d.sort(function(a,b){
+					return a.idx_tot -b.idx_tot;
+				});
+				d.forEach(function(_d,_i){
+					_d.value.forEach(function(__d){
+						__d.idx_temp = _i;
+					});
+				})
+			}
+		}
 		d.forEach(function(_d,_i){ 
 
 			//calculate length in relation to total length for placement
@@ -317,7 +353,7 @@ class generateVisualization{
 
 			//var str = self.device === 'mobile' ? self.anno_userDetail.html().split("<br>")[0] : self.anno_userDetail.html();
 			var str = '"' +self.freeze_focus.comment.substring(0,70);
-			str +='..." Share your story at https://www.quantamagazine.org/20161020-science-math-education-survey/?code=' +self.freeze_focus.ID +'. #PencilsDown'
+			str +='..." Share your story at https://www.quantamagazine.org/20161020-science-math-education-survey/?code=' +self.freeze_focus.id +'. #PencilsDown'
 			self.util_form_submit_tweet(str);
 		});
 
@@ -491,7 +527,7 @@ class generateVisualization{
 					self.freeze = self.onload && filters_off;
 					if(self.onload && self.freeze){
 						self.modes.forEach(function(d){
-							var filtered = self.data[d].filter(function(_d){ return _d.ID === _q[1]; });
+							var filtered = self.data[d].filter(function(_d){ return _d.id === _q[1]; });
 							if(filtered.length >0){
 								self.freeze_focus = filtered[0];
 								self.mode = self.modes.indexOf(d);
@@ -596,16 +632,16 @@ class generateVisualization{
 		//for columns
 		var hex_display_length = filters_off ? self.data_display.length : self.data_display.filter(function(d){ return d.value.length >0; }).length,
 
-			hex_pad = device_off ? 60 : 30,
+			hex_pad = device_off ? 75 : 30,
 			hex_pad_sub = self.filters.length === 2 ? (device_off ? 15 : 6) : 0,
 
 			hex_area_w = self.device === 'default' ?
-				( self.filters.length === 2 ? self.w*0.75 -((hex_display_length -1)*hex_pad +(hex_display_length*hex_pad_sub))
-				: self.filters.length === 1 ? self.w*0.75 -((hex_display_length -1)*hex_pad)
+				( self.filters.length === 2 ? self.w*0.65 -((hex_display_length -1)*hex_pad +(hex_display_length*hex_pad_sub))
+				: self.filters.length === 1 ? self.w*0.65 -((hex_display_length -1)*hex_pad)
 				: 0)
 				: self.w*0.45,
 			hex_area_h = self.device === 'default' ?
-				self.h*0.45 :
+				self.h*0.4 :
 				( self.filters.length === 2 ? self.h*0.65 -((hex_display_length -1)*hex_pad -(hex_display_length*hex_pad_sub))
 				: self.filters.length === 1 ? self.h*0.65 -((hex_display_length -1)*hex_pad)
 				: 0),
@@ -625,7 +661,8 @@ class generateVisualization{
 		hex_w = hex_rad*2;
 
 		//adjust hex group padding, in case it's smaller than the size of a hexagon
-		hex_pad_sub = hex_pad_sub <hex_rad*2 ? hex_rad*2 : hex_pad_sub;
+		//hex_pad_sub = hex_pad_sub <hex_rad*2 ? hex_rad*2 : hex_pad_sub;
+		hex_pad_sub = hex_rad*2;
 
 		var	hex_row_h = Math.floor( hex_area_h/hex_h ),
 			hex_col_w = Math.floor( hex_area_w/(hex_w*0.75) );
@@ -869,13 +906,14 @@ class generateVisualization{
 					var o = d.rating/5;
 					var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
 						col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
-					var p = self.data_display[d.idx],
+					var acting_idx = (Number.isInteger(d.idx_temp) && d.idx_temp >=0 && self.filters.indexOf('country') >-1) ? d.idx_temp : d.idx,
+						p = self.data_display[acting_idx],
 
 						x_trans = filters_off ? hex_coords.x : device_off ? padding.left : (self.w -hex_area_w)/3,
 						y_trans = filters_off ? hex_coords.y : device_off ? (self.h -hex_area_h)/1.75 : padding.top,
 
-						x_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? (p.ratio_agg*hex_area_w) +(d.idx*hex_pad) +(d.idx*hex_pad_sub) : 0,
-						y_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? 0 : (p.ratio_agg*hex_area_h) +(d.idx*hex_pad) +(d.idx*hex_pad_sub);
+						x_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? (p.ratio_agg*hex_area_w) +(acting_idx*hex_pad) +(acting_idx*hex_pad_sub) : 0,
+						y_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? 0 : (p.ratio_agg*hex_area_h) +(acting_idx*hex_pad) +(acting_idx*hex_pad_sub);
 
 					x = filters_off ? d.pos.y : col_num*(hex_w*0.75);
 					y = filters_off ? d.pos.x : row_num*(hex_h) +((col_num%2)*(hex_h/2));
@@ -914,14 +952,14 @@ class generateVisualization{
 
 		//labels under groups
 		hexesLabels = hexesG.selectAll('text.hexLabel')
-			.data(function(d){ return !filters_off ? [d] : false; });
+			.data(function(d,i){ return !filters_off ? [d] : false; });
 		hexesLabels.enter().append('text')
 			.classed('hexLabel',true);
 		hexesLabels
 			.classed('sub',function(){ return self.filters.length === 2; })
 			.attr('x',function(d){ return d.ratio ? device_off ? (self.filters.length <2 ? 0 : 0) : hex_area_w +30 : 0; })
 			.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +30 : 0 : 0; })
-			.text(function(d){ 
+			.text(function(d,i){ 
 				var t;
 				var split = d.key.split('_');
 				if(self.filters.length === 1){
@@ -939,14 +977,19 @@ class generateVisualization{
 
 		//labels for when double-filters are showing
 		hexesLabels_ = hexesG.selectAll('text.hexLabel_')
-			.data(function(d){ return self.filters.length === 2 ? [d] : false; });
+			.data(function(d,i){
+				return self.filters.length === 2 ? [d] : false; 
+			});
 		hexesLabels_.enter().append('text')
 			.classed('hexLabel_',true);
 		hexesLabels_
 			.attr('x',function(d){ 
 				return d.ratio ? device_off ? d.ratio_agg +(hex_area_w*d.ratio) +hex_pad_sub/2 : hex_area_w +60 : 0; 
 			})
-			.attr('y',function(d){ return d.ratio ? device_off ? hex_area_h +60 : 0 : 0; })
+			.attr('y',function(d){ 
+				// return d.ratio ? device_off ? hex_area_h +60 : 0 : 0; 
+				return device_off ? hex_area_h +60 : 0; 
+			})
 			.text(function(d,i){
 				var split = d.key.split('_');
 				return d.value.length === 0 ? '' : (split[split.length -1] === 'M' ? self.util_toTitleCase(d.key.substring(0,d.key.length -2).split('_').join(' ')) : ''); 
@@ -997,15 +1040,6 @@ class generateVisualization{
 
 			var x, y;
 			var o = self.freeze_focus.rating/5;
-			// var row_num = device_off ? i%hex_row_h : Math.floor(i/hex_col_w),
-			// 	col_num = device_off ? Math.floor(i/hex_row_h) : i%hex_col_w;
-			// var p = self.data_display[d.idx],
-
-			// 	x_trans = filters_off ? hex_coords.x : device_off ? padding.left : (self.w -hex_area_w)/3,
-			// 	y_trans = filters_off ? hex_coords.y : device_off ? (self.h -hex_area_h)/1.75 : padding.top,
-
-			// 	x_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? (p.ratio_agg*hex_area_w) +(d.idx*hex_pad) +(d.idx*hex_pad_sub) : 0,
-			// 	y_trans_micro = filters_off ? 0 : device_off && p.ratio_agg ? 0 : (p.ratio_agg*hex_area_h) +(d.idx*hex_pad) +(d.idx*hex_pad_sub);
 
 			x = self.freeze_focus.pos.y;
 			y = self.freeze_focus.pos.x;
@@ -1199,7 +1233,7 @@ class generateVisualization{
 	}
 	calc_hex_linear_radius(_count,_area){
 		var self = this;
-		var hex_bound = 50,
+		var hex_bound = 100,
 			hex_count = _count <hex_bound ? hex_bound : _count,
 			hex_area = _area/hex_count;
 		return Math.floor(Math.sqrt(((hex_area/6)*4)/Math.sqrt(3)));
@@ -1280,8 +1314,7 @@ class generateVisualization{
 		obj.rating = self.util_resolve_rating_to_number(document.getElementById('input_rating').value);
 		obj.experience = document.getElementById('input_experience').value;
 
-		//**TODO assign unique ID
-		obj.ID = Math.round(Math.random()*30000);
+		obj.id = Math.round(Math.random()*30000);
 
 		//make sure none are blank
 		if(	obj.gender === ''
@@ -1294,6 +1327,20 @@ class generateVisualization{
 		} else{
 
 			//**TODO submit object to database
+			$.ajax({
+				url: '/wp-admin/admin-ajax.php',
+				type: 'POST',
+				data: f.serialize(),
+				success: function( response ) {
+					//@todo handle errors
+					if( response.new_id == 0 ){
+						result.html( 'Something went wrong with your form submission, please try again!' );
+					}else{
+						result.html( response.message );
+						f.find('.section').hide();							
+					}
+				}
+			});
 
 			self.util_form_clear();
 			//self.util_form_compose_tweet(obj);
@@ -1302,7 +1349,7 @@ class generateVisualization{
 			self.form_alert.classed('hidden',false);
 			//self.form_tweet.classed('hidden',false);
 
-			var url = "www.quantamagazine.org/20161020-science-math-education-survey/?code=" +obj.ID,
+			var url = "www.quantamagazine.org/20161020-science-math-education-survey/?code=" +obj.id,
 				lnk = "<a href='http://" +url +"'>" +url +"</a>",
 				str = "Thank you! Your survey response will be available here once it has been approved: " +lnk;
 			//alert(str);
@@ -1324,7 +1371,7 @@ class generateVisualization{
 		_obj.rating = +_obj.rating;
 
 		// str_begin = 'I' +self.util_resolve_rating_to_sentence(_obj.rating) +' because "',
-		// str_end = '..." Share your story at www.quantamagazine.org/?code=' +_obj.ID +'. #PencilsDown';
+		// str_end = '..." Share your story at www.quantamagazine.org/?code=' +_obj.id +'. #PencilsDown';
 
 		//if needed, truncate experience blurb
 		// var str_length = str_begin.length +_obj.experience.length +str_end.length;
@@ -1504,7 +1551,7 @@ class generateVisualization{
 	}
 	util_setURL(){
 		var self = this;
-		var path = '?mode=' +self.modes[self.mode] +(self.freeze ? '&code=' +self.freeze_focus.ID : '');
+		var path = '?mode=' +self.modes[self.mode] +(self.freeze ? '&code=' +self.freeze_focus.id : '');
 
 		if(self.filters.length === 0){ window.history.pushState("", document.title, path); }
 	}
