@@ -26,6 +26,7 @@ class generateVisualization{
 		this.form_visible = false,
 
 		this.unique_countries = {};
+		this.country_limit = 3;
 
 		//buckets for each attribute
 		this.buckets_age = ['<18', '18-33', '34-49', '50-65', '>65'];
@@ -579,9 +580,9 @@ class generateVisualization{
 		countries_menu_items
 			.on('click',function(d){
 				d3.event.stopPropagation();
-				if(d3.select(this).classed('selected') || self.buckets_country.length <5){
+				if(d3.select(this).classed('selected') || self.buckets_country.length <self.country_limit){
 					self.filter(this.parentNode.parentNode,this);
-					d3.select('#country_count').text(5 -self.buckets_country.length);
+					d3.select('#country_count').text(self.country_limit -self.buckets_country.length);
 				}
 			});
 		countries_menu_items.exit().remove();
@@ -1127,7 +1128,7 @@ class generateVisualization{
 				if(btn_id === 'country'){
 					self.buckets_country = [];
 					d3.selectAll('#country .option').classed('selected',false);
-					d3.select('#country_count').text(5);
+					d3.select('#country_count').text(self.country_limit);
 				}
 			}
 
@@ -1246,7 +1247,7 @@ class generateVisualization{
 		self.filters = [];
 		self.buckets_country = [];
 		
-		d3.select('#country_count').text(5);
+		d3.select('#country_count').text(self.country_limit);
 
 		self.btn_filters
 			.classed('selected',false)
