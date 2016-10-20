@@ -1349,7 +1349,7 @@ class generateVisualization{
 						//self.form_tweet.classed('hidden',false);
 
 						var url = "www.quantamagazine.org/20161020-science-math-education-survey/?code=" +response.new_id,
-							lnk = "<a href='http://" +url +"'>" +url +"</a>",
+							lnk = url,
 							str = "Thank you! Your survey response will be available here once it has been approved: " +lnk;
 						//alert(str);
 						self.form_alert.select('#submit_message').html('<span>' +str +'</span>');
