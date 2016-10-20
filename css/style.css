@@ -637,7 +637,7 @@ select:-moz-focusring {
 .form {
 	z-index:10000;
 	display:block;
-	position:absolute;
+	position:fixed;
 	background:white;
 	width:500px;
 	margin:0 auto;
@@ -997,6 +997,10 @@ input.second {
 		font-size:0.65rem;
 		}
 
+	#anno {
+		z-index:10;
+		}
+
 	#anno #hover_tweet {
 		display:none;
 		margin:15px;
@@ -1156,6 +1160,10 @@ input.second {
 		font-size:0.725rem;
 		}
 
+	#anno {
+		z-index:1000000;
+		}
+
 	#anno #hover_tweet {
 		display:block;
 		margin:15px;
@@ -1313,6 +1321,10 @@ input.second {
 		}
 	.hexLabel.sub {
 		font-size:0.725rem;
+		}
+
+	#anno {
+		z-index:1000000;
 		}
 
 	#anno #hover_tweet {
