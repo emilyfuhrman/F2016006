@@ -1309,16 +1309,16 @@ class generateVisualization{
 		var obj = {};
 
 		//gather values into new data object
-		obj.subject = self.modes[self.mode];
+		obj.type = self.modes[self.mode];
 		obj.name = document.getElementById('input_name').value;
 		obj.gender = document.getElementById('input_female').checked ? 'F' : document.getElementById('input_male').checked ? 'M' : '';
-		obj.country = document.getElementById('input_country').value;
-		obj.age = document.getElementById('input_age').value;
-		obj.grade = document.getElementById('input_grade').value;
-		obj.rating = self.util_resolve_rating_to_number(document.getElementById('input_rating').value);
-		obj.experience = document.getElementById('input_experience').value;
+		obj.input_country = document.getElementById('input_country').value;
+		obj.input_age = document.getElementById('input_age').value;
+		obj.input_grade = document.getElementById('input_grade').value;
+		obj.input_rating = self.util_resolve_rating_to_number(document.getElementById('input_rating').value);
+		obj.input_experience = document.getElementById('input_experience').value;
 
-		obj.id = Math.round(Math.random()*30000);
+//		obj.id = Math.round(Math.random()*30000);
 
 		//make sure none are blank
 		if(	obj.gender === ''
@@ -1329,35 +1329,34 @@ class generateVisualization{
 			|| obj.experience === ''){
 			alert('Please fill out form completely.')
 		} else{
+			obj.action = 'edin_form_submit';
 
 			//**TODO submit object to database
 			$.ajax({
 				url: '/wp-admin/admin-ajax.php',
 				type: 'POST',
-				data: f.serialize(),
+				data: $.param(obj),
 				success: function( response ) {
 					//@todo handle errors
 					if( response.new_id == 0 ){
-						result.html( 'Something went wrong with your form submission, please try again!' );
+						self.form_alert.select('#submit_message').html('<span>Something went wrong with your form submission, please try again!</span>');
 					}else{
-						result.html( response.message );
-						f.find('.section').hide();							
+						self.util_form_clear();
+						//self.util_form_compose_tweet(obj);
+
+						self.form.classed('hidden',true);
+						self.form_alert.classed('hidden',false);
+						//self.form_tweet.classed('hidden',false);
+
+						var url = "www.quantamagazine.org/20161020-science-math-education-survey/?code=" +response.new_id,
+							lnk = "<a href='http://" +url +"'>" +url +"</a>",
+							str = "Thank you! Your survey response will be available here once it has been approved: " +lnk;
+						//alert(str);
+						self.form_alert.select('#submit_message').html('<span>' +str +'</span>');
 					}
 				}
 			});
 
-			self.util_form_clear();
-			//self.util_form_compose_tweet(obj);
-
-			self.form.classed('hidden',true);
-			self.form_alert.classed('hidden',false);
-			//self.form_tweet.classed('hidden',false);
-
-			var url = "www.quantamagazine.org/20161020-science-math-education-survey/?code=" +obj.id,
-				lnk = "<a href='http://" +url +"'>" +url +"</a>",
-				str = "Thank you! Your survey response will be available here once it has been approved: " +lnk;
-			//alert(str);
-			self.form_alert.select('#submit_message').html('<span>' +str +'</span>');
 		}
 	}
 	util_form_compose_tweet(_obj){
