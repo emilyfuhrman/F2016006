@@ -848,6 +848,10 @@ input.second {
 		width:100%;
 		}
 
+	.form .section {
+		padding:15px 0;
+		}
+
 	.form .tag {
 		width:40%;
 		}
@@ -1015,6 +1019,10 @@ input.second {
 		width:500px;
 		}
 
+	.form .section {
+		padding:30px 0;
+		}
+
 	.form .tag {
 		width:auto;
 		}
@@ -1176,6 +1184,10 @@ input.second {
 
 	.form {
 		width:500px;
+		}
+
+	.form .section {
+		padding:30px 0;
 		}
 
 	.form .tag {
