@@ -1206,7 +1206,7 @@ class generateVisualization{
 			.classed('comment_block',true);
 		comments
 			.html(function(d){
-				var str = '<span class="mobile_comment_user">Grade ' +d.grade +' rating: ' +d.rating +'/5 &#124; ' +self.util_resolve_gender(d.gender) +', ' +d.age +', ' +d.country +'</span><span>&ldquo;' +d.comment +'&rdquo;</span>';
+				var str = '<span class="mobile_comment_user">' +(d.name ? d.name : self.util_resolve_gender(d.gender)) +', ' +d.age +', from ' +d.country +', has' +self.util_resolve_rating_to_sentence(d.rating,true) +' since ' +self.util_resolve_grade(d.grade).toLowerCase() + '</span><span>&ldquo;' +d.comment +'&rdquo;</span>';
 				return str;
 			})
 			.style('border-bottom',function(d){
