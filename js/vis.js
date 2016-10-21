@@ -1305,6 +1305,7 @@ class generateVisualization{
 		});
 	}
 	util_form_submit(){
+		
 		var self = this;
 		var obj = {};
 
@@ -1322,13 +1323,15 @@ class generateVisualization{
 
 		//make sure none are blank
 		if(	obj.gender === ''
-			|| obj.country === ''
-			|| obj.age === ''
-			|| obj.grade === ''
-			|| obj.rating === ''
-			|| obj.experience === ''){
+			|| obj.input_country === ''
+			|| obj.input_age === ''
+			|| obj.input_grade === ''
+			|| obj.input_rating === ''
+			|| obj.input_experience === ''){
 			alert('Please fill out form completely.')
-		} else{
+		} else if(isNaN(parseFloat(obj.input_age)) && !isFinite(obj.input_age)) {
+			alert('Please input a valid age');
+		} else {
 			obj.action = 'edin_form_submit';
 
 			//**TODO submit object to database
